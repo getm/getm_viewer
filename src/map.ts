@@ -3,8 +3,9 @@ import './getm.css';
 import * as ol from 'openlayers';
 import * as $ from 'jquery';
 import 'jqueryui';
+import { x } from "./sig";
 //import {getmPopup} from './getm';
-import {x} from './sig';
+
 // var read = new XMLHttpRequest();
 // read.open('GET', 'nav.html', false);
 // read.send();

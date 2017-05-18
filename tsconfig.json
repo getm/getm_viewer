@@ -1,6 +1,5 @@
 {
     "compilerOptions": {
-        // "baseUrl": "./",
         "outDir": "./source_maps/",
         "sourceMap": true,
         "allowJs": true,
@@ -11,9 +10,6 @@
         "types": [
             "openlayers"
         ],
-        // "paths": {
-        //     "*": ["*"]
-        // },
         "lib": [
             "dom",
             "es5",

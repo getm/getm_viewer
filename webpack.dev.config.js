@@ -6,6 +6,7 @@ const config = {
         path: path.resolve(__dirname, 'dist'),
         filename: 'map.bundle.js'
     },
+    resolve: { extensions: ['.ts', '.js'] },
     module: {
         rules: [
             {test: /\.css$/, use: ['style-loader', 'css-loader']},
