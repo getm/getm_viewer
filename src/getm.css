@@ -8,16 +8,64 @@
     width: 33%;
 }
 
-#deletetShapes {
+#deleteShapes {
     float: left;
     width: 33%;
 }
 
 #layer{
-    top: 0px;
-    left: 0px;
+    padding-left: 10px;
+    padding-bottom: 30px;
 }
 
 select{
     color: #000;
+    width: 90%;
+}
+
+.popuptext {
+    padding: 40px;
+}
+.popup {
+    position: fixed;
+    height: 50%;
+    width: 50%;
+    top:25%;
+    bottom:25%;
+    left: 25%;
+    right:25%;
+    z-index: -1;
+    -webkit-user-drag: element;
+
+}
+
+/* The actual popup */
+.popup .popuptext {
+    padding: 10px;
+    visibility: hidden;
+    /*width: 160px;*/
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    /*padding: 8px 0;*/
+    position: absolute;
+    top:0;
+    bottom:0;
+    left: 0;
+    right:0;
+    margin:auto;
+}
+
+/* Toggle this class - hide and show the popup */
+.popup .show {
+    visibility: visible;
+    -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s;
+}
+
+.getm-window{
+    padding-right:5px;
+    padding-bottom:25px;
 }

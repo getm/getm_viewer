@@ -45,48 +45,6 @@ body{
     display: block;
 }
 
-.popup {
-    position: fixed;
-    height: 50%;
-    width: 50%;
-    top:25%;
-    bottom:25%;
-    left: 25%;
-    right:25%;
-    z-index: -1;
-     -webkit-user-drag: element;
-    /*display: inline-block;
-    cursor: pointer;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;*/
-}
-
-/* The actual popup */
-.popup .popuptext {
-    visibility: hidden;
-    /*width: 160px;*/
-    background-color: #555;
-    color: #fff;
-    text-align: center;
-    border-radius: 6px;
-    /*padding: 8px 0;*/
-    position: absolute;
-    top:0;
-    bottom:0;
-    left: 0;
-    right:0;
-    margin:auto;
-}
-
-/* Toggle this class - hide and show the popup */
-.popup .show {
-    visibility: visible;
-    -webkit-animation: fadeIn 1s;
-    animation: fadeIn 1s;
-}
-
 .ol-popup {
     position: absolute;
     background-color: white;
@@ -128,17 +86,77 @@ body{
 }
 .ol-popup-closer:after {
     content: "\2716";
-}.insertShapes {
+}#insertShapes {
     float: left;
     width: 33%;
 }
 
-.updateShapes {
+#updateShapes {
     float: left;
     width: 33%;
 }
 
-.deletetShapes {
+#deletetShapes {
     float: left;
     width: 33%;
+}
+
+#layer{
+    top: 0px;
+    left: 0px;
+}
+
+select{
+    color: #000;
+}
+
+
+.popup {
+    position: fixed;
+    height: 50%;
+    width: 50%;
+    top:25%;
+    bottom:25%;
+    left: 25%;
+    right:25%;
+    z-index: -1;
+     -webkit-user-drag: element;
+    /*display: inline-block;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;*/
+}
+
+/* The actual popup */
+.popup .popuptext {
+    padding: 10px;
+    visibility: hidden;
+    /*width: 160px;*/
+    background-color: #555;
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+            border: 1px solid #ccc;
+    /*padding: 8px 0;*/
+    position: absolute;
+    top:0;
+    bottom:0;
+    left: 0;
+    right:0;
+    margin:auto;
+}
+
+/* Toggle this class - hide and show the popup */
+.popup .show {
+    visibility: visible;
+    -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s;
+}
+
+
+.getm-window{
+    padding-right:5px;
+    padding-bottom:25px;
 }

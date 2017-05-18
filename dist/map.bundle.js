@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 8);
+/******/ 	return __webpack_require__(__webpack_require__.s = 9);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -10328,141 +10328,6 @@ return jQuery;
 
 /***/ }),
 /* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(4);
-__webpack_require__(3);
-var ol = __webpack_require__(6);
-var $ = __webpack_require__(0);
-__webpack_require__(5);
-//import {a} from './x';
-var container = document.getElementById('popup');
-// overlay for popup messages
-var overlay = new ol.Overlay({
-    element: container,
-    autoPan: true
-});
-overlay.setPosition(undefined);
-// drawing shapes
-var source = new ol.source.Vector({ wrapX: false });
-var vector = new ol.layer.Vector({ source: source });
-// map
-exports.map = new ol.Map({ target: 'map', overlays: [overlay] });
-exports.map.setView(new ol.View({
-    center: [0, 0],
-    zoom: 2
-}));
-var osmSource = new ol.source.OSM();
-var osmLayer = new ol.layer.Tile({ source: osmSource });
-var USGSTopoSource = new ol.source.OSM({
-    url: "http://129.206.228.72/cached/osm/service/",
-});
-var USGSTopoLayer = new ol.layer.Tile({ source: USGSTopoSource });
-exports.map.addLayer(osmLayer);
-//map.addLayer(USGSTopoLayer);
-exports.map.addLayer(vector);
-// TODO: wrap this in a method/button thing
-var draw;
-function drawFunction() {
-    if (draw == undefined) {
-        var value = 'Circle';
-        var geometryFunction = ol.interaction.Draw.createBox();
-        draw = new ol.interaction.Draw({
-            source: source,
-            type: "Circle",
-            geometryFunction: ol.interaction.Draw.createBox(),
-        });
-        exports.map.addInteraction(draw);
-    }
-    else {
-        exports.map.removeInteraction(draw);
-        draw = undefined;
-    }
-}
-source.on('addfeature', function (evt) {
-    draw.setActive(false);
-    draw = undefined;
-    // not sure what this means
-    document.getElementById('debug').innerHTML = source.getFeatures().pop().getGeometry().getExtent().toString();
-});
-// overlay in the map -- not in use rn
-function myFunc() {
-    if (overlay.getPosition() == undefined) {
-        overlay.setPosition(exports.map.getView().getCenter());
-        var content = document.getElementById('popup-content');
-        var read = new XMLHttpRequest();
-        read.open('GET', 'getm.html', false);
-        read.send();
-        content.innerHTML = read.responseText;
-    }
-}
-function myFunction() {
-    var popup = document.getElementById("popup");
-    var mypopup = document.getElementById("myPopup");
-    // read popup from file
-    var read = new XMLHttpRequest();
-    read.open('GET', 'getm.html', false);
-    read.send();
-    mypopup.innerHTML = read.responseText;
-    // move around the popup
-    $(".popup").draggable();
-    $(".popup").resizable();
-    // z-index workaround
-    if (mypopup.classList.toggle("show"))
-        $('.popup').zIndex(2);
-    else
-        $('.popup').zIndex(-1);
-}
-// opens up the overlay
-var btn = document.createElement('button');
-btn.innerText = 'popup button';
-document.getElementById('button').appendChild(btn);
-btn.onclick = myFunction; //myFunc;
-// draw button
-var drawButton = document.createElement('button');
-drawButton.innerText = 'draw button';
-document.getElementById('draw').appendChild(drawButton);
-drawButton.onclick = drawFunction; //myFunc;
-// closing stuff -- not in use rn
-var closer = document.getElementById('popup-closer');
-closer.onclick = function () {
-    overlay.setPosition(undefined);
-    closer.blur();
-    return false;
-};
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, exports) {
-
-// small nav bar
-//import * as ol from 'openlayers';
-//import {map} from './map';
-// big nav bar
-var read = new XMLHttpRequest();
-read.open('GET', 'nav.html', false);
-read.send();
-document.getElementById('nav').innerHTML = read.responseText;
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 4 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*! jQuery UI - v1.11.1 - 2014-08-13
@@ -26845,7 +26710,242 @@ var tooltip = $.widget( "ui.tooltip", {
 }));
 
 /***/ }),
+/* 2 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+__webpack_require__(6);
+__webpack_require__(5);
+var ol = __webpack_require__(7);
+__webpack_require__(1);
+var sig_1 = __webpack_require__(4);
+var getm_1 = __webpack_require__(3);
+console.log(sig_1.x);
+// var container = document.getElementById('popup');
+// // overlay for popup messages
+// const overlay = new ol.Overlay({
+//     element: container,
+//     autoPan: true
+// });
+// overlay.setPosition(undefined);
+// drawing shapes
+var source = new ol.source.Vector({ wrapX: false });
+var vector = new ol.layer.Vector({ source: source });
+vector.set('selectable', true);
+// map
+//export const map = new ol.Map({target: 'map', overlays:[overlay]});
+exports.map = new ol.Map({ target: 'map' });
+exports.map.setView(new ol.View({
+    center: [0, 0],
+    zoom: 2
+}));
+var osmSource = new ol.source.OSM();
+var osmLayer = new ol.layer.Tile({ source: osmSource });
+var USGSTopoSource = new ol.source.OSM({
+    url: "http://129.206.228.72/cached/osm/service/",
+});
+var USGSTopoLayer = new ol.layer.Tile({ source: USGSTopoSource });
+var selectStyle = new ol.style.Style({
+    stroke: new ol.style.Stroke({
+        color: '#ffccff',
+    })
+});
+exports.map.addLayer(osmLayer);
+//map.addLayer(USGSTopoLayer);
+exports.map.addLayer(vector);
+exports.map.addInteraction(new ol.interaction.Select({
+    layers: function (layer) {
+        return layer.get('selectable') == true;
+    },
+    style: [selectStyle]
+}));
+// TODO: wrap this in a method/button thing
+var draw;
+function drawFunction() {
+    if (draw == undefined) {
+        var value = 'Circle';
+        draw = new ol.interaction.Draw({
+            source: source,
+            type: "Circle",
+            geometryFunction: ol.interaction.Draw.createBox(),
+        });
+        exports.map.addInteraction(draw);
+    }
+    else {
+        exports.map.removeInteraction(draw);
+        draw = undefined;
+    }
+}
+function drawCircle() {
+    if (draw == undefined) {
+        var value = 'Circle';
+        draw = new ol.interaction.Draw({
+            source: source,
+            type: "Circle"
+        });
+        exports.map.addInteraction(draw);
+    }
+    else {
+        exports.map.removeInteraction(draw);
+        draw = undefined;
+    }
+}
+function drawFreeform() {
+    if (draw == undefined) {
+        var value = 'Polygon';
+        draw = new ol.interaction.Draw({
+            source: source,
+            // type: "LineString",
+            type: "Polygon",
+            freehand: true
+        });
+        exports.map.addInteraction(draw);
+    }
+    else {
+        exports.map.removeInteraction(draw);
+        draw = undefined;
+    }
+}
+function drawPolyline() {
+    if (draw == undefined) {
+        var value = 'Polygon';
+        draw = new ol.interaction.Draw({
+            source: source,
+            type: "LineString"
+        });
+        exports.map.addInteraction(draw);
+    }
+    else {
+        exports.map.removeInteraction(draw);
+        draw = undefined;
+    }
+}
+source.on('addfeature', function (evt) {
+    draw.setActive(false);
+    draw = undefined;
+    document.getElementById('debug').innerHTML = source.getFeatures().entries.toString();
+    // not sure what this means
+    // document.getElementById('debug').innerHTML = source.getFeatures().pop().getGeometry().getExtent().toString() + "\n" 
+    // + source.getFeatures().pop().getStyle();
+});
+// overlay in the map -- not in use rn
+// function myFunc () {
+//     if(overlay.getPosition() == undefined) {
+//         overlay.setPosition(map.getView().getCenter());
+//         var content = document.getElementById('popup-content');
+//         var read = new XMLHttpRequest();
+//         read.open('GET', 'getm.html', false);
+//         read.send();
+//         content.innerHTML=read.responseText;
+//     }
+// }
+// var modalBody = document.getElementById("modal-body");
+// // read popup from file
+// var read = new XMLHttpRequest();
+// read.open('GET', 'getm.html', false);
+// read.send();
+// modalBody.innerHTML=read.responseText;
+// opens up the overlay
+var btn = document.createElement('button');
+btn.innerText = 'popup button';
+document.getElementById('button').appendChild(btn);
+btn.onclick = getm_1.getmPopup; //getm.getmPopup;//getmPopup; //myFunc;
+// draw button
+var drawRectButton = document.createElement('button');
+drawRectButton.innerText = 'rectangle';
+document.getElementById('drawRect').appendChild(drawRectButton);
+drawRectButton.onclick = drawFunction; //myFunc;
+var drawCircButton = document.createElement('button');
+drawCircButton.innerText = 'circle';
+document.getElementById('drawCirc').appendChild(drawCircButton);
+drawCircButton.onclick = drawCircle; //myFunc;
+var drawFreeButton = document.createElement('button');
+drawFreeButton.innerText = 'freeform';
+document.getElementById('drawFreeform').appendChild(drawFreeButton);
+drawFreeButton.onclick = drawFreeform; //myFunc;
+var drawLineButton = document.createElement('button');
+drawLineButton.innerText = 'polyline';
+document.getElementById('drawPolyline').appendChild(drawLineButton);
+drawLineButton.onclick = drawPolyline; //myFunc;
+// closing stuff -- not in use rn
+// var closer = document.getElementById('popup-closer');
+// closer.onclick = function() {
+//     overlay.setPosition(undefined);
+//     closer.blur();
+//     return false;
+// };
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var $ = __webpack_require__(0);
+__webpack_require__(1);
+document.getElementById('debug').innerHTML = "SOMETHINGSKJDFKLJDSLFJDS";
+function getmPopup() {
+    var popup = document.getElementById("popup");
+    var mypopup = document.getElementById("myPopup");
+    // z-index workaround
+    if (mypopup.classList.toggle("show")) {
+        // read popup from file
+        var read = new XMLHttpRequest();
+        read.open('GET', 'getm.html', false);
+        read.send();
+        mypopup.innerHTML = read.responseText;
+        var getmCloseBtn = document.createElement('button');
+        getmCloseBtn.className = "close";
+        getmCloseBtn.innerHTML = "&times;";
+        document.getElementById("getm-close").appendChild(getmCloseBtn);
+        getmCloseBtn.onclick = hidePopup;
+        // move around the popup
+        $(".popup").draggable();
+        $(".popup").resizable();
+        $('.popup').zIndex(2);
+    }
+    else {
+        hidePopup();
+    }
+}
+exports.getmPopup = getmPopup;
+function hidePopup() {
+    var mypopup = document.getElementById("myPopup");
+    mypopup.classList.toggle("show");
+    $('.popup').zIndex(-1);
+}
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+// big nav bar
+//alert("<p>words</p>");
+exports.x = 1;
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
 /* 6 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global) {var require;var require;var require;var require;var require;var require;var require;var require;// OpenLayers. See https://openlayers.org/
@@ -27869,10 +27969,10 @@ Qk.prototype.changed=Qk.prototype.s;Qk.prototype.dispatchEvent=Qk.prototype.b;Qk
 }));
 
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports) {
 
 var g;
@@ -27899,10 +27999,9 @@ module.exports = g;
 
 
 /***/ }),
-/* 8 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(1);
 module.exports = __webpack_require__(2);
 
 
