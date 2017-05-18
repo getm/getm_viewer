@@ -1,0 +1,23 @@
+#insertShapes {
+    float: left;
+    width: 33%;
+}
+
+#updateShapes {
+    float: left;
+    width: 33%;
+}
+
+#deletetShapes {
+    float: left;
+    width: 33%;
+}
+
+#layer{
+    top: 0px;
+    left: 0px;
+}
+
+select{
+    color: #000;
+}

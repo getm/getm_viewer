@@ -1,0 +1,30 @@
+{
+    "compilerOptions": {
+        // "baseUrl": "./",
+        "outDir": "./source_maps/",
+        "sourceMap": true,
+        "allowJs": true,
+        "noImplicitAny": false,
+        "module": "commonjs",
+        "target": "es5",
+        "jsx": "react",
+        "types": [
+            "openlayers"
+        ],
+        // "paths": {
+        //     "*": ["*"]
+        // },
+        "lib": [
+            "dom",
+            "es5",
+            "es2015.promise",
+            "es2015.iterable"
+        ]
+    },
+    "awesomeTypescriptLoaderOptions": {
+        "useCache": false
+    },
+    "include": [
+        "./src/**/*"
+    ]
+}

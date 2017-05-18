@@ -1,0 +1,46 @@
+<!doctype html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>New Map</title>
+    <link rel="stylesheet" type="text/css" href="map.css"/>
+    <link rel="stylesheet" type="text/css" href="bootstrap.min.css"/>
+
+</head>
+
+<body >
+    <div id="app" class="">
+        <!-- Navigation -->
+        <div id="nav" class="something"></div>
+        <div id="button" ></div>
+        <div id="mySidenav" class="sidenav">
+            <div id="drawRect"></div>
+            <div id="drawCirc"></div>
+            <div id="drawFreeform"></div>
+            <div id="drawPolyline"></div>
+            <div id="drawMarker"></div>
+        </div>
+        
+        <div id="debug"></div>
+        <br/><br/><br/>
+
+        <div class="popup" draggable="true">         
+            <div class="popuptext" id="myPopup" draggable="true"></div>
+        </div>
+
+
+
+        <br/><br/><br/><br/><br/><br/>
+
+        <div id="map"></div>
+        <!--<div id="popup" class="ol-popup">
+            <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+        <div id="popup-content"></div>-->
+    </div>
+
+    </div>
+    <script src="map.bundle.js"></script>
+    <script src="jquery-3.2.1.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+</body>
