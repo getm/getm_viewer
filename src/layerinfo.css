@@ -1,21 +1,27 @@
 #layerInfoPopup {
-    /*position: absolute;*/
-    /*top:50px;
-    left:33%;*/
     width: auto;
     margin: auto;
+    top: 50px;
+    height: 50%;
     
-
+}
+#layerInfoPopup:before {
+    height: 50%;
 }
 
+#layerInfoPopup:after {
+    position: fixed;
+    height: max-content;
+}
 #layerInfoPopupText {
     margin: 0px;
     min-width: 200px;
-    
+    height: 100%;
+    padding-bottom: 40px;
+    padding-right: 10px;
 }
 
 #layerinfoform {
- /*width: 90%;*/
  padding: 10px;
  width: 100%;
 }
@@ -23,16 +29,6 @@
 .layerinfoselect {
     width:auto;
 }
-.wrapper{
-    overflow-x: hidden;
-    height: 90%;
-    overflow-y: auto;
-    display: inline-block; 
-}
-
-/*#layerInfoPopupText select {
-    color: #000;
-}*/
 
 .wrong {
     border: 2px solid red;

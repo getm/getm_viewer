@@ -1,0 +1,18 @@
+.page-contents{
+    top:50px;
+    position:absolute;
+    /*height: 100%;*/
+    width: 100%;
+    background-color: #ddf;
+}
+
+body{
+    padding-top: 50px /* nav bar has height of 50px */
+}
+.window-contents {
+    background-color: #fde; /* for debugging #555 for final*/
+    overflow-x:hidden;
+    overflow-y: auto;
+    border-radius: 6px;
+    height: 100%;
+}

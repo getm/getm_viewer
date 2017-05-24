@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 17);
+/******/ 	return __webpack_require__(__webpack_require__.s = 16);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -11625,7 +11625,7 @@ Qk.prototype.changed=Qk.prototype.s;Qk.prototype.dispatchEvent=Qk.prototype.b;Qk
 }));
 
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(16)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(15)))
 
 /***/ }),
 /* 3 */
@@ -11635,7 +11635,7 @@ Qk.prototype.changed=Qk.prototype.s;Qk.prototype.dispatchEvent=Qk.prototype.b;Qk
 
 Object.defineProperty(exports, "__esModule", { value: true });
 var $ = __webpack_require__(0);
-__webpack_require__(15);
+__webpack_require__(14);
 __webpack_require__(12);
 var config_1 = __webpack_require__(7);
 var draw_1 = __webpack_require__(1);
@@ -12406,7 +12406,7 @@ exports.utils = {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-__webpack_require__(14);
+// import './map.css';
 var ol = __webpack_require__(2);
 // drawing shapes
 exports.source = new ol.source.Vector();
@@ -12419,7 +12419,7 @@ exports.map = new ol.Map({
 });
 exports.map.setView(new ol.View({
     // projection: 'EPSG:900913',
-    projection: 'EPSG:4326',
+    // projection: 'EPSG:4326',
     center: [0, 0],
     zoom: 2
 }));
@@ -12496,12 +12496,6 @@ exports.navSetup = navSetup;
 
 /***/ }),
 /* 14 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_FACTORY__, __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*! jQuery UI - v1.11.1 - 2014-08-13
@@ -28884,7 +28878,7 @@ var tooltip = $.widget( "ui.tooltip", {
 }));
 
 /***/ }),
-/* 16 */
+/* 15 */
 /***/ (function(module, exports) {
 
 var g;
@@ -28911,7 +28905,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 17 */
+/* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports = __webpack_require__(6);

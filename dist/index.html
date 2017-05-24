@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>New Map</title>
     <link rel="stylesheet" type="text/css" href="map.css"/>
+    <link rel="stylesheet" type="text/css" href="index.css"/>
     <link rel="stylesheet" type="text/css" href="bootstrap.min.css"/>
     <link rel="stylesheet" href="https://openlayers.org/en/v4.1.1/css/ol.css" type="text/css">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -13,38 +14,36 @@
 <body >
     <div id="app" class="">
         <!-- Navigation -->
-        <div id="nav" class="something"></div>
-        <br/>
-        <center>
-            <div id="getmButton" ></div> 
-            <div id="drawButton"></div>
-        </center>
-        <br/>
-        <!--TODO: create a button that summons this draw popup-->
-        <!--<div class="popup" id="drawPopup">
-            <div class="popuptext" id="drawPopupText">
-                <div id="drawRect"></div>
-                <div id="drawCirc"></div>
-                <div id="drawFreeform"></div>
-                <div id="drawPolyline"></div>
-                <div id="drawMarker">TODO</div>
-                <div id="delete"></div>
+        <div id="nav"></div><br/>
+
+        <div class='page-contents'> 
+            <center>
+                <div id="getmButton" ></div> 
+                <div id="drawButton"></div>
+            </center>
+            <br/>
+            <!--TODO: create a button that summons this draw popup-->
+            <!--<div class="popup" id="drawPopup">
+                <div class="popuptext" id="drawPopupText">
+                    <div id="drawRect"></div>
+                    <div id="drawCirc"></div>
+                    <div id="drawFreeform"></div>
+                    <div id="drawPolyline"></div>
+                    <div id="drawMarker">TODO</div>
+                    <div id="delete"></div>
+                </div>
+            </div>-->       
+
+            <div class="popup" id="getmPopup" >         
+                <div class="popuptext" id="getmPopupText" ></div>
             </div>
-        </div>-->       
 
-        <div class="popup" id="getmPopup" >         
-            <div class="popuptext" id="getmPopupText" ></div>
+            <div id="map"></div><br/>
+            <div id="debug"></div>
+            <!--<div id="popup" class="ol-popup">
+                <a href="#" id="popup-closer" class="ol-popup-closer"></a>
+            <div id="popup-content"></div>-->
         </div>
-
-        <!--<br/><br/><br/><br/><br/><br/>-->
-
-        <div id="map"></div>
-        <br/>
-        <div id="debug"></div>
-        <!--<div id="popup" class="ol-popup">
-            <a href="#" id="popup-closer" class="ol-popup-closer"></a>
-        <div id="popup-content"></div>-->
-    </div>
 
     </div>
     <script src="map.bundle.js"></script>

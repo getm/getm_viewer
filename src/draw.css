@@ -1,19 +1,29 @@
 #drawPopup {
-    width: 100px;
-    height: 230px;
-    min-width: 100px;
-    min-height: 230px;
+    width: max-content;
+    height:250px;
+    display:unset;
+    top:25%;
+    bottom: 25%;
+}
+
+
+#drawPopup:before {
+    height: 250px;
+}
+
+#drawPopup:after {
+    position: fixed;
+    height: max-content;
+}
+
+#drawPopupText{
+    height: 100%;
+    padding-bottom: 40px;
+    padding-right: 10px;
 }
 
 #drawPopupText button {
     color: #000;
-
-}
-
-.wrapper{
-    overflow-x:hidden;
-    height: 90%;
-        overflow-y: auto;
 }
 
 input {

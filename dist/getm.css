@@ -13,14 +13,6 @@
     width: 33%;
 }
 
-#getm-text-container {
-    background-color: #555;
-    overflow: auto;
-    border-radius: 6px;
-    height:90%;
-    width: max-content;
-}
-
 #layer{
     padding-left: 10px;
     padding-bottom: 30px;
@@ -34,43 +26,27 @@ select{
 
 .popuptext {
     padding: 40px;
-}
+    border: green 2px solid; /*for debugging*/
+} 
 
 .popup {
     position: fixed;
     z-index: -1;
     -webkit-user-drag: element;
+    min-width: 40px;
+    min-height: 40px;
+    border: blue 2px solid; /*for debugging*/
 }
-#getmPopupText{
-    width: max-content;
-}
-#getmPopup{
-    /*height: 50%;*/
-    /*width: 50%;*/
-    width: max-content;
-    top:25%;
-    bottom:25%;
-    /*left: 25%;
-    right:25%;*/
-}
-
 /* The actual popup */
 .popup .popuptext {
     padding: 10px;
     visibility: hidden;
-    /*width: 160px;*/
     background-color: #faa; /*find suitable color later*/
     color: #fff;
     text-align: center;
     border-radius: 6px;
     border: 1px solid #ccc;
-    /*padding: 8px 0;*/
-    position: absolute;
-    top:0;
-    bottom:0;
-    /*left: 0;
-    right:0;*/
-    margin:auto;
+    margin: 0;
 }
 
 #debug {
@@ -84,7 +60,97 @@ select{
     animation: fadeIn 1s;
 }
 
+#getmPopupText{
+    height: 100%;
+    padding-bottom: 40px;
+    padding-right: 10px;
+}
+
+#getmPopup:before {
+    height: max-content;
+}
+
+#getmPopup:after {
+    position: fixed;
+    width: max-content;
+}
+
+#getmPopup{
+    display: unset;
+    width: 50%;
+    height: 500px;
+
+    left: 25%;
+    right: 25%;
+}
+
+
 .getm-window{
     padding-right:5px;
     padding-bottom:25px;
+}
+#drawPopup {
+    width: max-content;
+    height:250px;
+    display:unset;
+    top:25%;
+    bottom: 25%;
+}
+
+
+#drawPopup:before {
+    height: 250px;
+}
+
+#drawPopup:after {
+    position: fixed;
+    height: max-content;
+}
+
+#drawPopupText{
+    height: 100%;
+    padding-bottom: 40px;
+    padding-right: 10px;
+}
+
+#drawPopupText button {
+    color: #000;
+}
+
+input {
+    color: #77f;
+}#layerInfoPopup {
+    width: auto;
+    margin: auto;
+    top: 50px;
+    height: 50%;
+    
+}
+#layerInfoPopup:before {
+    height: 50%;
+}
+
+#layerInfoPopup:after {
+    position: fixed;
+    height: max-content;
+}
+#layerInfoPopupText {
+    margin: 0px;
+    min-width: 200px;
+    height: 100%;
+    padding-bottom: 40px;
+    padding-right: 10px;
+}
+
+#layerinfoform {
+ padding: 10px;
+ width: 100%;
+}
+
+.layerinfoselect {
+    width:auto;
+}
+
+.wrong {
+    border: 2px solid red;
 }
