@@ -1,7 +1,30 @@
-import './map.css';
+// import './map.css';
 import * as ol from 'openlayers';
-// import * as $ from 'jquery';
-// import 'jqueryui';
+
+// drawing shapes
+export var source = new ol.source.Vector();
+var vector = new ol.layer.Vector({source: source});
+vector.set('selectable', true);
+
+// map
+export const map = new ol.Map({
+    target: 'map',
+    controls: ol.control.defaults().extend([new ol.control.FullScreen()])
+});
+
+map.setView(new ol.View({
+    // projection: 'EPSG:900913',
+    // projection: 'EPSG:4326',
+    center: [0, 0],
+    zoom: 2
+}));
+
+const osmSource = new ol.source.OSM();
+const osmLayer = new ol.layer.Tile({source: osmSource});
+
+map.addLayer(osmLayer);
+map.addLayer(vector);
+
 
 // var container = document.getElementById('popup');
 
@@ -11,30 +34,12 @@ import * as ol from 'openlayers';
 //     autoPan: true
 // });
 // overlay.setPosition(undefined);
-
-// drawing shapes
-export var source = new ol.source.Vector({wrapX: false});
-var vector = new ol.layer.Vector({source: source});
-vector.set('selectable', true);
-// map
 //export const map = new ol.Map({target: 'map', overlays:[overlay]});
-export const map = new ol.Map({target: 'map'});
-map.setView(new ol.View({
-    center: [0, 0],
-    zoom: 2
-}));
-
-const osmSource = new ol.source.OSM();
-const osmLayer = new ol.layer.Tile({source: osmSource});
-
 // const USGSTopoSource = new ol.source.OSM({
 //     url : "http://129.206.228.72/cached/osm/service/",
 // })
 // const USGSTopoLayer = new ol.layer.Tile({source: USGSTopoSource});
-
-map.addLayer(osmLayer);
 //map.addLayer(USGSTopoLayer);
-map.addLayer(vector);
 
 // overlay in the map -- not in use rn
 // function myFunc () {

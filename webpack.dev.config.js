@@ -23,6 +23,12 @@ const config = {
             chunks: false,
             colors: true,
             errorDetails: true
+        },
+        proxy: {
+            '/GeoServerRest/**/*': {
+                target: 'http://localhost:8080/',
+                changeOrigin: true
+            }
         }
     }
 };

@@ -1,10 +1,10 @@
-// TODO: wrap this in a method/button thing
 import {source, map} from './map';
 import * as $ from 'jquery';
-import 'jqueryui';
 import * as ol from 'openlayers';
 import './draw.css';
-import './getm.css';
+import {setupShapes} from './getm';
+import {layerInfoPopup, layerInfoMap, fillLayerInfoDefaults} from './layerinfo';
+import {debug} from './config'
 
 // go over which i need
 var draw;
@@ -15,12 +15,12 @@ export var features = {};
 // TODO: do something about the draw functions? really repetitive code
 function drawRectangle() {
     if(draw == undefined) {
-        var value = 'Circle';
         draw = new ol.interaction.Draw({
             source: source,
             type: "Circle",
             geometryFunction: ol.interaction.Draw.createBox(),
         });
+
         draw.on('drawend', function(e) {
             e.feature.setProperties({
                 'id': 'box'+id
@@ -37,7 +37,6 @@ function drawRectangle() {
 
 function drawCircle() {
     if(draw == undefined) {
-        var value = 'Circle';
         draw = new ol.interaction.Draw({
             source: source,
             type: "Circle"
@@ -58,7 +57,6 @@ function drawCircle() {
 
 function drawFreeform() {
     if(draw == undefined) {
-        var value = 'Polygon';
         draw = new ol.interaction.Draw({
             source: source,
             // type: "LineString",
@@ -81,7 +79,6 @@ function drawFreeform() {
 
 function drawPolyline() {
     if(draw == undefined) {
-        var value = 'Polygon';
         draw = new ol.interaction.Draw({
             source: source,
             type: "LineString"
@@ -101,13 +98,33 @@ function drawPolyline() {
 }
 
 function drawDelete() {
-    //source.removeFeature(map.getLayers().item(0).get);
     if(source.getFeatures() == null || source.getFeatures().length == 0) {
         alert("no features");
         return;
     } else {
         selectInteraction.setActive(false);
         deleteInteraction.setActive(true);
+    }
+}
+
+function drawPolygon() {
+    if(draw == undefined) {
+        draw = new ol.interaction.Draw({
+            source: source,
+            type: "Polygon",
+            freehand: false
+        });
+        draw.on('drawend', function(e) {
+            e.feature.setProperties({
+                'id': 'polygon'+id
+            });
+            features['polygon'+id] = e.feature;
+            id++;
+        });
+        map.addInteraction(draw);
+    } else {
+        map.removeInteraction(draw);
+        draw = undefined;
     }
 }
 
@@ -142,37 +159,82 @@ function drawDelete() {
     map.addInteraction(deleteInteraction);
 }
 
+// //TODO: callback function for update shapes
+function submitShapes(form) {
+
+    var s = 'form has ' + form.children.length + 'stuffs<br/>'
+    for(var i = 0; i < form.children.length-1; i++) {
+        s = s +'child ' + (i+1) + ' is ' + form.children[i].firstChild.id + ': ' + form.children[i].firstChild.value 
+        + ' with type ' + form.children[i].firstChild.type +'<br/>'
+    }
+    //var a = document.getElementById('tgt_name').getAttribute('value').toString();
+   // var b = features[a];
+    //s = s + new ol.format.GeoJSON().writeFeature(b);
+    document.getElementById('debug').innerHTML = s;
+    
+     //+ 'child has ' + form.firstChild.children.length + 'stuffs';
+        // 'got feature '+ feature.get('id') + 
+        // ' at position (' + (<MouseEvent>e).screenX + ',' + (<MouseEvent>e).screenY + ')';
+}
+
+// TODO: map right click thing to edit info
+{
+    map.getViewport().addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+        var feature = map.forEachFeatureAtPixel(map.getEventPixel(e),
+            function (feature, layer) {
+                return feature;
+        });
+        if (feature) {
+            // document.getElementById('debug').innerHTML =
+            //     'got feature '+ feature.get('id') + 
+            //     ' at position (' + (<MouseEvent>e).screenX + ',' + (<MouseEvent>e).screenY + ')'; //TODO: popup location??? or just center?
+            (<HTMLInputElement>document.getElementById('tgt_name')).value = feature.get('id');
+            layerInfoPopup();
+
+            var submitlayerinfo = document.getElementById('submitlayerinfo');
+            submitlayerinfo.onclick = function() {submitShapes( document.getElementById('layerinfoform')); /*buildJson();*/};
+        }
+    });
+}
+
+
 // TODO: organize this remove/add feature blurb
 {
     source.on('removefeature', function(e){
-        // alert('removed');
         selectInteraction.setActive(true);
         deleteInteraction.setActive(false);
-
+        setupShapes();
     });
 
     source.on('addfeature', function(evt){
         draw.setActive(false);
         draw = undefined;
-        // selectInteraction.getFeatures().clear();
-        //document.getElementById('debug').innerHTML = source.getFeatures().entries().next().value[1].getGeometryName().toString();
-        // not sure what this means
-        document.getElementById('debug').innerHTML = 'adding: ' + source.getFeatures().pop().get('id')
-            + '<br/>num of objs: ' + Object.keys(features).length
-            + '<br/>' + Object.keys(features).toString()
-            + '<br/>' + source.getFeatures().pop().getGeometry().getExtent().toString();
+        (<HTMLInputElement>document.getElementById('tgt_name')).value = source.getFeatures().pop().get('id');
+        fillLayerInfoDefaults();
+        // TODO: create new page of stuff
+        // if(debug) {
+        //     fillLayerInfoDefaults();
+        //     // , {dataProjection: 'EPSG:900913',featureProjection: 'EPSG:4326'}
+        //     var geojsonfeature = new ol.format.GeoJSON().writeFeature(source.getFeatures().pop());
+        //     document.getElementById('debug').innerHTML = 'adding: ' + source.getFeatures().pop().get('id')
+        //         + '<br/>num of objs: ' + Object.keys(features).length
+        //         + '<br/>' + Object.keys(features).toString()
+        //         + '<br/>' + source.getFeatures().pop().getGeometry().getExtent().toString()
+        //         + '<br/>' + geojsonfeature;
+        // }
+        
+        setupShapes();
     });
 }
 
-// I call hidePopup once... do i need???
-function hidePopup() {
-    var drawPopupText = document.getElementById("drawPopupText");
-    drawPopupText.classList.toggle("show");
-    $('#drawPopup').zIndex(-1);
-}
-
 // TODO: something about organizing this
-function setup() {
+export function drawSetup() {
+    var btn = document.createElement('button');
+    btn.innerText = 'draw';
+    document.getElementById('drawButton').appendChild(btn);
+    btn.onclick = drawPopup;
+
     var app = document.getElementById("app");
     var drawDiv = document.createElement('div');
     var read = new XMLHttpRequest();
@@ -181,56 +243,47 @@ function setup() {
     drawDiv.innerHTML = read.responseText;
     app.appendChild(drawDiv);
     drawDiv.classList.toggle('show');
+    
     drawButtons();
 
-    var drawCloseBtn = document.createElement('button');
-    drawCloseBtn.className = "close";
-    drawCloseBtn.innerHTML = "&times;";
-    document.getElementById("draw-close").appendChild(drawCloseBtn);
-    drawCloseBtn.onclick = hidePopup;
+
 }
 
-export function drawPopup() {
+function drawPopup() {
     var drawPopupText = document.getElementById('drawPopupText')
     if(drawPopupText.classList.toggle("show")) {
         // move around the popup
-        $("#drawPopup").draggable();
-        $("#drawPopup").resizable();
-        $("#drawPopup").zIndex(2);
+        $(drawPopupText.parentElement).draggable();
+        $(drawPopupText.parentElement).resizable({
+            handles: 'all'
+        });
+        $(drawPopupText.parentElement).zIndex(1);
     } 
 }
 
 // TODO: disable all butttons except current selected one
 function disableButtons() {
-
 }
 
 // draw buttons
 function drawButtons() {
-    var drawRectButton = document.createElement('button');
-    drawRectButton.innerText = 'rectangle';
-    document.getElementById('drawRect').appendChild(drawRectButton);
-    drawRectButton.onclick = drawRectangle; 
+    var innerText = [ 'rectangle', 'circle', 'freeform', 'polyline', 'polygon', 'delete'];
+    var elementID = ['drawRect', 'drawCirc', 'drawFreeform', 'drawPolyline', 'drawPolygon', 'delete'];
+    var functions = [drawRectangle, drawCircle, drawFreeform, drawPolyline, drawPolygon, drawDelete];
+    for(var i in innerText) {
+        var button = document.createElement('button');
+        button.innerText = innerText[i];
+        document.getElementById(elementID[i]).appendChild(button);
+        button.onclick = functions[i]; 
+    }
 
-    var drawCircButton = document.createElement('button');
-    drawCircButton.innerText = 'circle';
-    document.getElementById('drawCirc').appendChild(drawCircButton);
-    drawCircButton.onclick = drawCircle;
-
-    var drawFreeButton = document.createElement('button');
-    drawFreeButton.innerText = 'freeform';
-    document.getElementById('drawFreeform').appendChild(drawFreeButton);
-    drawFreeButton.onclick = drawFreeform; 
-
-    var drawLineButton = document.createElement('button');
-    drawLineButton.innerText = 'polyline';
-    document.getElementById('drawPolyline').appendChild(drawLineButton);
-    drawLineButton.onclick = drawPolyline; 
-
-    var deleteButton = document.createElement('button');
-    deleteButton.innerText = 'delete';
-    document.getElementById('delete').appendChild(deleteButton);
-    deleteButton.onclick = drawDelete;
+    var drawCloseBtn = document.createElement('button');
+    drawCloseBtn.className = "close";
+    drawCloseBtn.innerHTML = "&times;";
+    document.getElementById("draw-close").appendChild(drawCloseBtn);
+    drawCloseBtn.onclick = function () {
+        var drawPopupText = document.getElementById("drawPopupText");
+            drawPopupText.classList.toggle("show");
+            $(drawPopupText.parentElement).zIndex(-1);
+    };
 }
-
-setup();

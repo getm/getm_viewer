@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 
 <head>
     <meta charset="utf-8">
@@ -6,7 +6,8 @@
     <title>New Map</title>
     <link rel="stylesheet" type="text/css" href="map.css"/>
     <link rel="stylesheet" type="text/css" href="bootstrap.min.css"/>
-
+    <link rel="stylesheet" href="https://openlayers.org/en/v4.1.1/css/ol.css" type="text/css">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 </head>
 
 <body >
@@ -15,9 +16,10 @@
         <div id="nav" class="something"></div>
         <br/>
         <center>
-            <div id="button" ></div> 
+            <div id="getmButton" ></div> 
             <div id="drawButton"></div>
         </center>
+        <br/>
         <!--TODO: create a button that summons this draw popup-->
         <!--<div class="popup" id="drawPopup">
             <div class="popuptext" id="drawPopupText">
@@ -28,10 +30,7 @@
                 <div id="drawMarker">TODO</div>
                 <div id="delete"></div>
             </div>
-        </div>-->
-        
-
-        <br/>
+        </div>-->       
 
         <div class="popup" id="getmPopup" >         
             <div class="popuptext" id="getmPopupText" ></div>
@@ -51,4 +50,5 @@
     <script src="map.bundle.js"></script>
     <script src="jquery-3.2.1.min.js"></script>
     <script src="bootstrap.min.js"></script>
+     <!--<script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>-->
 </body>
