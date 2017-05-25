@@ -1,17 +1,19 @@
 import * as $ from 'jquery';
 import 'jqueryui';
-import './getm.css';
+import './css/getm.css';
 import {debug} from './config';
-import {source} from './map';
+import {source, currLayer} from './map';
 import {features} from './draw';
 import {GeoServerRestInterface} from './gsRestService';
-import {layerInfoMap} from './layerinfo';
-
+import {layerInfoMap, layerInfoPopup} from './layerinfo';
+import {getmFiltersSetup} from './getmFilters';
 // for debugging
 document.getElementById('debug').innerHTML = "Debug Texts Go Here";
 
 // remembers info, regenerate only if changes made to map
 export function getmSetup() {
+    getmFiltersSetup();
+
     var btn = document.createElement('button');
     btn.innerText = 'getm';
     document.getElementById('getmButton').appendChild(btn);
@@ -23,14 +25,15 @@ export function getmSetup() {
     read.send();
     getmPopupText.innerHTML=read.responseText;
 
+
     // populate layer select
-    var layerSelect = document.getElementById('layer-select');
-    for (var x of ['asdf', 'qwerty', 'dvorak']) //TODO: select the layers from somewhere
-    {
-        var layerOpt = document.createElement('option');
-        layerOpt.innerHTML = x;
-        layerSelect.appendChild(layerOpt);
-    }
+    // var layerSelect = document.getElementById('layer-select');
+    // for (var x of ['tm_prime', 'qwerty', 'dvorak']) //TODO: select the layers from somewhere
+    // {
+    //     var layerOpt = document.createElement('option');
+    //     layerOpt.innerHTML = x;
+    //     layerSelect.appendChild(layerOpt);
+    // }
 
     // fill out inside of the windows stuff
     setupShapes();
@@ -44,7 +47,7 @@ export function getmSetup() {
 
     // move around the popup
     $(getmPopupText.parentElement).draggable();
-    $(getmPopupText.parentElement).resizable({
+    $(getmPopupText).resizable({
         handles: 'all'
     });
     
@@ -58,7 +61,7 @@ export function setupShapes() {
 
     // sort entries into appropriate columns
     for(var f in features) {
-        console.log('working on feature ' + f);
+        console.log('working on feature ' + f + ' with layer ' + JSON.stringify(layerInfoMap[f]));
         if(layerInfoMap[f].objectID == -1)
             insertEntries.push(f);
         else {
@@ -96,6 +99,10 @@ export function setupShapes() {
         for (var x of shapeEntries[a]) {
             var opt = document.createElement('option');
             opt.innerHTML = x;
+            opt.ondblclick = function(){
+                (<HTMLInputElement>document.getElementById('tgt_name')).value = this.innerHTML;
+                layerInfoPopup();
+            };
             select.appendChild(opt);
         }
 
@@ -174,7 +181,7 @@ function buildDelete() {
         var entry= {};
         entry['id'] = selectedOptions[option].text;
         entry['objectID'] =  JSON.stringify(layerInfoMap[selectedOptions[option].text]['objectID']);
-        entry['name'] = 'tm_prime';
+        entry['name'] = currLayer;
         records.push(JSON.stringify(entry));
     }
     return {'records':records};

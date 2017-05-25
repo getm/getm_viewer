@@ -1,7 +1,7 @@
 import {source, map} from './map';
 import * as $ from 'jquery';
 import * as ol from 'openlayers';
-import './draw.css';
+import './css/draw.css';
 import {setupShapes} from './getm';
 import {layerInfoPopup, layerInfoMap, fillLayerInfoDefaults} from './layerinfo';
 import {debug} from './config'
@@ -167,9 +167,6 @@ function submitShapes(form) {
         s = s +'child ' + (i+1) + ' is ' + form.children[i].firstChild.id + ': ' + form.children[i].firstChild.value 
         + ' with type ' + form.children[i].firstChild.type +'<br/>'
     }
-    //var a = document.getElementById('tgt_name').getAttribute('value').toString();
-   // var b = features[a];
-    //s = s + new ol.format.GeoJSON().writeFeature(b);
     document.getElementById('debug').innerHTML = s;
     
      //+ 'child has ' + form.firstChild.children.length + 'stuffs';
@@ -180,6 +177,7 @@ function submitShapes(form) {
 // TODO: map right click thing to edit info
 {
     map.getViewport().addEventListener('contextmenu', function (e) {
+        // console.log('asdf');
         e.preventDefault();
         var feature = map.forEachFeatureAtPixel(map.getEventPixel(e),
             function (feature, layer) {
@@ -192,8 +190,7 @@ function submitShapes(form) {
             (<HTMLInputElement>document.getElementById('tgt_name')).value = feature.get('id');
             layerInfoPopup();
 
-            var submitlayerinfo = document.getElementById('submitlayerinfo');
-            submitlayerinfo.onclick = function() {submitShapes( document.getElementById('layerinfoform')); /*buildJson();*/};
+            document.getElementById('submitlayerinfo').onclick = function() {submitShapes( document.getElementById('layerinfoform')); /*buildJson();*/};
         }
     });
 }
@@ -254,7 +251,7 @@ function drawPopup() {
     if(drawPopupText.classList.toggle("show")) {
         // move around the popup
         $(drawPopupText.parentElement).draggable();
-        $(drawPopupText.parentElement).resizable({
+        $(drawPopupText).resizable({
             handles: 'all'
         });
         $(drawPopupText.parentElement).zIndex(1);

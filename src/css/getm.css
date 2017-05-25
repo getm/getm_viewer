@@ -1,0 +1,54 @@
+#insertShapes {
+    float: left;
+    width: 33%;
+}
+
+#updateShapes {
+    float: left;
+    width: 33%;
+}
+
+#deleteShapes {
+    float: left;
+    width: 33%;
+}
+
+#layer{
+    padding-left: 10px;
+    padding-bottom: 30px;
+    padding-right: 10px;
+}
+
+select{
+    color: #000;
+    width: 90%;
+}
+
+
+#debug {
+    padding: 30px;
+}
+
+/* Toggle this class - hide and show the popup */
+
+#getmPopupText.popuptext{
+    height: 100%;
+}
+
+#getmPopup.popup:before {
+    height: max-content;
+}
+
+#getmPopup.popup:after {
+    position: fixed;
+    width: max-content;
+}
+
+#getmPopup.popup{
+    display: unset;
+    width: 50%;
+    height: 500px;
+
+    left: 25%;
+    right: 25%;
+}

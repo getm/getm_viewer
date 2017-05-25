@@ -1,4 +1,4 @@
-#drawPopup {
+#drawPopup.popup {
     width: max-content;
     height:250px;
     display:unset;
@@ -6,26 +6,27 @@
     bottom: 25%;
 }
 
-
-#drawPopup:before {
+#drawPopup.popup:before {
     height: 250px;
 }
 
-#drawPopup:after {
+#drawPopup.popup:after {
     position: fixed;
     height: max-content;
 }
 
-#drawPopupText{
+#drawPopupText.popuptext{
     height: 100%;
-    padding-bottom: 40px;
-    padding-right: 10px;
 }
 
-#drawPopupText button {
+#drawPopupText.popuptext button {
     color: #000;
 }
 
 input {
     color: #77f;
+}
+
+.draw-contents{
+    padding: 10px;
 }

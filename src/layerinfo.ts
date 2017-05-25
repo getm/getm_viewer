@@ -1,9 +1,10 @@
-import './layerinfo.css'
+import './css/layerinfo.css'
 import * as $ from 'jquery';
 import * as ol from 'openlayers';
 import {features} from './draw';
 import {utils} from './getmValidation/getmUtils';
 import {GeoServerRestInterface} from './gsRestService';
+import {currLayer} from './map';
 
 export var layerInfoMap = {};
 var required;
@@ -21,20 +22,12 @@ var required;
 
 function setRequired(response) {
     response = JSON.parse(response);
-    required = response['properties']['tm_prime']['required'];
+    required = response['properties'][currLayer]['required'];
 }
 
 export function layerInfoPopup(){
-    var layerInfoPopupText = document.getElementById('layerInfoPopupText');
-    if(layerInfoPopupText.classList.toggle("show")) {
-        // move around the popup
-        $(layerInfoPopupText.parentElement).draggable();
-        $(layerInfoPopupText.parentElement).resizable({
-            handles: 'all'
-        });
-        $(layerInfoPopupText.parentElement).zIndex(2);
-    } 
-
+    $('#layerInfoPopupText').addClass('show');
+    $('#layerInfoPopup').zIndex(2);
     var id = (<HTMLInputElement>document.getElementById('tgt_name')).value;
     if(layerInfoMap[id] != undefined)
         retrieveValues();
@@ -101,9 +94,9 @@ function retrieveValues() {
 
     console.log('Map for this layer is: \n' + JSON.stringify(layerInfoMap[id]));
     for(var val in vals){
-        if(layerInfoMap[id]['tm_prime']['properties'][vals[val]] != undefined) {
-            console.log('layer info of ' + id + ' is ' + layerInfoMap[id]['tm_prime']['properties'][vals[val]]['val']);
-            (<HTMLInputElement>document.getElementById(vals[val])).value = layerInfoMap[id]['tm_prime']['properties'][vals[val]]['val'];
+        if(layerInfoMap[id][currLayer]['properties'][vals[val]] != undefined) {
+            console.log('retrieved layer info of ' + id + ' is ' + layerInfoMap[id][currLayer]['properties'][vals[val]]['val']);
+            (<HTMLInputElement>document.getElementById(vals[val])).value = layerInfoMap[id][currLayer]['properties'][vals[val]]['val'];
         } else {
             (<HTMLInputElement>document.getElementById(vals[val])).value = "";
         }
@@ -116,13 +109,16 @@ function assignValues() {
     var id = (<HTMLInputElement>document.getElementById('tgt_name')).value;
     var fields = {};
     var entry = {};
+    // TODO: get select layer
 
     for(var val in vals) {
         if((<HTMLInputElement>document.getElementById(vals[val])).value != undefined 
         && (<HTMLInputElement>document.getElementById(vals[val])).value.length > 0 ) {
             try{
                 fields[vals[val]] =  {'val' : (<HTMLInputElement>document.getElementById(vals[val])).value, 'type': types[val] };
-            } catch(e) {}
+            } catch(e) {
+                console.log('exception in assigning ' + id + ' field ' + vals[val]);
+            }
         }
     }
 
@@ -134,13 +130,14 @@ function assignValues() {
                 geojson['geometry']['coordinates'][coordinate][coord] = normalizeCoord(geojson['geometry']['coordinates'][coordinate][coord]);
         }
     }
-
-    entry['tm_prime'] = {'properties':fields};
+    // var layer = (<HTMLSelectElement>(document.getElementById('layerinfolayer'))).selectedOptions[0].text;
+    entry[currLayer] = {'properties':fields};
     entry['id'] = id;
     entry['geoJson'] = geojson;
     entry['objectID'] = (layerInfoMap[id] == undefined) ? -1 : layerInfoMap[id]['objectID']; // TODO: update flag
 
     layerInfoMap[id] = entry;
+    console.log('assigned values to ' + id);
 }
 
 function normalizeCoord(coord) {
@@ -210,7 +207,7 @@ export function fillLayerInfoDefaults() {
 
 function hideLayerInfoPopup() {
     var layerInfoPopupText = document.getElementById("layerInfoPopupText");
-    layerInfoPopupText.classList.toggle("show");
+    $(layerInfoPopupText).removeClass('show');
     $(layerInfoPopupText.parentElement).zIndex(-1);
 }
 
@@ -229,7 +226,6 @@ function layerInfoSetup(){
     read.send();
     layerInfoDiv.innerHTML = read.responseText;
     app.appendChild(layerInfoDiv);
-    // layerInfoDiv.classList.toggle('show');
 
     $('#submitlayerinfo').click(assignValues);
 
@@ -238,6 +234,11 @@ function layerInfoSetup(){
     layerInfoCloseBtn.innerHTML = "&times;";
     document.getElementById("layerInfo-close").appendChild(layerInfoCloseBtn);
     layerInfoCloseBtn.onclick = hideLayerInfoPopup;
+
+    $('#layerInfoPopup').draggable();
+    $('#layerInfoPopupText').resizable({
+        handles: 'all'
+    });
 }
 
 layerInfoSetup();

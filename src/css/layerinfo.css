@@ -1,24 +1,25 @@
-#layerInfoPopup {
-    width: auto;
+#layerInfoPopup.popup {
+    width: max-content;
     margin: auto;
     top: 50px;
-    height: 50%;
-    
-}
-#layerInfoPopup:before {
-    height: 50%;
+    max-height: max-content;
+    height: 400px;
 }
 
-#layerInfoPopup:after {
+#layerInfoPopup.popup:before {
+    height: 300px;
+}
+
+#layerInfoPopup.popup:after {
     position: fixed;
     height: max-content;
 }
-#layerInfoPopupText {
+
+
+#layerInfoPopupText.popuptext {
     margin: 0px;
     min-width: 200px;
     height: 100%;
-    padding-bottom: 40px;
-    padding-right: 10px;
 }
 
 #layerinfoform {
@@ -30,6 +31,9 @@
     width:auto;
 }
 
+#layerinfolayer {
+    width:auto;
+}
 .wrong {
     border: 2px solid red;
 }

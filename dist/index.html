@@ -3,9 +3,12 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>New Map</title>
-    <link rel="stylesheet" type="text/css" href="map.css"/>
-    <link rel="stylesheet" type="text/css" href="index.css"/>
+    <title>GETM</title>
+    <!--<link rel="stylesheet" type="text/css" href="map.css"/>
+    <link rel="stylesheet" type="text/css" href="getm.css"/>
+    <link rel="stylesheet" type="text/css" href="draw.css"/>
+    <link rel="stylesheet" type="text/css" href="layerinfo.css"/>
+    <link rel="stylesheet" type="text/css" href="index.css"/>-->
     <link rel="stylesheet" type="text/css" href="bootstrap.min.css"/>
     <link rel="stylesheet" href="https://openlayers.org/en/v4.1.1/css/ol.css" type="text/css">
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
@@ -18,21 +21,13 @@
 
         <div class='page-contents'> 
             <center>
-                <div id="getmButton" ></div> 
-                <div id="drawButton"></div>
-            </center>
-            <br/>
-            <!--TODO: create a button that summons this draw popup-->
-            <!--<div class="popup" id="drawPopup">
-                <div class="popuptext" id="drawPopupText">
-                    <div id="drawRect"></div>
-                    <div id="drawCirc"></div>
-                    <div id="drawFreeform"></div>
-                    <div id="drawPolyline"></div>
-                    <div id="drawMarker">TODO</div>
-                    <div id="delete"></div>
-                </div>
-            </div>-->       
+                <span id="getmFilters" class="tempOrganizer"></span>
+                <span class="tempOrganizer">
+                    <div id="getmButton" ></div> 
+                    <div id="drawButton"></div>
+                    <div id="mapButton"></div>
+                </span>
+            </center><br/>
 
             <div class="popup" id="getmPopup" >         
                 <div class="popuptext" id="getmPopupText" ></div>

@@ -16,7 +16,10 @@ const config = {
     },
     plugins: [
         new ExtractTextPlugin('map.css'),
-        new ExtractTextPlugin('getm.css')
+        new ExtractTextPlugin('getm.css'),
+        new ExtractTextPlugin('draw.css'),
+        new ExtractTextPlugin('index.css'),
+        new ExtractTextPlugin('layerinfo.css')
     ],
     devServer: {
         inline: true,
