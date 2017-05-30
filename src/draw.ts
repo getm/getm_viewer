@@ -5,12 +5,12 @@ import './css/draw.css';
 import {setupShapes} from './getm';
 import {layerInfoPopup, layerInfoMap, fillLayerInfoDefaults} from './layerinfo';
 import {debug} from './config'
-
 // go over which i need
 var draw;
 var selectedFeatureID;
 var id = 0;
 export var features = {};
+
 
 // TODO: do something about the draw functions? really repetitive code
 function drawRectangle() {
@@ -189,10 +189,11 @@ function submitShapes(form) {
             //     ' at position (' + (<MouseEvent>e).screenX + ',' + (<MouseEvent>e).screenY + ')'; //TODO: popup location??? or just center?
             (<HTMLInputElement>document.getElementById('tgt_name')).value = feature.get('id');
             layerInfoPopup();
-
+            
             document.getElementById('submitlayerinfo').onclick = function() {submitShapes( document.getElementById('layerinfoform')); /*buildJson();*/};
         }
     });
+    
 }
 
 
@@ -224,6 +225,22 @@ function submitShapes(form) {
         setupShapes();
     });
 }
+
+export function saveShapes() {
+    
+    var a = document.createElement('a');
+    a.download = 'helloworld.kml';
+    
+    var saveButton = document.getElementById('saveBtn');
+    saveButton.appendChild(a);
+    saveButton.onclick = function(){
+        alert('saving id ' + id);
+        var kml = new ol.format.KML().writeFeatures(features[id]);
+        a.href = window.URL.createObjectURL(new Blob([kml], {'type': 'application/octet-stream'}));
+        a.click(); 
+    };
+}
+
 
 // TODO: something about organizing this
 export function drawSetup() {

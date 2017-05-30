@@ -1,4 +1,5 @@
 import * as $ from 'jquery';
+
 function filterSearch() {
     console.log("besearch contains: " + $('#besearch').val());
     console.log("catcode contains: " + $('#catsearch').val());

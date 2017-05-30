@@ -28,6 +28,10 @@ const config = {
             '/GeoServerRest/**/*': {
                 target: 'http://localhost:8080/',
                 changeOrigin: true
+            },
+            '/geoserver/**/*': {
+                target: 'http://localhost:8080/',
+                changeOrigin: true
             }
         }
     }

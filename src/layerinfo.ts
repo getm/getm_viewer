@@ -121,7 +121,7 @@ function assignValues() {
             }
         }
     }
-
+    
     var geojson = new ol.format.GeoJSON().writeFeatureObject(features[id]);
     for(var coordinate in geojson['geometry']['coordinates']) {
         for(var coord in geojson['geometry']['coordinates'][coordinate]) {
@@ -139,6 +139,7 @@ function assignValues() {
     layerInfoMap[id] = entry;
     console.log('assigned values to ' + id);
 }
+
 
 function normalizeCoord(coord) {
     // Lon is the only one that wraps.
