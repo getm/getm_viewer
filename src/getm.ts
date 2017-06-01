@@ -2,7 +2,7 @@ import * as $ from 'jquery';
 import 'jqueryui';
 import './css/getm.css';
 import {debug} from './config';
-import {source, currLayer} from './map';
+import {currShapeLayer} from './map';
 import {features} from './draw';
 import {GeoServerRestInterface} from './gsRestService';
 import {layerInfoMap, layerInfoPopup} from './layerinfo';
@@ -181,7 +181,7 @@ function buildDelete() {
         var entry= {};
         entry['id'] = selectedOptions[option].text;
         entry['objectID'] =  JSON.stringify(layerInfoMap[selectedOptions[option].text]['objectID']);
-        entry['name'] = currLayer;
+        entry['name'] = currShapeLayer;
         records.push(JSON.stringify(entry));
     }
     return {'records':records};

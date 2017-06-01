@@ -2,11 +2,13 @@ import './css/map.css';
 import * as ol from 'openlayers';
 import {debug} from './config';
 import * as $ from 'jquery';
-// drawing shapes
-export var source = new ol.source.Vector();
-var vector = new ol.layer.Vector({source: source});
-vector.set('selectable', true);
+
 const BASE_MAP_LAYER = 0;
+const AIRPORTS_LAYER = 1;
+const ROADS_LAYER = 2;
+const STATE_ROUTES_LAYER = 3;
+const SHAPES_LAYER = 4;
+
 var wfs_airports_source = new ol.source.Vector({
     format: new ol.format.GML3(),
     url: 'http://localhost:9002/' +
@@ -17,6 +19,12 @@ var wfs_airports_source = new ol.source.Vector({
 var wfs_roads_source = new ol.source.Vector({
     format: new ol.format.GML3(),
     url: 'http://localhost:9002/' + 'geoserver/wfs/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=wfs:cl_roads' + '&outputFormat=GML3',
+    strategy: ol.loadingstrategy.bbox
+});
+
+var wfs_state_routes_source = new ol.source.Vector({
+    format: new ol.format.GML3(),
+    url: 'http://localhost:9002/' + 'geoserver/wfs/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=wfs:cl_state_routes' + '&outputFormat=GML3',
     strategy: ol.loadingstrategy.bbox
 });
 
@@ -31,14 +39,22 @@ var wfs_airports_layer = new ol.layer.Vector({
     visible: true
 });
 
-
-
 var wfs_roads_layer = new ol.layer.Vector({
     source: wfs_roads_source,
     style: new ol.style.Style({
         stroke: new ol.style.Stroke({
             color: 'rgba(255, 0, 0, 1.0)',
-            // color: 'rgba(0, 0, 0, 1.0)',
+            width: 2
+        })
+    }),
+    visible: true
+});
+
+var wfs_state_routes_layer = new ol.layer.Vector({
+    source: wfs_state_routes_source,
+    style: new ol.style.Style({
+        stroke: new ol.style.Stroke({
+            color: 'rgba(0, 255, 0, 1.0)',
             width: 2
         })
     }),
@@ -71,9 +87,7 @@ var styles = [
     'ordnanceSurvey'
 ];
 
-
-const osmSource = new ol.source.OSM();
-const osmLayer = new ol.layer.Tile({source: osmSource});
+const osmLayer = new ol.layer.Tile({source: new ol.source.OSM()});
 const test0Layer = new ol.layer.Tile({
     source: new ol.source.BingMaps({
         key: 'AujpfmQXbCtjzvhFvRij8xuM4AMDhnOjUec2XypfwBTDMyWAR8qr_y2WyHrWX_OG',
@@ -83,160 +97,136 @@ const test0Layer = new ol.layer.Tile({
 const test1Layer = new ol.layer.Tile({
     source: new ol.source.Stamen({layer: 'watercolor'})
 });
-
-
-// TODO: configure this to GML2(1.0.0) or GML3(1.1.0)
-var aSource = new ol.source.Vector({
-    format: new ol.format.GML3(),
-    url: 'http://localhost:9002/' +
-    'geoserver/wfs/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=wfs:cl_airports&maxFeatures=50' + '&outputFormat=GML3',
-    strategy: ol.loadingstrategy.bbox
-});
-
-var aLayer = new ol.layer.Vector({
-    source: aSource,
-    style: new ol.style.Style({
-        stroke: new ol.style.Stroke({
-        color: 'rgba(0, 0, 255, 1.0)',
-        width: 2
-        })
-    })
-});
-
-
-// TODO: split vector into different subcategories. depending on the layer we are on....?
-// maybe keep vector as the unassigned ones and the other layers as the actually assigned oens...? or create new assigned ones. 
-var osmLayerGroup = new ol.layer.Group({
-    layers: [osmLayer, vector, wfs_airports_layer, new ol.layer.Vector()]
-});
-var test0LayerGroup = new ol.layer.Group({
-    layers: [test0Layer, vector]
-});
-var test1LayerGroup = new ol.layer.Group({
-    layers: [test1Layer, vector]
-});
-var test2LayerGroup = new ol.layer.Group({
-    layers: [osmLayer,vector,wfs_airports_layer, wfs_roads_layer]
-});
-
-// var test3LayerGroup = new ol.layer.Group({
-//     layers: [test3Layer]
-// });
-var b = 0;
-
-map.setLayerGroup(osmLayerGroup);
-console.log('osm layer');
-//map.addLayer(osmLayer);
-// map.addLayer(testLayer);
-// map.addLayer(vector);
-
-var button = document.createElement('button');
-button.innerHTML = "switch map";
-button.onclick = function(){
-    if(b % 4 == 0) {
-        map.setLayerGroup(osmLayerGroup);
-        console.log('osm layer');
-    } else if(b % 4 == 1){
-        map.setLayerGroup(test0LayerGroup);
-        console.log('test layer 0');
-    } else if(b % 4 == 2){
-        map.setLayerGroup(test1LayerGroup);
-        console.log('test layer 1');
-    } else {
-        map.setLayerGroup(test2LayerGroup);
-        console.log('test layer 2');
-    }
-    b++;
-};
-
-document.getElementById('mapButton').appendChild(button);
-
-// TODO: find way to assign this value.
-export var currLayer = 'tm_prime';
-var layerOptions = ['tm_prime', 'layer0', 'layer1', 'layer2'];
-
-// function setLayer() {
-//     switch(currLayer) {
-//         case 'tm_prime': 
-//     }
-// }
-
-export function populateLayers(){
-    var layerSelect = document.getElementsByClassName('layer-select');
-
-    var select = document.createElement('select');
-    for( var i = 0; i < layerOptions.length; i++) {
-        var opt = document.createElement('option');
-        opt.innerHTML=layerOptions[i];
-        opt.value = layerOptions[i];
-        select.appendChild(opt);
-    }
-    select.value = currLayer;
-
-    for(var i = 0; i < layerSelect.length; i++) {
-        layerSelect[i].innerHTML = ""; // clear contents
-        var cln = select.cloneNode(true);
-        (<HTMLSelectElement>cln).onchange = function(){
-            currLayer = (<HTMLSelectElement>this).value; 
-             
-            console.log(currLayer);
-                if((<HTMLSelectElement>this).selectedIndex % 4 == 0) {
-                    console.log('osm layer ' + (<HTMLSelectElement>this).selectedIndex);
-                    map.getLayerGroup().getLayers().setAt(BASE_MAP_LAYER, osmLayerGroup);
-                    console.log('osm layer');
-                } else if((<HTMLSelectElement>this).selectedIndex % 4 == 1){
-                    console.log('test layer 0 ' + (<HTMLSelectElement>this).selectedIndex);
-                    map.getLayerGroup().getLayers().setAt(BASE_MAP_LAYER, test0LayerGroup);
-                    console.log('test layer 0');
-                } else if((<HTMLSelectElement>this).selectedIndex % 4 == 2){
-                    console.log('test layer 1 ' + (<HTMLSelectElement>this).selectedIndex );
-                    map.getLayerGroup().getLayers().setAt(BASE_MAP_LAYER, test1LayerGroup);
-                } else {
-                    map.setLayerGroup(test2LayerGroup);
-                    console.log('test layer 2');
-                }
-
-        };
-        layerSelect[i].appendChild(cln);
-    }
+export var shapeSource;
+var shapeLayerOptions = ['tm_prime', 'tm_prod', 'tm_release'];
+var shapeLayers = {};
+export var shapeSources = {};
+for(var i = 0; i < shapeLayerOptions.length; i++) {
+    var source = new ol.source.Vector();
+    shapeSources[shapeLayerOptions[i]] = source;
+    var vector = new ol.layer.Vector({source: source});
+    vector.set('selectable', true);
+    shapeLayers[shapeLayerOptions[i]] = vector;
 }
 
-// var container = document.getElementById('popup');
+shapeSource = shapeSources[shapeLayerOptions[0]];
+var shapeLayer = shapeLayers[shapeLayerOptions[0]];
 
-// // overlay for popup messages
-// const overlay = new ol.Overlay({
-//     element: container,
-//     autoPan: true
-// });
-// overlay.setPosition(undefined);
-//export const map = new ol.Map({target: 'map', overlays:[overlay]});
-// const USGSTopoSource = new ol.source.OSM({
-//     url : "http://129.206.228.72/cached/osm/service/",
-// })
-// const USGSTopoLayer = new ol.layer.Tile({source: USGSTopoSource});
-//map.addLayer(USGSTopoLayer);
+var layers = [osmLayer, new ol.layer.Vector(), new ol.layer.Vector(), new ol.layer.Vector(), shapeLayer];
 
-// overlay in the map -- not in use rn
-// function myFunc () {
-//     if(overlay.getPosition() == undefined) {
-//         overlay.setPosition(map.getView().getCenter());
-//         var content = document.getElementById('popup-content');
-//         var read = new XMLHttpRequest();
-//         read.open('GET', 'getm.html', false);
-//         read.send();
-//         content.innerHTML=read.responseText;
-//     }
+var layerGroup = new ol.layer.Group({
+    layers: layers
+});
+
+// TODO: find way to assign this value.
+var mapLayerOptions = ['layer0', 'layer1', 'layer2'];
+export var currMapLayer = mapLayerOptions[0];
+export var currShapeLayer = shapeLayerOptions[0];
+
+function populateMap() {
+    var mapLayerSelect = document.getElementsByClassName('layer-select');
+    var mapSelect = document.createElement('select');
+    for( var i = 0; i < mapLayerOptions.length; i++) {
+        var opt = document.createElement('option');
+        opt.innerHTML=mapLayerOptions[i];
+        opt.value = mapLayerOptions[i];
+        mapSelect.appendChild(opt);
+    }
+    mapSelect.value = currMapLayer;
+
+    for(var i = 0; i < mapLayerSelect.length; i++) {
+        mapLayerSelect[i].innerHTML = ""; // clear contents
+        var cln = mapSelect.cloneNode(true);
+        (<HTMLSelectElement>cln).onchange = function(){
+            currMapLayer = (<HTMLSelectElement>this).value; 
+             
+            console.log(currMapLayer);
+            if((<HTMLSelectElement>this).selectedIndex % 3 == 0) {
+                console.log('osm layer ' + (<HTMLSelectElement>this).selectedIndex);
+                map.getLayerGroup().getLayers().setAt(BASE_MAP_LAYER, osmLayer);
+            } else if((<HTMLSelectElement>this).selectedIndex % 3 == 1){
+                console.log('test layer 0 ' + (<HTMLSelectElement>this).selectedIndex);
+                map.getLayerGroup().getLayers().setAt(BASE_MAP_LAYER, test0Layer);
+            } else {
+                console.log('test layer 1 ' + (<HTMLSelectElement>this).selectedIndex );
+                map.getLayerGroup().getLayers().setAt(BASE_MAP_LAYER, test1Layer);
+            }
+        };
+        mapLayerSelect[i].appendChild(cln);
+    }
+
+    // toggle airports
+    $('#airports_checkbox').click(function(){
+        if((<HTMLInputElement>document.getElementById('airports_checkbox')).checked) {
+            map.getLayerGroup().getLayers().setAt(AIRPORTS_LAYER, wfs_airports_layer);
+        } else {
+            map.getLayerGroup().getLayers().setAt(AIRPORTS_LAYER, new ol.layer.Vector());
+        }
+    });
+
+    // toggle roads
+    $('#roads_checkbox').click(function(){
+        if((<HTMLInputElement>document.getElementById('roads_checkbox')).checked) {
+            map.getLayerGroup().getLayers().setAt(ROADS_LAYER, wfs_roads_layer);
+        } else {
+            map.getLayerGroup().getLayers().setAt(ROADS_LAYER, new ol.layer.Vector());
+        }
+    });
+
+    // toggle state routes
+    $('#state_routes_checkbox').click(function(){
+        if((<HTMLInputElement>document.getElementById('state_routes_checkbox')).checked) {
+            map.getLayerGroup().getLayers().setAt(STATE_ROUTES_LAYER, wfs_state_routes_layer);
+        } else {
+            map.getLayerGroup().getLayers().setAt(STATE_ROUTES_LAYER, new ol.layer.Vector());
+        }
+    });
+}
+
+// let asdf = (window as any).asdf; 
+// if(!asdf) {
+//     (window as any).asdf = {};
+//     asdf = (window as any).asdf;
 // }
-
-// closing stuff -- not in use rn
-// var closer = document.getElementById('popup-closer');
-// closer.onclick = function() {
-//     overlay.setPosition(undefined);
-//     closer.blur();
-//     return false;
-// };
+// asdf['b'] = 'B';
+// console.log(asdf);
 
 
+function populateShape(){
+    // shape layers
+    var shapeLayerSelect = document.getElementsByClassName('shape-layer-select');
+    var shapeSelect = document.createElement('select');
+    for( var i = 0; i < shapeLayerOptions.length; i++) {
+        var opt = document.createElement('option');
+        opt.innerHTML=shapeLayerOptions[i];
+        opt.value = shapeLayerOptions[i];
+        shapeSelect.appendChild(opt);
+    }
+    shapeSelect.value = currShapeLayer;
+
+    for(var i = 0; i < shapeLayerSelect.length; i++) {
+        shapeLayerSelect[i].innerHTML = ""; // clear contents
+        var cln = shapeSelect.cloneNode(true);
+        (<HTMLSelectElement>cln).onchange = function(){
+            currShapeLayer = (<HTMLSelectElement>this).value; 
+            console.log(currShapeLayer);
+
+            console.log('shape layer ' + (<HTMLSelectElement>this).selectedIndex);
+            map.getLayerGroup().getLayers().setAt(SHAPES_LAYER, shapeLayers[shapeLayerOptions[(<HTMLSelectElement>this).selectedIndex]]);
+            shapeSource = shapeSources[shapeLayerOptions[(<HTMLSelectElement>this).selectedIndex]];
+            console.log(shapeSource);
+        };
+        shapeLayerSelect[i].appendChild(cln);
+    }
+}
+export function populateLayers(){
+    populateMap();
+    populateShape();
+
+    // default: 
+    map.setLayerGroup(layerGroup);
+    console.log('osm layer');
+}
 
 
 

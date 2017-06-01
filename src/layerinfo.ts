@@ -4,7 +4,7 @@ import * as ol from 'openlayers';
 import {features} from './draw';
 import {utils} from './getmValidation/getmUtils';
 import {GeoServerRestInterface} from './gsRestService';
-import {currLayer} from './map';
+import {currShapeLayer} from './map';
 
 export var layerInfoMap = {};
 var required;
@@ -22,7 +22,7 @@ var required;
 
 function setRequired(response) {
     response = JSON.parse(response);
-    required = response['properties'][currLayer]['required'];
+    required = response['properties'][currShapeLayer]['required'];
 }
 
 export function layerInfoPopup(){
@@ -94,13 +94,15 @@ function retrieveValues() {
 
     console.log('Map for this layer is: \n' + JSON.stringify(layerInfoMap[id]));
     for(var val in vals){
-        if(layerInfoMap[id][currLayer]['properties'][vals[val]] != undefined) {
-            console.log('retrieved layer info of ' + id + ' is ' + layerInfoMap[id][currLayer]['properties'][vals[val]]['val']);
-            (<HTMLInputElement>document.getElementById(vals[val])).value = layerInfoMap[id][currLayer]['properties'][vals[val]]['val'];
+        if(layerInfoMap[id][currShapeLayer]['properties'][vals[val]] != undefined) {
+            console.log('retrieved layer info of ' + id + ' is ' + layerInfoMap[id][currShapeLayer]['properties'][vals[val]]['val']);
+            (<HTMLInputElement>document.getElementById(vals[val])).value = layerInfoMap[id][currShapeLayer]['properties'][vals[val]]['val'];
         } else {
             (<HTMLInputElement>document.getElementById(vals[val])).value = "";
         }
     }
+    (<HTMLSelectElement>(document.getElementById('layerinfolayer')).firstChild).value = 
+        Object.keys(layerInfoMap[id]).filter(function(a){return ['id', 'geoJson', 'objectID'].indexOf(a) == -1})[0];
 }
 
 $('#benumber').change(function(){alert('changed');});
@@ -130,11 +132,19 @@ function assignValues() {
                 geojson['geometry']['coordinates'][coordinate][coord] = normalizeCoord(geojson['geometry']['coordinates'][coordinate][coord]);
         }
     }
+    console.log('layer info layer ' + (<HTMLSelectElement>(document.getElementById('layerinfolayer')).firstChild).selectedOptions);
+    var layer = (<HTMLSelectElement>(document.getElementById('layerinfolayer')).firstChild).selectedOptions == undefined ? currShapeLayer : (<HTMLSelectElement>(document.getElementById('layerinfolayer')).firstChild).selectedOptions[0].text;
     // var layer = (<HTMLSelectElement>(document.getElementById('layerinfolayer'))).selectedOptions[0].text;
-    entry[currLayer] = {'properties':fields};
+    entry[layer] = {'properties':fields};
     entry['id'] = id;
     entry['geoJson'] = geojson;
     entry['objectID'] = (layerInfoMap[id] == undefined) ? -1 : layerInfoMap[id]['objectID']; // TODO: update flag
+
+    if (layerInfoMap[id]!=undefined) {
+        var src = Object.keys(layerInfoMap[id]).filter(function(a){return ['id', 'geoJson', 'objectID'].indexOf(a) == -1});
+        console.log(src[0]);
+    }
+
 
     layerInfoMap[id] = entry;
     console.log('assigned values to ' + id);
@@ -163,6 +173,8 @@ function normalizeCoord(coord) {
 
 // TODO: something about this....
 export function fillLayerInfoDefaults() {
+    (<HTMLInputElement>(document.getElementById('layerinfolayer').firstChild)).value = currShapeLayer;
+    console.log('curr shape layer is ' + currShapeLayer);
     (<HTMLInputElement>document.getElementById('benumber')).value = '0000-00000';
     (<HTMLInputElement>document.getElementById('osuffix')).value = 'AS000';
     (<HTMLInputElement>document.getElementById('tgt_coor')).value = '1.2N 1.2E';
@@ -171,18 +183,18 @@ export function fillLayerInfoDefaults() {
     (<HTMLInputElement>document.getElementById('country')).value = 'US';
     (<HTMLInputElement>document.getElementById('label')).value = 'RIDDLER';
     (<HTMLInputElement>document.getElementById('feat_nam')).value = 'FEATURE NAME';
-    (<HTMLInputElement>document.getElementById('out_ty')).value = 'none';
-    (<HTMLInputElement>document.getElementById('notional')).value = '23f';
+    (<HTMLInputElement>document.getElementById('out_ty')).value = 'outlinetype1';
+    (<HTMLInputElement>document.getElementById('notional')).value = 'yes';
     (<HTMLInputElement>document.getElementById('ce_l')).value = '0.0';
     (<HTMLInputElement>document.getElementById('ce_w')).value = '0.0';
     (<HTMLInputElement>document.getElementById('ce_h')).value = '0.0';
-    (<HTMLInputElement>document.getElementById('c_pvchar')).value = 'none';
-    (<HTMLInputElement>document.getElementById('conf_lvl')).value = 'none';
+    (<HTMLInputElement>document.getElementById('c_pvchar')).value = 'as';
+    (<HTMLInputElement>document.getElementById('conf_lvl')).value = 'Confirmed';
     // (<HTMLInputElement>document.getElementById('icod')).value = '2017-02-12';
     (<HTMLInputElement>document.getElementById('icod')).value = '02/12/2017';
     (<HTMLInputElement>document.getElementById('qc_level')).value = '0';
-    (<HTMLInputElement>document.getElementById('class')).value = 'none';
-    (<HTMLInputElement>document.getElementById('release')).value = 'n';
+    (<HTMLInputElement>document.getElementById('class')).value = 'UNCLASSIFIED';
+    (<HTMLInputElement>document.getElementById('release')).value = 'x';
     (<HTMLInputElement>document.getElementById('control')).value = 'none';
     (<HTMLInputElement>document.getElementById('drv_from')).value = 'none';
     (<HTMLInputElement>document.getElementById('c_reason')).value = 'none';
@@ -196,7 +208,7 @@ export function fillLayerInfoDefaults() {
     (<HTMLInputElement>document.getElementById('circ_er')).value = '0.0';
     (<HTMLInputElement>document.getElementById('lin_er')).value = '0.0';
     (<HTMLInputElement>document.getElementById('history')).value = '0';
-    (<HTMLInputElement>document.getElementById('producer')).value = '0';
+    (<HTMLInputElement>document.getElementById('producer')).value = '1';
     (<HTMLInputElement>document.getElementById('analyst')).value = 'none';
     (<HTMLInputElement>document.getElementById('qc')).value = 'none';
     (<HTMLInputElement>document.getElementById('class_by')).value = 'none';
@@ -212,6 +224,10 @@ function hideLayerInfoPopup() {
     $(layerInfoPopupText.parentElement).zIndex(-1);
 }
 
+function assignAndClose(){
+    assignValues();
+    hideLayerInfoPopup();
+}
 
 function layerInfoSetup(){
     $.ajax({
@@ -228,7 +244,7 @@ function layerInfoSetup(){
     layerInfoDiv.innerHTML = read.responseText;
     app.appendChild(layerInfoDiv);
 
-    $('#submitlayerinfo').click(assignValues);
+    $('#submitlayerinfo').click(assignAndClose);
 
     var layerInfoCloseBtn = document.createElement('button');
     layerInfoCloseBtn.className = "close";

@@ -14,4 +14,5 @@ export function getmFiltersSetup() {
 
     // setup button actions
     $('#filterSearchBtn').click(filterSearch);
+
 }
