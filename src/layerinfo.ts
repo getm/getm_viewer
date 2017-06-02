@@ -1,29 +1,28 @@
 import './css/layerinfo.css'
 import * as $ from 'jquery';
 import * as ol from 'openlayers';
-import {features} from './draw';
 import {utils} from './getmValidation/getmUtils';
 import {GeoServerRestInterface} from './gsRestService';
-import {currShapeLayer} from './map';
+import {currShapeLayer, map} from './map';
+import {layerInfoMap, features} from './globals';
 
-export var layerInfoMap = {};
-var required;
-    var vals=['benumber', 'osuffix', 'tgt_coor', 'tgt_name', 'catcode', 
+//var required;
+var vals=['benumber', 'osuffix', 'tgt_coor', 'tgt_name', 'catcode', 
     'country', 'label', 'feat_nam', 'out_ty', 'notional', 'ce_l', 'ce_w', 
     'ce_h', 'c_pvchar', 'conf_lvl', 'icod', 'qc_level', 'class', 'release', 
     'control', 'drv_from', 'c_reason', 'decl_on', 'source', 'c_method', 'doi', 
     'c_date', 'circ_er', 'lin_er', 'history', 'producer', 'analyst', 'qc', 'class_by', 'tot','shape'];
 
-    var types=['java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 
+var types=['java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 
     'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.math.BigDecimal', 'java.math.BigDecimal', 
     'java.math.BigDecimal', 'java.lang.String', 'java.lang.String', 'java.sql.Timestamp', 'java.lang.Short', 'java.lang.String', 'java.lang.String', 
     'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.sql.Timestamp', 
     'java.sql.Timestamp', 'java.math.BigDecimal', 'java.math.BigDecimal', 'java.lang.Short', 'java.lang.Short', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'com.vividsolutions.jts.geom.Geometry'];
 
-function setRequired(response) {
-    response = JSON.parse(response);
-    required = response['properties'][currShapeLayer]['required'];
-}
+// function setRequired(response) {
+//     response = JSON.parse(response);
+//     required = response['properties'][currShapeLayer]['required'];
+// }
 
 export function layerInfoPopup(){
     $('#layerInfoPopupText').addClass('show');
@@ -55,38 +54,38 @@ function typeCheck(val, type) {
     }
 }
 
-function valCheck(fieldName, fieldValue) {
-    switch(fieldName) {
-    case 'benumber':
-        utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
-    case 'osuffix':
-        utils.verifyOSuffix(fieldValue, required.indexOf(fieldName) != -1);
-    case 'tgt_coor':
-        utils.verifyTgtCoord(fieldValue, required.indexOf(fieldName) != -1);
-    case 'tgt_name':
-        //utils.verifyString(fieldValue);
-    case 'catcode':
-        utils.verifyCatcode(fieldValue, required.indexOf(fieldName) != -1);
-    case 'country':
-        utils.verifyCountry(fieldValue, required.indexOf(fieldName) != -1);
-    case 'label':
-        //utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
-    case 'feat_nam':
-        //utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
-    case 'out_ty':
-        //utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
-    case 'notional':
-        //utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
-    case 'ce_l':
-        //utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
-    case 'ce_w':
-        //utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
-    case 'ce_h':
-        //utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);                
-    case 'c_pvchar':
-        utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
-    }
-}
+// function valCheck(fieldName, fieldValue) {
+//     switch(fieldName) {
+//     case 'benumber':
+//         utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
+//     case 'osuffix':
+//         utils.verifyOSuffix(fieldValue, required.indexOf(fieldName) != -1);
+//     case 'tgt_coor':
+//         utils.verifyTgtCoord(fieldValue, required.indexOf(fieldName) != -1);
+//     case 'tgt_name':
+//         //utils.verifyString(fieldValue);
+//     case 'catcode':
+//         utils.verifyCatcode(fieldValue, required.indexOf(fieldName) != -1);
+//     case 'country':
+//         utils.verifyCountry(fieldValue, required.indexOf(fieldName) != -1);
+//     case 'label':
+//         //utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
+//     case 'feat_nam':
+//         //utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
+//     case 'out_ty':
+//         //utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
+//     case 'notional':
+//         //utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
+//     case 'ce_l':
+//         //utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
+//     case 'ce_w':
+//         //utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
+//     case 'ce_h':
+//         //utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);                
+//     case 'c_pvchar':
+//         utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
+//     }
+// }
 
 function retrieveValues() {
     var id = (<HTMLInputElement>document.getElementById('tgt_name')).value;
@@ -94,9 +93,11 @@ function retrieveValues() {
 
     console.log('Map for this layer is: \n' + JSON.stringify(layerInfoMap[id]));
     for(var val in vals){
-        if(layerInfoMap[id][currShapeLayer]['properties'][vals[val]] != undefined) {
-            console.log('retrieved layer info of ' + id + ' is ' + layerInfoMap[id][currShapeLayer]['properties'][vals[val]]['val']);
-            (<HTMLInputElement>document.getElementById(vals[val])).value = layerInfoMap[id][currShapeLayer]['properties'][vals[val]]['val'];
+        console.log(features[id]);
+        console.log(features[id].getProperties());
+        if(layerInfoMap[id][features[id].getProperties()['shapelayer']]['properties'][vals[val]] != undefined) {
+            console.log('retrieved layer info of ' + id + ' is ' + layerInfoMap[id][features[id].getProperties()['shapelayer']]['properties'][vals[val]]['val']);
+            (<HTMLInputElement>document.getElementById(vals[val])).value = layerInfoMap[id][features[id].getProperties()['shapelayer']]['properties'][vals[val]]['val'];
         } else {
             (<HTMLInputElement>document.getElementById(vals[val])).value = "";
         }
@@ -134,7 +135,7 @@ function assignValues() {
     }
     console.log('layer info layer ' + (<HTMLSelectElement>(document.getElementById('layerinfolayer')).firstChild).selectedOptions);
     var layer = (<HTMLSelectElement>(document.getElementById('layerinfolayer')).firstChild).selectedOptions == undefined ? currShapeLayer : (<HTMLSelectElement>(document.getElementById('layerinfolayer')).firstChild).selectedOptions[0].text;
-    // var layer = (<HTMLSelectElement>(document.getElementById('layerinfolayer'))).selectedOptions[0].text;
+
     entry[layer] = {'properties':fields};
     entry['id'] = id;
     entry['geoJson'] = geojson;
@@ -225,17 +226,25 @@ function hideLayerInfoPopup() {
 }
 
 function assignAndClose(){
+    var form =  document.getElementById('layerinfoform'); 
+    var s = 'form has ' + form.children.length + ' stuffs<br/>'
+    for(var i = 0; i < form.children.length-1; i++) {
+        s = s +'child ' + (i+1) + ' is ' + (<HTMLElement>(form.children[i].firstChild)).id + ': ' + (<HTMLInputElement>(form.children[i].firstChild)).value 
+        + ' with type ' + (<HTMLInputElement>(form.children[i].firstChild)).type +'<br/>'
+    }
+    document.getElementById('debug').innerHTML = s;
+
     assignValues();
     hideLayerInfoPopup();
 }
 
 function layerInfoSetup(){
-    $.ajax({
-        type: 'GET',
-        url: GeoServerRestInterface.getLayersUrl(),
-        success: function(response, status, asdf){setRequired(response);},
-        error: function(response, status, asdf){alert("errors: " + status + '\n' + response);}
-    });
+    // $.ajax({
+    //     type: 'GET',
+    //     url: GeoServerRestInterface.getLayersUrl(),
+    //     success: function(response, status, asdf){setRequired(response);},
+    //     error: function(response, status, asdf){alert("errors: " + status + '\n' + response);}
+    // });
     var app = document.getElementById("app");
     var layerInfoDiv = document.createElement('div');
     var read = new XMLHttpRequest();
@@ -255,6 +264,19 @@ function layerInfoSetup(){
     $('#layerInfoPopup').draggable();
     $('#layerInfoPopupText').resizable({
         handles: 'all'
+    });
+
+    map.getViewport().addEventListener('contextmenu', function (e) {
+        e.preventDefault();
+        var feature = map.forEachFeatureAtPixel(map.getEventPixel(e),
+            function (feature, layer) {
+                return feature;
+        });
+        if (feature) {
+            (<HTMLInputElement>document.getElementById('tgt_name')).value = feature.get('id');
+            layerInfoPopup();
+        }
+
     });
 }
 

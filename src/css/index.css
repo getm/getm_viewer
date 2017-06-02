@@ -1,3 +1,7 @@
+.inprogress{
+    background-color: orange;
+}
+
 .page-contents{
     top:50px;
     position:absolute;

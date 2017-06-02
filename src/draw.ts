@@ -1,10 +1,11 @@
-import {shapeSource, shapeSources, map, currShapeLayer} from './map';
+import {shapeSource, map, currShapeLayer} from './map';
 import * as $ from 'jquery';
 import * as ol from 'openlayers';
 import './css/draw.css';
 import {setupShapes} from './getm';
-import {layerInfoPopup, layerInfoMap, fillLayerInfoDefaults} from './layerinfo';
-import {debug} from './config'
+import {fillLayerInfoDefaults} from './layerinfo';
+import {layerInfoMap, features, debug} from './globals';
+
 
 
 // go over which i need
@@ -12,40 +13,9 @@ var draw;
 var selectedFeatureID;
 var id = 0;
 var currShape;
-
-export var features = {};
-// let asdf = (window as any).asdf; 
-// if(!asdf) {
-//     (window as any).asdf = {};
-//     asdf = (window as any).asdf;
-// }
-// asdf['a'] = 'A';
-// console.log(asdf);
+var deleteInteraction, selectInteraction;
 
 // TODO: do something about the draw functions? really repetitive code
-function drawRectangle() {
-    if(draw == undefined) {
-        draw = new ol.interaction.Draw({
-            source: shapeSource,
-            type: "Circle",
-            geometryFunction: ol.interaction.Draw.createBox(),
-        });
-
-        draw.on('drawend', function(e) {
-            e.feature.setProperties({
-                'id': 'box'+id
-            });
-            features['box'+id] = e.feature;
-            id++;
-        });        
-        map.addInteraction(draw);
-    } else {
-        map.removeInteraction(draw);
-        draw = undefined;
-    }
-    addRemoveFeatures();
-}
-
 function drawShape(shape) {
     if(draw == undefined) {
         console.log('draw is undefined and shape is ' + shape);
@@ -63,6 +33,32 @@ function drawShape(shape) {
                     type: "Circle"
                 });
                 break;
+            case 'ellipse':
+                draw = new ol.interaction.Draw({
+                    source: shapeSource,
+                    type: 'Circle',
+                    geometryFunction: function(coordinates, geometry) {
+                        if (!geometry) {
+                            console.log('geom');
+                            geometry =new ol.geom.Circle(null);
+                            
+                        }
+                        console.warn('coordinates reads');
+                        console.log(coordinates[0]);
+                        var a = (coordinates[0][0] - coordinates[1][0]);
+                        a = (a < 0) ? (a * -1): a;
+                        console.log('radius reads ' + a);
+
+                        (<ol.geom.Circle>geometry).setCenterAndRadius([(coordinates[0][0] + coordinates[1][0])/2, (coordinates[0][1] + coordinates[1][1])/2], 
+                            a/2, 
+                            'XY');
+                        ol.geom.Polygon.fromCircle(<ol.geom.Circle>geometry, 0, 0).applyTransform(function(g1, g2, dim){
+                            return g2;
+                        });
+                        return geometry;
+                    }
+                });
+                break;                
             case 'freeform':
                 draw = new ol.interaction.Draw({
                     source: shapeSource,
@@ -93,9 +89,12 @@ function drawShape(shape) {
         if(draw != undefined) {
             draw.on('drawend', function(e) {
                 e.feature.setProperties({
-                    'id': shape+id
+                    'id': shape+id,
+                    'shapelayer': currShapeLayer
                 });
                 features[shape+id] = e.feature;
+                console.log('setting shpae layer to be ' + currShapeLayer);
+                //features[shape+id]['shapelayer'] = currShapeLayer; // TODO: this isn't updating correctly.... see shapeSource?
                 id++;
             });        
             map.addInteraction(draw);
@@ -107,123 +106,29 @@ function drawShape(shape) {
     addRemoveFeatures();
 }
 
-function drawCircle() {
-    if(draw == undefined) {
-        draw = new ol.interaction.Draw({
-            source: shapeSource,
-            type: "Circle"
-        });
-        draw.on('drawend', function(e) {
-            e.feature.setProperties({
-                'id': 'circle'+id
-            });
-            features['circle'+id] = e.feature;
-            id++;
-        });        
-        map.addInteraction(draw);
-    } else {
-        map.removeInteraction(draw);
-        draw = undefined;
-    }
-    addRemoveFeatures();
-}
-
-function drawFreeform() {
-    if(draw == undefined) {
-        draw = new ol.interaction.Draw({
-            source: shapeSource,
-            // type: "LineString",
-            type: "Polygon",
-            freehand: true
-        });
-        draw.on('drawend', function(e) {
-            e.feature.setProperties({
-                'id': 'freeform'+id
-            });
-            features['freeform'+id] = e.feature;
-            id++;
-        });
-        map.addInteraction(draw);
-    } else {
-        map.removeInteraction(draw);
-        draw = undefined;
-    }
-}
-
-function drawPolyline() {
-    if(draw == undefined) {
-        draw = new ol.interaction.Draw({
-            source: shapeSource,
-            type: "LineString"
-        });
-        draw.on('drawend', function(e) {
-            e.feature.setProperties({
-                'id': 'polyline'+id
-            }),
-            features['polyline'+id] = e.feature;
-            id++;
-        });
-        map.addInteraction(draw);
-    } else {
-        map.removeInteraction(draw);
-        draw = undefined;
-    }
-}
-
-function drawDelete() {
-    if(shapeSource.getFeatures() == null || shapeSource.getFeatures().length == 0) {
-        alert("no features");
-        return;
-    } else {
-        selectInteraction.setActive(false);
-        deleteInteraction.setActive(true);
-    }
-}
-
-function drawPolygon() {
-    if(draw == undefined) {
-        draw = new ol.interaction.Draw({
-            source: shapeSource,
-            type: "Polygon",
-            freehand: false
-        });
-        draw.on('drawend', function(e) {
-            e.feature.setProperties({
-                'id': 'polygon'+id
-            });
-            features['polygon'+id] = e.feature;
-            id++;
-        });
-        map.addInteraction(draw);
-    } else {
-        map.removeInteraction(draw);
-        draw = undefined;
-    }
-}
-
 //TODO: clean up select interaction and delete interaction 
-{
-    var selectInteraction = new ol.interaction.Select({
+function setupSelect() {
+    selectInteraction = new ol.interaction.Select({
         layers: function(layer) {
             return layer.get('selectable') == true;
         },
         condition: ol.events.condition.click
     });
     map.addInteraction(selectInteraction);
+}
 
-
-    var deleteInteraction = new ol.interaction.Select({
+function setupDelete(){
+    deleteInteraction = new ol.interaction.Select({
         layers: function(layer) {
             return layer.get('selectable') == true;
         }
     });
+
     deleteInteraction.getFeatures().on('add', function (e){
         selectedFeatureID = e.element.get('id');
         // remove all
         delete features[selectedFeatureID];
         shapeSource.removeFeature(e.element);
-        deleteInteraction.getFeatures().remove(e.element);
-        selectInteraction.getFeatures().remove(e.element);
 
         // debugging statements
         document.getElementById('debug').innerHTML = "deleting: " + selectedFeatureID 
@@ -233,45 +138,10 @@ function drawPolygon() {
     deleteInteraction.setActive(false);
     map.addInteraction(deleteInteraction);
 }
-
 // //TODO: callback function for update shapes
 function submitShapes(form) {
 
-    var s = 'form has ' + form.children.length + 'stuffs<br/>'
-    for(var i = 0; i < form.children.length-1; i++) {
-        s = s +'child ' + (i+1) + ' is ' + form.children[i].firstChild.id + ': ' + form.children[i].firstChild.value 
-        + ' with type ' + form.children[i].firstChild.type +'<br/>'
-    }
-    document.getElementById('debug').innerHTML = s;
-    
-     //+ 'child has ' + form.firstChild.children.length + 'stuffs';
-        // 'got feature '+ feature.get('id') + 
-        // ' at position (' + (<MouseEvent>e).screenX + ',' + (<MouseEvent>e).screenY + ')';
 }
-
-// TODO: map right click thing to edit info
-{
-    map.getViewport().addEventListener('contextmenu', function (e) {
-        e.preventDefault();
-        var feature = map.forEachFeatureAtPixel(map.getEventPixel(e),
-            function (feature, layer) {
-                return feature;
-        });
-        if (feature) {
-            // document.getElementById('debug').innerHTML =
-            //     'got feature '+ feature.get('id') + 
-            //     ' at position (' + (<MouseEvent>e).screenX + ',' + (<MouseEvent>e).screenY + ')'; //TODO: popup location??? or just center?
-            selectedFeatureID = feature.get('id');
-            (<HTMLInputElement>document.getElementById('tgt_name')).value = feature.get('id');
-            (<HTMLInputElement>document.getElementById('layerinfolayer')).value = currShapeLayer;
-            layerInfoPopup();
-            document.getElementById('submitlayerinfo').onclick = function() {
-                submitShapes( document.getElementById('layerinfoform')); 
-            };
-        }
-    });
-}
-
 
 // TODO: organize this remove/add feature blurb
 function addRemoveFeatures() {
@@ -287,22 +157,23 @@ function addRemoveFeatures() {
             draw = undefined;
         }
         (<HTMLInputElement>document.getElementById('tgt_name')).value = shapeSource.getFeatures().pop().get('id');
-        fillLayerInfoDefaults();
+        fillLayerInfoDefaults(); // TODO
         setupShapes();
     });
 }
 
 export function saveShapes() {
-    var a = document.createElement('a');
-    a.download = 'helloworld.kml';
-    var saveButton = document.getElementById('saveBtn');
-    saveButton.appendChild(a);
-    saveButton.onclick = function(){
-        alert('saving id ' + id);
-        var kml = new ol.format.KML().writeFeatures(features[id]);
-        a.href = window.URL.createObjectURL(new Blob([kml], {'type': 'application/octet-stream'}));
-        a.click(); 
-    };
+    console.log('saving');
+    // var a = document.createElement('a');
+    // a.download = 'helloworld.kml';
+    // var saveButton = document.getElementById('saveBtn');
+    // saveButton.appendChild(a);
+    // saveButton.onclick = function(){
+    //     alert('saving id ' + id);
+    //     var kml = new ol.format.KML().writeFeatures(features[id]);
+    //     a.href = window.URL.createObjectURL(new Blob([kml], {'type': 'application/octet-stream'}));
+    //     a.click(); 
+    // };
 }
 
 // TODO: something about organizing this
@@ -320,9 +191,10 @@ export function drawSetup() {
     drawDiv.innerHTML = read.responseText;
     app.appendChild(drawDiv);
     drawDiv.classList.toggle('show');
-    
-    drawButtons();
 
+    drawButtons();
+    setupSelect();
+    setupDelete();
 }
 
 function drawPopup() {
@@ -343,13 +215,17 @@ function disableButtons() {
 
 // draw buttons
 function drawButtons() {
-    var innerText = [ 'rectangle', 'circle', 'freeform', 'polyline', 'polygon', 'delete'];
-    var elementID = ['drawRect', 'drawCirc', 'drawFreeform', 'drawPolyline', 'drawPolygon', 'delete'];
+    var innerText = [ 'rectangle', 'circle', 'freeform', 'polyline', 'polygon', 'ellipse', 'delete'];
+    var elementID = ['drawRect', 'drawCirc', 'drawFreeform', 'drawPolyline', 'drawPolygon', 'drawEllipse', 'delete'];
     for(var i in innerText) {
         var button = document.createElement('button');
         button.innerText = innerText[i];
         document.getElementById(elementID[i]).appendChild(button);
         button.onclick = function(){drawShape(this.innerText);};
+        if(innerText[i] == 'ellipse')
+        {
+            button.className = button.className + ' inprogress';
+        }
     }
 
     var drawCloseBtn = document.createElement('button');

@@ -6,8 +6,8 @@ import './css/index.css';
 import './css/getmFilters.css';
 // opens up the overlay
 
+
 navSetup();
 getmSetup();
 drawSetup();
 m.populateLayers();
-saveShapes();

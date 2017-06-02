@@ -1,14 +1,58 @@
 import * as $ from 'jquery';
 import 'jqueryui';
 import './css/getm.css';
-import {debug} from './config';
-import {currShapeLayer} from './map';
-import {features} from './draw';
+import * as ol from 'openlayers';
 import {GeoServerRestInterface} from './gsRestService';
-import {layerInfoMap, layerInfoPopup} from './layerinfo';
+import {layerInfoPopup} from './layerinfo'; // to something about this?
 import {getmFiltersSetup} from './getmFilters';
+import {layerInfoMap, features, debug} from './globals';
+import {currShapeLayer, shapeSources} from './map';  // todo: take out shape Sources
 // for debugging
 document.getElementById('debug').innerHTML = "Debug Texts Go Here";
+
+function loadSession() {
+    if(localStorage.featureArray){
+        var fao = new ol.format.KML().readFeatures(localStorage.featureArray);
+        for(var i in fao) {
+            console.log(fao[i]);
+            features[fao[i].getProperties().id] = fao[i]; 
+            (<ol.source.Vector>shapeSources[fao[i].getProperties().shapelayer]).addFeature(fao[i]);
+        }
+    }
+    if(localStorage.layerInfoMap){
+        var limo = JSON.parse(localStorage.layerInfoMap);
+        for(var i in limo) {
+            layerInfoMap[limo[i].id] = $.extend(true,{},limo[i]);
+        }
+    }
+}
+
+function saveSession(){
+    var featureArray = [];
+    for(var f in features) {
+        console.log('working on feature ' + f + ' with layer ' + JSON.stringify(layerInfoMap[f]) + ' and shape layer ' + features[f].getProperties()['shapelayer']);
+        if(features[f].getProperties()['shapelayer'] == currShapeLayer || currShapeLayer == 'all') {
+            featureArray.push(features[f]);
+        }
+    }                
+    localStorage.featureArray = new ol.format.KML().writeFeatures(featureArray);
+    localStorage.layerInfoMap = JSON.stringify(layerInfoMap);
+    console.log('session saved');
+}
+
+function saveShapes(){
+    var featureArray = [];
+    for(var f in features) {
+        if(features[f].getProperties()['shapelayer'] == currShapeLayer || currShapeLayer == 'all') {
+            featureArray.push(features[f]);
+        }
+    }                
+    var a = document.createElement('a');
+    a.download = 'helloworld.kml';            
+    var kml = new ol.format.KML().writeFeatures(featureArray);
+    a.href = window.URL.createObjectURL(new Blob([kml], {'type': 'application/octet-stream'}));
+    a.click();         
+}
 
 // remembers info, regenerate only if changes made to map
 export function getmSetup() {
@@ -25,15 +69,7 @@ export function getmSetup() {
     read.send();
     getmPopupText.innerHTML=read.responseText;
 
-
     // populate layer select
-    // var layerSelect = document.getElementById('layer-select');
-    // for (var x of ['tm_prime', 'qwerty', 'dvorak']) //TODO: select the layers from somewhere
-    // {
-    //     var layerOpt = document.createElement('option');
-    //     layerOpt.innerHTML = x;
-    //     layerSelect.appendChild(layerOpt);
-    // }
 
     // fill out inside of the windows stuff
     setupShapes();
@@ -50,7 +86,9 @@ export function getmSetup() {
     $(getmPopupText).resizable({
         handles: 'all'
     });
-    
+    $('#saveBtn').click(saveShapes);
+    $('#saveSessBtn').click(saveSession);
+    $('#loadSessBtn').click(loadSession);
 }
 
 // setup shapes 
@@ -61,12 +99,16 @@ export function setupShapes() {
 
     // sort entries into appropriate columns
     for(var f in features) {
-        console.log('working on feature ' + f + ' with layer ' + JSON.stringify(layerInfoMap[f]));
-        if(layerInfoMap[f].objectID == -1)
-            insertEntries.push(f);
-        else {
-            updateEntries.push(f); // TODO: indicate update stuff
-            deleteEntries.push(f);
+        console.log(currShapeLayer);
+        console.log('working on feature ' + f + ' with layer ' + JSON.stringify(layerInfoMap[f]) + ' and shape layer ' + features[f].getProperties()['shapelayer']);
+        if(features[f].getProperties()['shapelayer'] == currShapeLayer || currShapeLayer == 'all') {
+            console.log(layerInfoMap);
+            if(layerInfoMap[f].objectID == -1)
+                insertEntries.push(f);
+            else {
+                updateEntries.push(f); // TODO: indicate update stuff
+                deleteEntries.push(f);
+            }
         }
     }
 
@@ -159,16 +201,6 @@ function buildUpdate() {
         records.push(JSON.stringify(entry));
     }
     return {'records':records};
-    /*
-    var records = [];
-    for (var feature of Object.keys(features)) {
-        var entry = layerInfoMap[feature];
-        records.push(JSON.stringify(entry));
-    }
-
-    if(debug)
-        document.getElementById('debug').innerHTML = 'submitting information <br/>' + JSON.stringify([ JSON.stringify(entry)]);
-    return {'records':records};*/
 }
 
 function buildDelete() {
@@ -181,7 +213,7 @@ function buildDelete() {
         var entry= {};
         entry['id'] = selectedOptions[option].text;
         entry['objectID'] =  JSON.stringify(layerInfoMap[selectedOptions[option].text]['objectID']);
-        entry['name'] = currShapeLayer;
+        entry['name'] = features[selectedOptions[option].text].getProperties()['shapelayer'];
         records.push(JSON.stringify(entry));
     }
     return {'records':records};
@@ -218,8 +250,6 @@ function insertShapes() {
          success: updateShapesCallback,
          error: function(response, status, asdf){if(debug) console.log("insert errors: " + status + '\n' + response);}
      });
-    // 'got feature '+ feature.get('id') + 
-    // ' at position (' + (<MouseEvent>e).screenX + ',' + (<MouseEvent>e).screenY + ')';
 }
 
 // toggle getm popup
