@@ -98,6 +98,7 @@ const test1Layer = new ol.layer.Tile({
 
 export var shapeSource;
 export var currShapeLayer;
+export var currGetmLayer;
 
 var shapeLayer;
 var shapeLayerOptions = ['tm_prime', 'tm_prod', 'tm_release', 'all'];
@@ -173,6 +174,7 @@ function populateShape(){
     }
 
     currShapeLayer = shapeLayerOptions[0];
+    currGetmLayer = shapeLayerOptions[0];
     shapeSource = shapeSources[currShapeLayer];
     shapeLayer = shapeLayers[currShapeLayer];
 
@@ -191,7 +193,9 @@ function populateShape(){
         (<HTMLSelectElement>shapeLayerSelect[i]).onchange = function(){
             currShapeLayer = (<HTMLSelectElement>this).value; 
             console.log(currShapeLayer);
-
+            if(this.id == 'getm-shape-layer-select') {
+                currGetmLayer = (<HTMLSelectElement>this).value; 
+            }
             console.log('shape layer ' + (<HTMLSelectElement>this).selectedIndex);
             // set other layers false and set this layer true, unless option is all, which case all true
             if((<HTMLSelectElement>this).selectedIndex < (<HTMLSelectElement>this).length -1) {
@@ -206,39 +210,12 @@ function populateShape(){
             }
             // map.getLayerGroup().getLayers().setAt(SHAPES_LAYER, shapeLayers[shapeLayerOptions[(<HTMLSelectElement>this).selectedIndex]]);
             shapeSource = shapeSources[shapeLayerOptions[(<HTMLSelectElement>this).selectedIndex]];
-            console.log(shapeSource);
+            console.log(shapeSource);       
+
+                //setupShapes();     
         };        
     }
-    
 
-    // for(var i = 0; i < shapeLayerSelect.length; i++) {
-    //     shapeLayerSelect[i].innerHTML = ""; // clear contents
-    //     var cln = shapeSelect.cloneNode(true);
-    //     (<HTMLSelectElement>cln).onchange = function(){
-    //         currShapeLayer = (<HTMLSelectElement>this).value; 
-    //         console.log(currShapeLayer);
-
-    //         console.log('shape layer ' + (<HTMLSelectElement>this).selectedIndex);
-    //         // set other layers false
-    //         // set this layer true
-    //         // unless option is all, which case all true
-
-    //         if((<HTMLSelectElement>this).selectedIndex < shapeSelect.length -1) {
-    //             for(var j = 0; j < shapeSelect.length - 1; j++ ){
-    //                 map.getLayerGroup().getLayers().getArray()[SHAPES_LAYER + j].setVisible(false);
-    //             }
-    //             map.getLayerGroup().getLayers().getArray()[SHAPES_LAYER + (<HTMLSelectElement>this).selectedIndex].setVisible(true);
-    //         } else  {
-    //             for(var j = 0; j < shapeSelect.length - 1; j++ ){
-    //                 map.getLayerGroup().getLayers().getArray()[SHAPES_LAYER + j].setVisible(true);
-    //             }
-    //         }
-    //         // map.getLayerGroup().getLayers().setAt(SHAPES_LAYER, shapeLayers[shapeLayerOptions[(<HTMLSelectElement>this).selectedIndex]]);
-    //         shapeSource = shapeSources[shapeLayerOptions[(<HTMLSelectElement>this).selectedIndex]];
-    //         console.log(shapeSource);
-    //     };
-    //     shapeLayerSelect[i].appendChild(cln);
-    // }
 }
 
 export function populateLayers(){
@@ -257,4 +234,5 @@ export function populateLayers(){
     // default: 
     map.setLayerGroup(layerGroup);
     console.log('osm layer');
+    
 }

@@ -14,7 +14,15 @@ var selectedFeatureID;
 var id = 0;
 var currShape;
 var deleteInteraction, selectInteraction;
-
+var style = new ol.style.Style({
+    stroke: new ol.style.Stroke({
+        color: [0, 0, 255, 0.5],
+        width: 2
+    }),
+    fill: new ol.style.Fill({
+        color: 'transparent'
+    })
+});
 // TODO: do something about the draw functions? really repetitive code
 function drawShape(shape) {
     if(draw == undefined) {
@@ -25,18 +33,21 @@ function drawShape(shape) {
                     source: shapeSource,
                     type: "Circle",
                     geometryFunction: ol.interaction.Draw.createBox(),
+                    style: style
                 });
                 break;
             case 'circle':
                 draw = new ol.interaction.Draw({
                     source: shapeSource,
-                    type: "Circle"
+                    type: "Circle",
+                    style: style
                 });
                 break;
             case 'ellipse':
                 draw = new ol.interaction.Draw({
                     source: shapeSource,
                     type: 'Circle',
+                    style: style,
                     geometryFunction: function(coordinates, geometry) {
                         if (!geometry) {
                             console.log('geom');
@@ -63,20 +74,23 @@ function drawShape(shape) {
                 draw = new ol.interaction.Draw({
                     source: shapeSource,
                     type: "Polygon",
+                    style: style,
                     freehand: true
                 });
                 break;
             case 'polyline':
                 draw = new ol.interaction.Draw({
                     source: shapeSource,
-                    type: "LineString"
+                    type: "LineString",
+                    style: style
                 });
                 break;
             case 'polygon':
                 draw = new ol.interaction.Draw({
                     source: shapeSource,
                     type: "Polygon",
-                    freehand: false
+                    freehand: false,
+                    style: style
                 });
                 break;
             case 'delete':
@@ -92,6 +106,7 @@ function drawShape(shape) {
                     'id': shape+id,
                     'shapelayer': currShapeLayer
                 });
+                e.feature.style = style;
                 features[shape+id] = e.feature;
                 console.log('setting shpae layer to be ' + currShapeLayer);
                 //features[shape+id]['shapelayer'] = currShapeLayer; // TODO: this isn't updating correctly.... see shapeSource?

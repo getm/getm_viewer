@@ -8,14 +8,14 @@
             <form  id="layerinfoform"  >
                 <!--<div class="layerinfoselect layer-select" id="layerinfolayer"></div>-->
                 <div class="layerinfoselect " id="layerinfolayer"><select class = "shape-layer-select"></select></div>
-                <div><input type="text" id="benumber" placeholder="benumber" ></div>
-                <div><input type="text" id="osuffix" placeholder="osuffix"></div>
-                <div><input type="text" id="tgt_coor" placeholder="target coordinate"></div>
-                <div><input type="text" id="tgt_name" placeholder="target name"></div>
-                <div><input type="text" id="catcode" placeholder="cat code"></div>
-                <div><input type="text" id="country" placeholder="country code"></div>
-                <div><input type="text" id="label" placeholder="label"></div>
-                <div><input type="text" id="feat_nam" placeholder="feature name"></div>
+                <div><input type="text" id="benumber" placeholder="benumber" class="layerinfoinput"><span class='msg'></span></div>
+                <div><input type="text" id="osuffix" placeholder="osuffix" class="layerinfoinput"><span class='msg'></span></div>
+                <div><input type="text" id="tgt_coor" placeholder="target coordinate" class="layerinfoinput"><span class='msg'></span></div>
+                <div><input type="text" id="tgt_name" placeholder="target name" class="layerinfoinput"><span class='msg'></span></div>
+                <div><input type="text" id="catcode" placeholder="cat code" class="layerinfoinput"><span class='msg'></span></div>
+                <div><input type="text" id="country" placeholder="country code" class="layerinfoinput"><span class='msg'></span></div>
+                <div><input type="text" id="label" placeholder="label" class="layerinfoinput"><span class='msg'></span></div>
+                <div><input type="text" id="feat_nam" placeholder="feature name" class="layerinfoinput"><span class='msg'></span></div>
                 <div><select id="out_ty" placeholder="outline type" class="layerinfoselect">
                     <option> outlinetype1 </option>
                     <option> outlinetype2 </option>
@@ -25,17 +25,17 @@
                     <option> yes </option>
                     <option> no </option>
                 </select></div>
-                <div><input type="number" id="ce_l" placeholder="0.0"></div>
-                <div><input type="number" id="ce_w" placeholder="0.0"></div>
-                <div><input type="number" id="ce_h" placeholder="0.0"></div>
-                <div><input type="text" id="c_pvchar" placeholder="ce pvchar"></div>
+                <div><input type="number" id="ce_l" placeholder="0.0" class="layerinfoinput"><span class='msg'></span></div>
+                <div><input type="number" id="ce_w" placeholder="0.0" class="layerinfoinput"><span class='msg'></span></div>
+                <div><input type="number" id="ce_h" placeholder="0.0" class="layerinfoinput"><span class='msg'></span></div>
+                <div><input type="text" id="c_pvchar" placeholder="ce pvchar" class="layerinfoinput"><span class='msg'></span></div>
                 <div><select id="conf_lvl" class="layerinfoselect">
                     <option> Confirmed </option>
                     <option> Probable </option>
                     <option> Possible </option>
                 </select></div>
-                <div><input type="text" id="icod" placeholder="icod"></div>
-                <div><input type="text" id="qc_level" placeholder="ce pvchar"></div>
+                <div><input type="text" id="icod" placeholder="icod" class="layerinfoinput"><span class='msg'></span></div>
+                <div><input type="text" id="qc_level" placeholder="ce pvchar" class="layerinfoinput"><span class='msg'></span></div>
                 <div><select id="class" class="layerinfoselect">
                     <option> UNCLASSIFIED </option>
                     <option> SUPER CLASSIFIED </option>
@@ -47,17 +47,17 @@
                     <option> c </option>
                     <option> d </option>
                 </select></div>        
-                <div><input type="text" id="control" placeholder="ce pvchar"></div>
+                <div><input type="text" id="control" placeholder="ce pvchar" class="layerinfoinput"><span class='msg'></span></div>
                 <div><select id="drv_from" class="layerinfoselect"></select></div>
                 <div><select id="c_reason" class="layerinfoselect"></select></div>
-                <div><input type="text" id="decl_on" placeholder="ce pvchar"></div>
-                <div><input type="text" id="source" placeholder="ce pvchar"></div>
+                <div><input type="text" id="decl_on" placeholder="ce pvchar" class="layerinfoinput"><span class='msg'></span></div>
+                <div><input type="text" id="source" placeholder="ce pvchar" class="layerinfoinput"><span class='msg'></span></div>
                 <div><select id="c_method" class="layerinfoselect"></select></div>
-                <div><input type="text" id="doi" ></div>
-                <div><input type="text" id="c_date"></div>
-                <div><input type="number" id="circ_er" placeholder="0.0"></div>
-                <div><input type="number" id="lin_er" placeholder="0.0"></div>
-                <div><input type="text" id="history" placeholder="ce pvchar"></div>
+                <div><input type="text" id="doi"  class="layerinfoinput"><span class='msg'></span></div>
+                <div><input type="text" id="c_date" class="layerinfoinput"><span class='msg'></span></div>
+                <div><input type="number" id="circ_er" placeholder="0.0" class="layerinfoinput"><span class='msg'></span></div>
+                <div><input type="number" id="lin_er" placeholder="0.0" class="layerinfoinput"><span class='msg'></span></div>
+                <div><input type="text" id="history" placeholder="ce pvchar" class="layerinfoinput"><span class='msg'></span></div>
                 <div><select id="producer" class="layerinfoselect">
                     <option> 1 </option>
                     <option> 2 </option>
@@ -65,11 +65,11 @@
                     <option> 4 </option>
                     <option> 5 </option>
                 </select></div>     
-                <div><input type="text" id="analyst"></div>
-                <div><input type="text" id="qc"></div>
-                <div><input type="text" id="class_by"></div>
-                <div><input type="text" id="tot"></div>
-                <div><input type="text" id="shape"></div>
+                <div><input type="text" id="analyst" class="layerinfoinput"><span class='msg'></span></div>
+                <div><input type="text" id="qc" class="layerinfoinput"><span class='msg'></span></div>
+                <div><input type="text" id="class_by" class="layerinfoinput"><span class='msg'></span></div>
+                <div><input type="text" id="tot" class="layerinfoinput"><span class='msg'></span></div>
+                <div><input type="text" id="shape" class="layerinfoinput"><span class='msg'></span></div>
                 <div><input type="button" id="submitlayerinfo" value="Submit"></div>
             </form>
         </div>

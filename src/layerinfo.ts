@@ -6,7 +6,7 @@ import {GeoServerRestInterface} from './gsRestService';
 import {currShapeLayer, map} from './map';
 import {layerInfoMap, features} from './globals';
 
-//var required;
+var required;
 var vals=['benumber', 'osuffix', 'tgt_coor', 'tgt_name', 'catcode', 
     'country', 'label', 'feat_nam', 'out_ty', 'notional', 'ce_l', 'ce_w', 
     'ce_h', 'c_pvchar', 'conf_lvl', 'icod', 'qc_level', 'class', 'release', 
@@ -19,10 +19,14 @@ var types=['java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lan
     'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.sql.Timestamp', 
     'java.sql.Timestamp', 'java.math.BigDecimal', 'java.math.BigDecimal', 'java.lang.Short', 'java.lang.Short', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'com.vividsolutions.jts.geom.Geometry'];
 
-// function setRequired(response) {
-//     response = JSON.parse(response);
-//     required = response['properties'][currShapeLayer]['required'];
-// }
+function setRequired(response) {
+    response = JSON.parse(response);
+    response.required.push('benumber');
+    required = response.required;
+    console.log('required reads' );
+    console.log(required);
+    // required = response['properties'][currShapeLayer]['required'];
+}
 
 export function layerInfoPopup(){
     $('#layerInfoPopupText').addClass('show');
@@ -35,57 +39,54 @@ export function layerInfoPopup(){
 }
 
 function typeCheck(val, type) {
-    switch(type) {
-        case 'java.lang.String':
-            utils.verifyString(val);
-            break;
-        case 'java.math.BigDecimal':
-            utils.verifyString(val);
-            break;
-        case 'java.sql.Timestamp':
-            utils.verifyString(val);
-            break;
-        case 'java.lang.Short':
-            utils.verifyString(val);
-            break;
-        case 'com.vividsolutions.jts.geom.Geometry':
-            utils.verifyString(val);
-            break;
+    var correct;
+    if(val != undefined) {
+        switch(val.id) {
+            case 'benumber':
+                correct = utils.verifyBeNumber(val, required.indexOf(val.id) != -1);
+                break;
+            case 'osuffix':
+                correct = utils.verifyOSuffix(val, required.indexOf(val.id) != -1);
+                break;
+            case 'tgt_coor':
+                correct = utils.verifyTgtCoord(val, required.indexOf(val.id) != -1);
+                break;
+            case 'catcode':
+                correct = utils.verifyCatcode(val, required.indexOf(val.id) != -1);
+                break;
+            case 'country':
+                correct = utils.verifyCountry(val, required.indexOf(val.id) != -1);
+                break;
+            case 'decl_on':
+                correct = utils.verifyDeclassifyOn(val, required.indexOf(val.id) != -1);
+                break;
+            case 'tot':
+                correct = utils.verifyTimeOverTarget(val, required.indexOf(val.id) != -1);
+                break;
+        }
+        if(correct == undefined) {
+            switch(type) {
+                case 'java.lang.String':
+                    correct = utils.verifyString(val);
+                    break;
+                case 'java.math.BigDecimal':
+                    correct = utils.verifyBigDecimal(val);
+                    break;
+                case 'java.sql.Timestamp':
+                    correct = utils.verifyDate(val, required.indexOf(val.id) != -1);
+                    break;
+                case 'java.lang.Short':
+                    correct = utils.verifyShort(val);
+                    break;
+                case 'com.vividsolutions.jts.geom.Geometry':
+                    correct = utils.verifyString(val);
+                    break;
+            }
+        }
     }
+    return correct;
 }
 
-// function valCheck(fieldName, fieldValue) {
-//     switch(fieldName) {
-//     case 'benumber':
-//         utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
-//     case 'osuffix':
-//         utils.verifyOSuffix(fieldValue, required.indexOf(fieldName) != -1);
-//     case 'tgt_coor':
-//         utils.verifyTgtCoord(fieldValue, required.indexOf(fieldName) != -1);
-//     case 'tgt_name':
-//         //utils.verifyString(fieldValue);
-//     case 'catcode':
-//         utils.verifyCatcode(fieldValue, required.indexOf(fieldName) != -1);
-//     case 'country':
-//         utils.verifyCountry(fieldValue, required.indexOf(fieldName) != -1);
-//     case 'label':
-//         //utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
-//     case 'feat_nam':
-//         //utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
-//     case 'out_ty':
-//         //utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
-//     case 'notional':
-//         //utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
-//     case 'ce_l':
-//         //utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
-//     case 'ce_w':
-//         //utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
-//     case 'ce_h':
-//         //utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);                
-//     case 'c_pvchar':
-//         utils.verifyBeNumber(fieldValue, required.indexOf(fieldName) != -1);
-//     }
-// }
 
 function retrieveValues() {
     var id = (<HTMLInputElement>document.getElementById('tgt_name')).value;
@@ -239,12 +240,12 @@ function assignAndClose(){
 }
 
 function layerInfoSetup(){
-    // $.ajax({
-    //     type: 'GET',
-    //     url: GeoServerRestInterface.getLayersUrl(),
-    //     success: function(response, status, asdf){setRequired(response);},
-    //     error: function(response, status, asdf){alert("errors: " + status + '\n' + response);}
-    // });
+    $.ajax({
+        type: 'GET',
+        url: GeoServerRestInterface.getLayersUrl(),
+        success: function(response, status, asdf){setRequired(response); console.log('response reads'); console.log(JSON.parse(response))},
+        error: function(response, status, asdf){alert("errors: " + status + '\n' + response);}
+    });
     var app = document.getElementById("app");
     var layerInfoDiv = document.createElement('div');
     var read = new XMLHttpRequest();
@@ -278,6 +279,21 @@ function layerInfoSetup(){
         }
 
     });
+    for(var val in vals){
+        (<HTMLInputElement>document.getElementById(vals[val])).onchange = function(){
+            validateLayerInfo(this.id, types[vals.indexOf(this.id)]);
+        }
+
+    }
+}
+
+function validateLayerInfo(val, t) {
+    // correct
+    if(typeCheck((<HTMLInputElement>document.getElementById(val)), t))
+        (<HTMLInputElement>document.getElementById(val)).className.replace(' wrong','')
+    // incorrect and not marked as wrong
+    else if((<HTMLInputElement>document.getElementById(val)).className.indexOf(' wrong') !== -1)
+        (<HTMLInputElement>document.getElementById(val)).className = (<HTMLInputElement>document.getElementById(val)).className + ' wrong';
 }
 
 layerInfoSetup();

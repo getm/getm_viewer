@@ -6,11 +6,16 @@ import {GeoServerRestInterface} from './gsRestService';
 import {layerInfoPopup} from './layerinfo'; // to something about this?
 import {getmFiltersSetup} from './getmFilters';
 import {layerInfoMap, features, debug} from './globals';
-import {currShapeLayer, shapeSources} from './map';  // todo: take out shape Sources
+import {currShapeLayer, currGetmLayer, shapeSources} from './map';  // todo: take out shape Sources
 // for debugging
 document.getElementById('debug').innerHTML = "Debug Texts Go Here";
 
 function loadSession() {
+    // clear this session first;
+    for (var f in features){
+        delete features[f];
+        delete layerInfoMap[f];
+    }
     if(localStorage.featureArray){
         var fao = new ol.format.KML().readFeatures(localStorage.featureArray);
         for(var i in fao) {
@@ -68,7 +73,7 @@ export function getmSetup() {
     read.open('GET', 'getm.html', false);
     read.send();
     getmPopupText.innerHTML=read.responseText;
-
+    
     // populate layer select
 
     // fill out inside of the windows stuff
@@ -89,6 +94,38 @@ export function getmSetup() {
     $('#saveBtn').click(saveShapes);
     $('#saveSessBtn').click(saveSession);
     $('#loadSessBtn').click(loadSession);
+    $('#filterSearchBtn').click(search);
+}
+
+function search() {
+    if($('#catsearch').val()){
+        console.log('cat search: ' + $('#catsearch').val());
+        for (var i in layerInfoMap) {
+            if(layerInfoMap[i][features[i].getProperties()['shapelayer']]['properties']['catcode']['val'] == $('#catsearch').val()) 
+            {
+                console.log('found: ' + i);
+            }
+        }
+    } else {
+        console.log('cat not found');
+    }
+
+    if($('#besearch').val()) {
+        console.log('be search: ' + $('#besearch').val());
+        for (var i in layerInfoMap) {
+            var x = [features[i].getProperties()['shapelayer']];
+            var y = layerInfoMap[i][features[i].getProperties()['shapelayer']];
+            var z = layerInfoMap[i];
+            var za = layerInfoMap[i][features[i].getProperties()['shapelayer']]['properties']['benumber']['val'];
+            var zb = $('#benumber').val();
+            if(layerInfoMap[i][features[i].getProperties()['shapelayer']]['properties']['benumber']['val'] == $('#benumber').val()) 
+            {
+                console.log('found: ' + i);
+            }
+        }        
+    } else {
+        console.log('be not found');
+    }
 }
 
 // setup shapes 
@@ -99,9 +136,10 @@ export function setupShapes() {
 
     // sort entries into appropriate columns
     for(var f in features) {
-        console.log(currShapeLayer);
+        console.log(currGetmLayer);
         console.log('working on feature ' + f + ' with layer ' + JSON.stringify(layerInfoMap[f]) + ' and shape layer ' + features[f].getProperties()['shapelayer']);
-        if(features[f].getProperties()['shapelayer'] == currShapeLayer || currShapeLayer == 'all') {
+        if(features[f].getProperties()['shapelayer'] == currGetmLayer || currGetmLayer == 'all') {
+            console.log('layerinfomap');
             console.log(layerInfoMap);
             if(layerInfoMap[f].objectID == -1)
                 insertEntries.push(f);

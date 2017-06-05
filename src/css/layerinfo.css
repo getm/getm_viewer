@@ -37,3 +37,32 @@
 .wrong {
     border: 2px solid red;
 }
+
+.required{
+    border: 2px solid darkblue;
+}
+
+.required ~ .msg{
+    display: inline;
+
+    /*float: right;*/
+}
+
+.required ~ .msg:after{
+        content: "Required";
+}
+
+.wrong ~ .msg:webkit{
+        content: "Syntax error";
+}
+
+.msg{ 
+    position: relative;
+    right:0px;
+    background-color: black;
+    width: 50px;
+    height: 100px;
+    overflow-y: auto;
+    /*display: none;*/
+    border: 2px black;
+}
