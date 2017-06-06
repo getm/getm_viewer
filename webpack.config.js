@@ -1,5 +1,6 @@
+const webpack = require('webpack');
 const path = require('path');
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 
 const config = {
     entry: ['./src/index.ts'],
@@ -10,23 +11,18 @@ const config = {
     resolve: { extensions: ['.ts', '.js'] },
     module: {
         rules: [
-            {test: /\.css$/, use: ExtractTextPlugin.extract({fallback: 'style-loader', use: 'css-loader'})},
+            {test: /\.css$/, use: ExtractTextPlugin.extract({fallback: 'style-loader', use: 'css-loader?-url'})},
             {test: /\.ts$/, use: 'awesome-typescript-loader'}
         ]
     },
     plugins: [
-        new ExtractTextPlugin('map.css'),
-        new ExtractTextPlugin('getm.css'),
-        new ExtractTextPlugin('draw.css'),
-        new ExtractTextPlugin('index.css'),
-        new ExtractTextPlugin('layerinfo.css')
-    ],
-    devServer: {
-        inline: true,
-        hot: true,
-        port: 9002,
-        contentBase: path.join(__dirname, "dist"),
-    }
+        new webpack.optimize.UglifyJsPlugin({
+            compress: {
+                warnings: false
+            }
+        }),
+        new ExtractTextPlugin('map.bundle.css'),
+    ]
 };
 
 module.exports = config; 
