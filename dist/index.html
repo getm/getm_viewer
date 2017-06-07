@@ -4,10 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>GETM</title>
-    <link rel="stylesheet" type="text/css" href="map.bundle.css"/>
     <link rel="stylesheet" type="text/css" href="bootstrap.min.css" />
-    <link rel="stylesheet" type="text/css" href="ol.css"/>
-    <link rel="stylesheet" type="text/css" href="jquery-ui.min.css"/>
 </head>
 
 <body>
@@ -15,14 +12,9 @@
         <!-- Navigation -->
         <div id="nav"></div><br/>
 
-        <div class='page-contents'>
+        <div class='page-contents' id='getmpage'>
             <center>
                 <span id="getmFilters" class="tempOrganizer"></span>
-                <span class="tempOrganizer">
-                    <div id="getmButton" ></div> 
-                    <div id="drawButton"></div>
-                    <div id="mapButton"></div>
-                </span>
             </center><br/>
 
             <div class="popup" id="getmPopup">
@@ -31,14 +23,10 @@
 
             <div id="map"></div><br/>
             <div id="debug"></div>
-            <!--<div id="popup" class="ol-popup">
-                <a href="#" id="popup-closer" class="ol-popup-closer"></a>
-            <div id="popup-content"></div>-->
         </div>
 
     </div>
     <script src="extra.js"></script>
     <script src="map.bundle.js"></script>
     <script src="bootstrap.min.js"></script>
-    <!--<script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL"></script>-->
 </body>

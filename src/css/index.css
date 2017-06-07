@@ -23,6 +23,7 @@ body{
     overflow-y: auto;
     border-radius: 6px;
     height: 100%;
+    padding: 20px;
 }
 
 .popup .show {

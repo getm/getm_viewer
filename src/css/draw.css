@@ -1,13 +1,13 @@
 #drawPopup.popup {
     width: max-content;
-    height:250px;
+    height:280px;
     display:unset;
     top:25%;
     bottom: 25%;
 }
 
 #drawPopup.popup:before {
-    height: 250px;
+    height: 280px;
 }
 
 #drawPopup.popup:after {
@@ -27,6 +27,3 @@ input {
     color: #77f;
 }
 
-.draw-contents{
-    padding: 10px;
-}

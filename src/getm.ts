@@ -5,79 +5,168 @@ import * as ol from 'openlayers';
 import {GeoServerRestInterface} from './gsRestService';
 import {layerInfoPopup} from './layerinfo'; // to something about this?
 import {getmFiltersSetup} from './getmFilters';
-import {layerInfoMap, features, debug} from './globals';
-import {currShapeLayer, currGetmLayer, shapeSources} from './map';  // todo: take out shape Sources
+import {globals} from './globals';
+import {map} from './map';
+import {Shape} from './Shape';
+
 // for debugging
 document.getElementById('debug').innerHTML = "Debug Texts Go Here";
-
-function loadSession() {
+function loadSession(){
     // clear this session first;
-    for (var f in features){
-        delete features[f];
-        delete layerInfoMap[f];
+    for (var shapesID in globals.shapes){
+        (globals.shapes[shapesID]).getLayer().getSource().removeFeature(globals.shapes[shapesID].getFeature());
+        delete globals.shapes[shapesID];
     }
-    if(localStorage.featureArray){
-        var fao = new ol.format.KML().readFeatures(localStorage.featureArray);
-        for(var i in fao) {
-            console.log(fao[i]);
-            features[fao[i].getProperties().id] = fao[i]; 
-            (<ol.source.Vector>shapeSources[fao[i].getProperties().shapelayer]).addFeature(fao[i]);
+
+    if(localStorage.shapes){
+        var storageShapes = JSON.parse(localStorage.shapes);
+        for(var shapesID in storageShapes) {
+            var layer = null;
+            console.log('loading: ' + shapesID);
+            var feature = new ol.format.KML().readFeature(storageShapes[shapesID]['feature']);
+            for(var l of map.getLayerGroup().getLayers().getArray()){
+                if( (<ol.layer.Vector>l).get('name') == storageShapes[shapesID]['layer']){
+                    (<ol.layer.Vector>l).getSource().addFeature(feature);     
+                    layer = l;
+                }
+            }
+
+            globals.shapes[shapesID] = new Shape(
+                feature,
+                layer,
+                storageShapes[shapesID]['properties'],
+                storageShapes[shapesID]['objectID']
+            );
+           // layer.getSource().addFeature(feature);            
         }
     }
-    if(localStorage.layerInfoMap){
-        var limo = JSON.parse(localStorage.layerInfoMap);
-        for(var i in limo) {
-            layerInfoMap[limo[i].id] = $.extend(true,{},limo[i]);
-        }
-    }
+    setupShapes();
 }
 
 function saveSession(){
-    var featureArray = [];
-    for(var f in features) {
-        console.log('working on feature ' + f + ' with layer ' + JSON.stringify(layerInfoMap[f]) + ' and shape layer ' + features[f].getProperties()['shapelayer']);
-        if(features[f].getProperties()['shapelayer'] == currShapeLayer || currShapeLayer == 'all') {
-            featureArray.push(features[f]);
-        }
-    }                
-    localStorage.featureArray = new ol.format.KML().writeFeatures(featureArray);
-    localStorage.layerInfoMap = JSON.stringify(layerInfoMap);
-    console.log('session saved');
+    var storageShapes = {};
+    for(var shapesID in globals.shapes) {
+        console.log('saving: ' + shapesID);
+        var storageShape = {};
+        storageShape['feature'] = new ol.format.KML().writeFeatures([globals.shapes[shapesID].getFeature()]);
+        storageShape['layer'] = globals.shapes[shapesID].getLayer().get('name');
+        storageShape['properties'] = globals.shapes[shapesID].getProperties();
+        storageShape['objectID'] = globals.shapes[shapesID].getObjectID();
+        storageShapes[shapesID] = storageShape;
+    }
+    localStorage.shapes = JSON.stringify(storageShapes);
 }
 
-function saveShapes(){
-    var featureArray = [];
-    for(var f in features) {
-        if(features[f].getProperties()['shapelayer'] == currShapeLayer || currShapeLayer == 'all') {
-            featureArray.push(features[f]);
-        }
-    }                
-    var a = document.createElement('a');
-    a.download = 'helloworld.kml';            
-    var kml = new ol.format.KML().writeFeatures(featureArray);
-    a.href = window.URL.createObjectURL(new Blob([kml], {'type': 'application/octet-stream'}));
-    a.click();         
+// function saveShapes(){
+//     var featureArray = [];
+//     for(var f in features) {
+//         if(features[f].getProperties()['shapelayer'] == currShapeLayer || currShapeLayer == 'all') {
+//             featureArray.push(features[f]);
+//         }
+//     }                
+//     var a = document.createElement('a');
+//     a.download = 'helloworld.kml';            
+//     var kml = new ol.format.KML().writeFeatures(featureArray);
+//     a.href = window.URL.createObjectURL(new Blob([kml], {'type': 'application/octet-stream'}));
+//     a.click();         
+// }
+
+function searchFiltersPopup() {
+    if(document.getElementById("searchFilterPopupText").classList.toggle("show")) {
+        $("#searchFilterPopup").zIndex(2);
+    }
+}
+function searchFiltersSetup() {
+    var searchFilterPopup = document.createElement('div');
+    searchFilterPopup.id = 'searchFilterPopup';
+    searchFilterPopup.className = 'popup';
+    document.getElementById('getmpage').appendChild(searchFilterPopup);
+
+    var searchFilterPopupText = document.createElement('div');
+    searchFilterPopupText.id = 'searchFilterPopupText';
+    searchFilterPopupText.className = 'popuptext';
+    searchFilterPopup.appendChild(searchFilterPopupText);
+
+    var windowHeaders = document.createElement('div');
+    windowHeaders.className = 'window-headers';
+    searchFilterPopupText.appendChild(windowHeaders);
+
+    var windowHeaderTitle = document.createElement('span');
+    windowHeaderTitle.innerHTML = 'Search Filters';
+    windowHeaders.appendChild(windowHeaderTitle);
+
+    var windowHeadersCloseBtn = document.createElement('button');
+    windowHeadersCloseBtn.className = "close";
+    windowHeadersCloseBtn.innerHTML = "&times;";
+    windowHeadersCloseBtn.onclick = function () {
+        searchFilterPopupText.classList.toggle("show");
+        $(searchFilterPopupText).zIndex(-1);
+    };
+    windowHeaders.appendChild(windowHeadersCloseBtn);
+    
+    var windowContents = document.createElement('div');
+    windowContents.className = 'window-contents';
+    searchFilterPopupText.appendChild(windowContents);
+
+    var beSearchfilter = document.createElement('div');
+    windowContents.appendChild(beSearchfilter);
+
+    var beSearchLabel = document.createElement('span'); // TODO make this label for prev
+    beSearchLabel.innerHTML = 'BE Search: ';
+    beSearchfilter.appendChild(beSearchLabel);
+
+    var beSearchInput = document.createElement('input');
+    beSearchInput.type = 'text';
+    beSearchInput.id = 'besearch';
+    beSearchfilter.appendChild(beSearchInput);
+
+    var catSearchfilter = document.createElement('div');
+    windowContents.appendChild(catSearchfilter);
+
+    var catSearchLabel = document.createElement('span'); // TODO make this label for prev
+    catSearchLabel.innerHTML = 'Catcode Search: ';
+    catSearchfilter.appendChild(catSearchLabel);
+
+    var catSearchInput = document.createElement('input');
+    catSearchInput.type = 'text';
+    catSearchInput.id = 'catsearch';
+    catSearchfilter.appendChild(catSearchInput);
+
+    var searchfilter = document.createElement('div');
+    windowContents.appendChild(searchfilter);
+
+    var filterSearchBtn = document.createElement('button');
+    filterSearchBtn.innerHTML = 'Search';
+    filterSearchBtn.id = 'filterSearchBtn';
+    filterSearchBtn.onclick = search;
+    searchfilter.appendChild(filterSearchBtn);
+
+    var searchResults = document.createElement('div');
+    searchResults.className = 'window-contents';
+    searchResults.id = 'searchResults';
+    searchFilterPopupText.appendChild(searchResults);
+
+    document.getElementById('searchBtn').onclick = searchFiltersPopup;
+
+    $(searchFilterPopup).draggable();
+    $(searchFilterPopupText).resizable({
+        handles: 'all'
+    });
 }
 
 // remembers info, regenerate only if changes made to map
 export function getmSetup() {
     getmFiltersSetup();
-
-    var btn = document.createElement('button');
-    btn.innerText = 'getm';
-    document.getElementById('getmButton').appendChild(btn);
-    btn.onclick = getmPopup;
-
+    document.getElementById('getmButton').onclick = getmPopup;
     var getmPopupText = document.getElementById("getmPopupText");
     var read = new XMLHttpRequest();
     read.open('GET', 'getm.html', false);
     read.send();
     getmPopupText.innerHTML=read.responseText;
-    
-    // populate layer select
 
-    // fill out inside of the windows stuff
     setupShapes();
+    searchFiltersSetup();
+
 
     // TODO: not sure if i need this...
     var getmCloseBtn = document.createElement('button');
@@ -91,40 +180,29 @@ export function getmSetup() {
     $(getmPopupText).resizable({
         handles: 'all'
     });
-    $('#saveBtn').click(saveShapes);
+    // $('#saveBtn').click(saveShapes);
     $('#saveSessBtn').click(saveSession);
     $('#loadSessBtn').click(loadSession);
-    $('#filterSearchBtn').click(search);
+
 }
 
 function search() {
+    document.getElementById('searchResults').innerHTML = "";
     if($('#catsearch').val()){
-        console.log('cat search: ' + $('#catsearch').val());
-        for (var i in layerInfoMap) {
-            if(layerInfoMap[i][features[i].getProperties()['shapelayer']]['properties']['catcode']['val'] == $('#catsearch').val()) 
-            {
-                console.log('found: ' + i);
+        for (var shapesID in globals.shapes) {
+            if(globals.shapes[shapesID].getProperties()['catcode']['val'] == $('#catsearch').val()) {
+                console.log('found: ' + shapesID);
+                document.getElementById('searchResults').innerHTML = document.getElementById('searchResults').innerHTML + shapesID;
             }
         }
-    } else {
-        console.log('cat not found');
     }
 
     if($('#besearch').val()) {
-        console.log('be search: ' + $('#besearch').val());
-        for (var i in layerInfoMap) {
-            var x = [features[i].getProperties()['shapelayer']];
-            var y = layerInfoMap[i][features[i].getProperties()['shapelayer']];
-            var z = layerInfoMap[i];
-            var za = layerInfoMap[i][features[i].getProperties()['shapelayer']]['properties']['benumber']['val'];
-            var zb = $('#benumber').val();
-            if(layerInfoMap[i][features[i].getProperties()['shapelayer']]['properties']['benumber']['val'] == $('#benumber').val()) 
-            {
-                console.log('found: ' + i);
+        for (var shapesID in globals.shapes) {
+            if(globals.shapes[shapesID].getProperties()['benumber']['val'] == $('#benumber').val()) {
+                console.log('found: ' + shapesID);
             }
         }        
-    } else {
-        console.log('be not found');
     }
 }
 
@@ -133,33 +211,30 @@ export function setupShapes() {
     var insertEntries = [];
     var updateEntries = [];
     var deleteEntries = [];
-
-    // sort entries into appropriate columns
-    for(var f in features) {
-        console.log(currGetmLayer);
-        console.log('working on feature ' + f + ' with layer ' + JSON.stringify(layerInfoMap[f]) + ' and shape layer ' + features[f].getProperties()['shapelayer']);
-        if(features[f].getProperties()['shapelayer'] == currGetmLayer || currGetmLayer == 'all') {
-            console.log('layerinfomap');
-            console.log(layerInfoMap);
-            if(layerInfoMap[f].objectID == -1)
-                insertEntries.push(f);
+    for(var shapesID in globals.shapes) {
+        console.log('working on feature ' + shapesID + 
+            ' with layer ' + globals.shapes[shapesID].getProperties() + 
+            ' and shape layer ' + globals.shapes[shapesID].getLayer().get('name'));
+        if(globals.shapes[shapesID].getLayer().getVisible()) {
+            if(globals.shapes[shapesID].objectID == -1)
+                insertEntries.push(shapesID);
             else {
-                updateEntries.push(f); // TODO: indicate update stuff
-                deleteEntries.push(f);
+                updateEntries.push(shapesID); // TODO: indicate update stuff
+                deleteEntries.push(shapesID);
             }
         }
     }
 
     var shapeEntries = [insertEntries, updateEntries, deleteEntries];
     var shapeActions = ['insertShapes', 'updateShapes', 'deleteShapes']; 
-    var shapes = document.getElementById('shapes');
+    var shapesContent = document.getElementById('shapes');
     var buttonActions = [insertShapes, updateShapes, deleteShapes];
 
-    shapes.innerHTML="";
+    shapesContent.innerHTML="";
     for(var a in shapeActions) {
         var div0 = document.createElement('div');
         div0.id = shapeActions[a];
-        shapes.appendChild(div0);
+        shapesContent.appendChild(div0);
 
         var label = document.createElement('label');
         label.innerText = shapeActions[a].charAt(0).toUpperCase() + shapeActions[a].replace('Shapes', ' Shapes').slice(1);
@@ -179,10 +254,10 @@ export function setupShapes() {
         for (var x of shapeEntries[a]) {
             var opt = document.createElement('option');
             opt.innerHTML = x;
-            opt.ondblclick = function(){
-                (<HTMLInputElement>document.getElementById('tgt_name')).value = this.innerHTML;
-                layerInfoPopup();
-            };
+            // opt.ondblclick = function(){
+            //     (<HTMLInputElement>document.getElementById('tgt_name')).value = this.innerHTML;
+            //     layerInfoPopup();
+            // };
             select.appendChild(opt);
         }
 
@@ -202,16 +277,36 @@ export function setupShapes() {
 function updateShapesCallback(response, status, asdf) {
     if(response!= []) {
         for(var i in response){
-            if(debug)
-                console.log('old object id is ' + layerInfoMap[response[i]['id']]['objectID'] );
-
-            layerInfoMap[response[i]['id']]['objectID'] = response[i]['objectID'];
-            if(debug)
+            if(globals.debug)
+                console.log('old object id is ' + globals.shapes[response[i]['id']].getObjectID() );
+            globals.shapes[response[i]['id']].setObjectID(response[i]['objectID']);
+            if(globals.debug)
                 console.log('new object id is ' +  response[i]['objectID']);
             setupShapes();
         }
     }
 }
+
+function normalizeCoord(coord) {
+    // Lon is the only one that wraps.
+    var revs = Math.floor(Math.abs(coord[0]) / 360);
+
+    // Shift lon to range (-360, 360).
+    if(coord[0] > 0) {
+        coord[0] = coord[0] - revs*360;
+    } else {
+        coord[0] = coord[0] + revs*360;
+    }
+
+    if(coord[0] > 180) {
+        coord[0] = -180 + (coord[0] - 180);
+    } else if(coord[0] < -180) {
+        coord[0] = 180 + (coord[0] + 180);
+    }
+
+    return coord;
+};
+
 
 function buildInsert() {
     var records = [];
@@ -219,23 +314,49 @@ function buildInsert() {
     var selectedOptions = (<HTMLSelectElement>insertSelect).selectedOptions;
 
     console.log('selected insert options has this many elements ' + selectedOptions.length);
+
     for(var option = 0; option < selectedOptions.length; option++) {
-        var entry = layerInfoMap[selectedOptions[option].text];
+        var layer = (globals.shapes[selectedOptions[option].text]).getLayer().get('name').toString();
+        var geojson = new ol.format.GeoJSON().writeFeatureObject(globals.shapes[selectedOptions[option].text].getFeature());
+        for(var coordinate in geojson['geometry']['coordinates']) {
+            for(var coord in geojson['geometry']['coordinates'][coordinate]) {
+                console.log(geojson['geometry']['coordinates'][coordinate][coord]);
+                if(typeof geojson['geometry']['coordinates'][coordinate][coord] != 'number')
+                    geojson['geometry']['coordinates'][coordinate][coord] = normalizeCoord(geojson['geometry']['coordinates'][coordinate][coord]);
+            }
+        }
+        var entry = {};
+        entry['id'] = selectedOptions[option].text;
+        entry['objectID'] = globals.shapes[selectedOptions[option].text].getObjectID();
+        entry['geoJson'] = geojson;
+        entry[layer] = {'properties': globals.shapes[selectedOptions[option].text].getProperties()};
         records.push(JSON.stringify(entry));
     }
     return {'records':records};
 }
 
 // TODO: update and insert look almost identical...
-// TODO: the return objectid is not looking right....
 function buildUpdate() {
     var records = [];
     var updateSelect = document.getElementById('updateShapesSelect');
     var selectedOptions = (<HTMLSelectElement>updateSelect).selectedOptions;
 
-    console.log('selected insert options has this many elements ' + selectedOptions.length);
+    console.log('selected update options has this many elements ' + selectedOptions.length);
     for(var option = 0; option < selectedOptions.length; option++) {
-        var entry = layerInfoMap[selectedOptions[option].text];
+        var layer = (globals.shapes[selectedOptions[option].text]).getLayer().get('name').toString();
+        var geojson = new ol.format.GeoJSON().writeFeatureObject(globals.shapes[selectedOptions[option].text].getFeature());
+        for(var coordinate in geojson['geometry']['coordinates']) {
+            for(var coord in geojson['geometry']['coordinates'][coordinate]) {
+                console.log(geojson['geometry']['coordinates'][coordinate][coord]);
+                if(typeof geojson['geometry']['coordinates'][coordinate][coord] != 'number')
+                    geojson['geometry']['coordinates'][coordinate][coord] = normalizeCoord(geojson['geometry']['coordinates'][coordinate][coord]);
+            }
+        }
+        var entry = {};
+        entry['id'] = selectedOptions[option].text;
+        entry['objectID'] = globals.shapes[selectedOptions[option].text].getObjectID();
+        entry['geoJson'] = geojson;
+        entry[layer] = {'properties': globals.shapes[selectedOptions[option].text].getProperties()};
         records.push(JSON.stringify(entry));
     }
     return {'records':records};
@@ -250,8 +371,8 @@ function buildDelete() {
     for(var option = 0; option < selectedOptions.length; option++) {
         var entry= {};
         entry['id'] = selectedOptions[option].text;
-        entry['objectID'] =  JSON.stringify(layerInfoMap[selectedOptions[option].text]['objectID']);
-        entry['name'] = features[selectedOptions[option].text].getProperties()['shapelayer'];
+        entry['objectID'] = (globals.shapes[selectedOptions[option].text]).getObjectID();
+        entry['name'] = (globals.shapes[selectedOptions[option].text]).getLayer().get('name');
         records.push(JSON.stringify(entry));
     }
     return {'records':records};
@@ -264,7 +385,7 @@ function deleteShapes() {
          data: JSON.stringify(buildDelete()),
          contentType: 'application/json',
          success: updateShapesCallback,
-         error: function(response, status, asdf){if(debug) console.log("delete errors: " + status + '\n' + JSON.stringify(response));}
+         error: function(response, status, asdf){if(globals.debug) console.log("delete errors: " + status + '\n' + JSON.stringify(response));}
      });
 }
 
@@ -275,7 +396,7 @@ function updateShapes() {
         data: JSON.stringify(buildUpdate()),
         contentType: 'application/json',
         success: updateShapesCallback,
-        error: function(response, status, asdf){if(debug) console.log("update errors: " + status + '\n' + response);}
+        error: function(response, status, asdf){if(globals.debug) console.log("update errors: " + status + '\n' + response);}
     });
 }
 
@@ -286,7 +407,7 @@ function insertShapes() {
         data: JSON.stringify(buildInsert()),
         contentType: 'application/json',
          success: updateShapesCallback,
-         error: function(response, status, asdf){if(debug) console.log("insert errors: " + status + '\n' + response);}
+         error: function(response, status, asdf){if(globals.debug) console.log("insert errors: " + status + '\n' + response);}
      });
 }
 

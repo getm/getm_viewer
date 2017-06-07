@@ -1,20 +1,40 @@
-<nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">	
-    <div class="container">
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container-fluid">
         <div class="navbar-header">
-            <a class="navbar-brand" id="version_id" href="#">CGSWeb</a>
+            <a class="navbar-brand" href="#">GETM Window</a>
         </div>
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav">
-                <li><a href="./dppdb.html">DPPDB</a></li>
-                <li><a href="./sig.html">SIG</a></li>
-                <li><a href="./mig.html">MIG</a></li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li><a href="# " data-toggle="modal" data-target="#myModal">About</a></li>
-                <li><a href="# " data-toggle="modal" data-target="#news">News</a></li>
-                <li><a href="./help.html">Help</a></li>
-                <li><a id="username" href="#">guest</a></li>
-            </ul>
-        </div>
+        <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+
+            <li><a href="#" id='getmButton'>GETM</a></li>
+            <li><a href="#" id='drawButton'>Draw</a></li>
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">WFS
+                <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                <li><a href="#">
+                    <input type="checkbox" id="airports_checkbox">
+                    <label for="airports_checkbox">Airports</label>
+                </a></li>
+                <li><a href="#">
+                    <input type="checkbox" id="roads_checkbox">
+                    <label for="roads_checkbox">Roads</label>
+                </a></li>
+                <li><a href="#">
+                    <input type="checkbox" id="state_routes_checkbox">
+                    <label for="state_routes_checkbox">State Routes</label> 
+                </a></li>
+                </ul>
+            </li>
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="#">Bookmarks
+                <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                <li><a href="#" id="saveSessBtn">Save Session</a></li>
+                <li><a href="#" id="loadSessBtn">Load Session</a></li>
+                </ul>
+            </li>
+            <li><a href="#" id='searchBtn'>Search</a></li>          
+        </ul>
     </div>
 </nav>

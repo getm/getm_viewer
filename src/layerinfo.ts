@@ -3,8 +3,8 @@ import * as $ from 'jquery';
 import * as ol from 'openlayers';
 import {utils} from './getmValidation/getmUtils';
 import {GeoServerRestInterface} from './gsRestService';
-import {currShapeLayer, map} from './map';
-import {layerInfoMap, features} from './globals';
+import {map, shapeLayer} from './map';
+import {globals} from './globals';
 
 var required;
 var vals=['benumber', 'osuffix', 'tgt_coor', 'tgt_name', 'catcode', 
@@ -19,20 +19,18 @@ var types=['java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lan
     'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.sql.Timestamp', 
     'java.sql.Timestamp', 'java.math.BigDecimal', 'java.math.BigDecimal', 'java.lang.Short', 'java.lang.Short', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'com.vividsolutions.jts.geom.Geometry'];
 
+
 function setRequired(response) {
     response = JSON.parse(response);
-    response.required.push('benumber');
+    response.required.push('benumber'); // TODO: remove
     required = response.required;
-    console.log('required reads' );
-    console.log(required);
-    // required = response['properties'][currShapeLayer]['required'];
 }
 
 export function layerInfoPopup(){
     $('#layerInfoPopupText').addClass('show');
     $('#layerInfoPopup').zIndex(2);
-    var id = (<HTMLInputElement>document.getElementById('tgt_name')).value;
-    if(layerInfoMap[id] != undefined)
+    var id = globals.selectedFeatureID;
+    if(globals.shapes[id].getProperties() != undefined)
         retrieveValues();
     else
         fillLayerInfoDefaults();
@@ -87,33 +85,22 @@ function typeCheck(val, type) {
     return correct;
 }
 
-
 function retrieveValues() {
-    var id = (<HTMLInputElement>document.getElementById('tgt_name')).value;
-    var fields = {};
-
-    console.log('Map for this layer is: \n' + JSON.stringify(layerInfoMap[id]));
+    var id = globals.selectedFeatureID;
     for(var val in vals){
-        console.log(features[id]);
-        console.log(features[id].getProperties());
-        if(layerInfoMap[id][features[id].getProperties()['shapelayer']]['properties'][vals[val]] != undefined) {
-            console.log('retrieved layer info of ' + id + ' is ' + layerInfoMap[id][features[id].getProperties()['shapelayer']]['properties'][vals[val]]['val']);
-            (<HTMLInputElement>document.getElementById(vals[val])).value = layerInfoMap[id][features[id].getProperties()['shapelayer']]['properties'][vals[val]]['val'];
+        if(globals.shapes[id].getProperties()[vals[val]] != undefined) {
+            (<HTMLInputElement>document.getElementById(vals[val])).value = globals.shapes[id].getProperties()[vals[val]]['val'];
         } else {
             (<HTMLInputElement>document.getElementById(vals[val])).value = "";
         }
     }
-    (<HTMLSelectElement>(document.getElementById('layerinfolayer')).firstChild).value = 
-        Object.keys(layerInfoMap[id]).filter(function(a){return ['id', 'geoJson', 'objectID'].indexOf(a) == -1})[0];
+    (<HTMLSelectElement>(document.getElementById('layerinfolayer')).firstChild).value = globals.shapes[id].getLayer().get('name');
 }
 
-$('#benumber').change(function(){alert('changed');});
-
 function assignValues() {
-    var id = (<HTMLInputElement>document.getElementById('tgt_name')).value;
+    var id = globals.selectedFeatureID;
     var fields = {};
     var entry = {};
-    // TODO: get select layer
 
     for(var val in vals) {
         if((<HTMLInputElement>document.getElementById(vals[val])).value != undefined 
@@ -126,61 +113,25 @@ function assignValues() {
         }
     }
     
-    var geojson = new ol.format.GeoJSON().writeFeatureObject(features[id]);
-    for(var coordinate in geojson['geometry']['coordinates']) {
-        for(var coord in geojson['geometry']['coordinates'][coordinate]) {
-            console.log(geojson['geometry']['coordinates'][coordinate][coord]);
-            if(typeof geojson['geometry']['coordinates'][coordinate][coord] != 'number')
-                geojson['geometry']['coordinates'][coordinate][coord] = normalizeCoord(geojson['geometry']['coordinates'][coordinate][coord]);
-        }
+    var feature = globals.shapes[id].getFeature();
+    if(globals.shapes[id].getLayer() != shapeLayer) {
+        console.log('layers are different');
+        globals.shapes[id].getLayer().getSource().removeFeature(globals.shapes[id].getFeature());
+        globals.shapes[id].setLayer(shapeLayer);
+        globals.shapes[id].getLayer().getSource().addFeature(globals.shapes[id].getFeature());
     }
-    console.log('layer info layer ' + (<HTMLSelectElement>(document.getElementById('layerinfolayer')).firstChild).selectedOptions);
-    var layer = (<HTMLSelectElement>(document.getElementById('layerinfolayer')).firstChild).selectedOptions == undefined ? currShapeLayer : (<HTMLSelectElement>(document.getElementById('layerinfolayer')).firstChild).selectedOptions[0].text;
-
-    entry[layer] = {'properties':fields};
-    entry['id'] = id;
-    entry['geoJson'] = geojson;
-    entry['objectID'] = (layerInfoMap[id] == undefined) ? -1 : layerInfoMap[id]['objectID']; // TODO: update flag
-
-    if (layerInfoMap[id]!=undefined) {
-        var src = Object.keys(layerInfoMap[id]).filter(function(a){return ['id', 'geoJson', 'objectID'].indexOf(a) == -1});
-        console.log(src[0]);
-    }
-
-
-    layerInfoMap[id] = entry;
+    globals.shapes[id].setProperties(fields);
     console.log('assigned values to ' + id);
 }
 
-
-function normalizeCoord(coord) {
-    // Lon is the only one that wraps.
-    var revs = Math.floor(Math.abs(coord[0]) / 360);
-
-    // Shift lon to range (-360, 360).
-    if(coord[0] > 0) {
-        coord[0] = coord[0] - revs*360;
-    } else {
-        coord[0] = coord[0] + revs*360;
-    }
-
-    if(coord[0] > 180) {
-        coord[0] = -180 + (coord[0] - 180);
-    } else if(coord[0] < -180) {
-        coord[0] = 180 + (coord[0] + 180);
-    }
-
-    return coord;
-};
-
 // TODO: something about this....
 export function fillLayerInfoDefaults() {
-    (<HTMLInputElement>(document.getElementById('layerinfolayer').firstChild)).value = currShapeLayer;
-    console.log('curr shape layer is ' + currShapeLayer);
+    (<HTMLInputElement>(document.getElementById('layerinfolayer').firstChild)).value = shapeLayer.get('name');
+    console.log('curr shape layer is ' + shapeLayer.get('name'));
     (<HTMLInputElement>document.getElementById('benumber')).value = '0000-00000';
     (<HTMLInputElement>document.getElementById('osuffix')).value = 'AS000';
     (<HTMLInputElement>document.getElementById('tgt_coor')).value = '1.2N 1.2E';
-    // (<HTMLInputElement>document.getElementById('tgt_name')).value = 'none';
+    (<HTMLInputElement>document.getElementById('tgt_name')).value = globals.selectedFeatureID;
     (<HTMLInputElement>document.getElementById('catcode')).value = '93434';
     (<HTMLInputElement>document.getElementById('country')).value = 'US';
     (<HTMLInputElement>document.getElementById('label')).value = 'RIDDLER';
@@ -239,12 +190,12 @@ function assignAndClose(){
     hideLayerInfoPopup();
 }
 
-function layerInfoSetup(){
+export function layerInfoSetup(){
     $.ajax({
         type: 'GET',
         url: GeoServerRestInterface.getLayersUrl(),
         success: function(response, status, asdf){setRequired(response); console.log('response reads'); console.log(JSON.parse(response))},
-        error: function(response, status, asdf){alert("errors: " + status + '\n' + response);}
+        error: function(response, status, asdf){console.log("errors: " + status + '\n' + response);}
     });
     var app = document.getElementById("app");
     var layerInfoDiv = document.createElement('div');
@@ -271,10 +222,12 @@ function layerInfoSetup(){
         e.preventDefault();
         var feature = map.forEachFeatureAtPixel(map.getEventPixel(e),
             function (feature, layer) {
+                console.log('context menu pls');
+                console.log(feature);
                 return feature;
         });
         if (feature) {
-            (<HTMLInputElement>document.getElementById('tgt_name')).value = feature.get('id');
+            globals.selectedFeatureID = feature.get('id');
             layerInfoPopup();
         }
 
@@ -296,4 +249,3 @@ function validateLayerInfo(val, t) {
         (<HTMLInputElement>document.getElementById(val)).className = (<HTMLInputElement>document.getElementById(val)).className + ' wrong';
 }
 
-layerInfoSetup();

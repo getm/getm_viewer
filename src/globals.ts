@@ -1,3 +1,5 @@
-export var layerInfoMap = {};
-export var features = {};
-export var debug = true;
+export var globals = {
+    debug: true,
+    selectedFeatureID: undefined,
+    shapes: {}
+}
