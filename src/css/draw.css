@@ -27,3 +27,18 @@ input {
     color: #77f;
 }
 
+.drawButtonOption {
+    display: none;
+}
+.drawButtonOption:checked ~ .drawButtonOptionLabel {
+    -webkit-box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.4);
+	-moz-box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.4);
+	box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+.drawButtonOptionLabel {
+    -webkit-appearance: button;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: black;
+    font-weight: normal;
+}

@@ -1,6 +1,6 @@
 import * as $ from 'jquery';
 import m = require('./map');
-import {getmSetup, setupShapes} from './getm';
+import {setup, setupShapes} from './getm';
 import {navSetup} from './nav';
 import {drawSetup} from './draw';
 import {layerInfoSetup} from './layerinfo';
@@ -13,11 +13,11 @@ import './css/getmFilters.css';
 (window as any).jQuery = $;
 
 navSetup();
-getmSetup();
+setup();
 drawSetup();
 layerInfoSetup();
 m.populateLayers();
 
 
 // TODO: plug these in somewhere
-$('#getm-shape-layer-select').change(setupShapes);
+//$('#getm-shape-layer-select').change(setupShapes);

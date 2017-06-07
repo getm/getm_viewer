@@ -5,7 +5,7 @@ import * as ol from 'openlayers';
 import {GeoServerRestInterface} from './gsRestService';
 import {layerInfoPopup} from './layerinfo'; // to something about this?
 import {getmFiltersSetup} from './getmFilters';
-import {globals} from './globals';
+import {globals, windowSetup} from './globals';
 import {map} from './map';
 import {Shape} from './Shape';
 
@@ -77,87 +77,15 @@ function searchFiltersPopup() {
     }
 }
 
-function windowSetup(){
-    var popup = document.createElement('div');
-    //popup.id = 'searchFilterPopup';
-    popup.className = 'popup';
-    document.getElementById('getmpage').appendChild(popup);
-
-    var popupText = document.createElement('div');
-    //popupText.id = 'searchFilterPopupText';
-    popupText.className = 'popuptext';
-    popup.appendChild(popupText);
-
-    var windowHeaders = document.createElement('div');
-    windowHeaders.className = 'window-headers';
-    popupText.appendChild(windowHeaders);
-
-    var windowHeaderTitle = document.createElement('span');
-    windowHeaderTitle.innerHTML = 'Search Filters';
-    windowHeaders.appendChild(windowHeaderTitle);
-
-    var windowHeadersCloseBtn = document.createElement('button');
-    windowHeadersCloseBtn.className = "close";
-    windowHeadersCloseBtn.innerHTML = "&times;";
-    windowHeadersCloseBtn.onclick = function () {
-        popupText.classList.toggle("show");
-        $(popupText).zIndex(-1);
-    };
-    windowHeaders.appendChild(windowHeadersCloseBtn);
-
-    var windowContents = document.createElement('div');
-    windowContents.className = 'window-contents';
-    popupText.appendChild(windowContents);
-
-    document.getElementById('searchBtn').onclick = function(){
-        if(popupText.classList.toggle("show")) {
-            $(popup).zIndex(2);
-        }
-    };
-
-    $(popup).draggable();
-    $(popupText).resizable({
-        handles: 'all'
-    });
-}
-
-
 function searchFiltersSetup() {
-    var searchFilterPopup = document.createElement('div');
-    searchFilterPopup.id = 'searchFilterPopup';
-    searchFilterPopup.className = 'popup';
+    var searchFilterPopup = windowSetup('searchFilter');
     document.getElementById('getmpage').appendChild(searchFilterPopup);
 
-    var searchFilterPopupText = document.createElement('div');
-    searchFilterPopupText.id = 'searchFilterPopupText';
-    searchFilterPopupText.className = 'popuptext';
-    searchFilterPopup.appendChild(searchFilterPopupText);
-
-    var windowHeaders = document.createElement('div');
-    windowHeaders.className = 'window-headers';
-    searchFilterPopupText.appendChild(windowHeaders);
-
-    var windowHeaderTitle = document.createElement('span');
-    windowHeaderTitle.innerHTML = 'Search Filters';
-    windowHeaders.appendChild(windowHeaderTitle);
-
-    var windowHeadersCloseBtn = document.createElement('button');
-    windowHeadersCloseBtn.className = "close";
-    windowHeadersCloseBtn.innerHTML = "&times;";
-    windowHeadersCloseBtn.onclick = function () {
-        searchFilterPopupText.classList.toggle("show");
-        $(searchFilterPopupText).zIndex(-1);
-    };
-    windowHeaders.appendChild(windowHeadersCloseBtn);
-    
-    var windowContents = document.createElement('div');
-    windowContents.className = 'window-contents';
-    searchFilterPopupText.appendChild(windowContents);
-
+    var windowContents = document.getElementById('searchFilter-contents');
     var beSearchfilter = document.createElement('div');
     windowContents.appendChild(beSearchfilter);
 
-    var beSearchLabel = document.createElement('span'); // TODO make this label for prev
+    var beSearchLabel = document.createElement('span'); 
     beSearchLabel.innerHTML = 'BE Search: ';
     beSearchfilter.appendChild(beSearchLabel);
 
@@ -169,7 +97,7 @@ function searchFiltersSetup() {
     var catSearchfilter = document.createElement('div');
     windowContents.appendChild(catSearchfilter);
 
-    var catSearchLabel = document.createElement('span'); // TODO make this label for prev
+    var catSearchLabel = document.createElement('span'); 
     catSearchLabel.innerHTML = 'Catcode Search: ';
     catSearchfilter.appendChild(catSearchLabel);
 
@@ -190,66 +118,74 @@ function searchFiltersSetup() {
     var searchResults = document.createElement('div');
     searchResults.className = 'window-contents';
     searchResults.id = 'searchResults';
-    searchFilterPopupText.appendChild(searchResults);
-
+    document.getElementById('searchFilterPopupText').appendChild(searchResults);
     document.getElementById('searchBtn').onclick = searchFiltersPopup;
+}
 
-    $(searchFilterPopup).draggable();
-    $(searchFilterPopupText).resizable({
-        handles: 'all'
-    });
+export function setup() {
+    getmFiltersSetup();
+    searchFiltersSetup();
+    getmSetup();
+
+    // $('#saveBtn').click(saveShapes);
+    $('#saveSessBtn').click(saveSession);
+    $('#loadSessBtn').click(loadSession);    
 }
 
 // remembers info, regenerate only if changes made to map
-export function getmSetup() {
-    getmFiltersSetup();
+function getmSetup() {
+    var getm = windowSetup('getm');
     document.getElementById('getmButton').onclick = getmPopup;
-    var getmPopupText = document.getElementById("getmPopupText");
-    var read = new XMLHttpRequest();
-    read.open('GET', 'getm.html', false);
-    read.send();
-    getmPopupText.innerHTML=read.responseText;
 
+    var div1 = document.createElement('div');
+    div1.id = 'layer';
+    div1.align = 'center';
+    document.getElementById('getm-contents').appendChild(div1);
+
+    var span = document.createElement('span'); 
+    span.innerHTML = 'Layer:';
+    div1.appendChild(span);
+    
+    var span2 = document.createElement('span');
+    div1.appendChild(span2);
+
+    var shapeLayerSelect = document.createElement('select');
+    shapeLayerSelect.id = 'getm-shape-layer-select';
+    shapeLayerSelect.className = 'shape-layer-select';
+    span2.appendChild(shapeLayerSelect);
+
+    var div2 = document.createElement('div');
+    div2.id = 'shapes';
+    document.getElementById('getm-contents').appendChild(div2);
     setupShapes();
-    //searchFiltersSetup();
-    windowSetup();
-
-    // TODO: not sure if i need this...
-    var getmCloseBtn = document.createElement('button');
-    getmCloseBtn.className = "close";
-    getmCloseBtn.innerHTML = "&times;";
-    document.getElementById("getm-close").appendChild(getmCloseBtn);
-    getmCloseBtn.onclick = hidePopup;
-
-    // move around the popup
-    $(getmPopupText.parentElement).draggable();
-    $(getmPopupText).resizable({
-        handles: 'all'
-    });
-    // $('#saveBtn').click(saveShapes);
-    $('#saveSessBtn').click(saveSession);
-    $('#loadSessBtn').click(loadSession);
 
 }
 
 function search() {
+    var results = [];
     document.getElementById('searchResults').innerHTML = "";
+
+    // TODO: do the opposite of this...
     if($('#catsearch').val()){
         for (var shapesID in globals.shapes) {
-            if(globals.shapes[shapesID].getProperties()['catcode']['val'] == $('#catsearch').val()) {
+            if(globals.shapes[shapesID].getProperties() != undefined &&
+            globals.shapes[shapesID].getProperties()['catcode']['val'] == $('#catsearch').val()) {
                 console.log('found: ' + shapesID);
-                document.getElementById('searchResults').innerHTML = document.getElementById('searchResults').innerHTML + shapesID;
+                results.push(shapesID);
             }
         }
     }
 
     if($('#besearch').val()) {
         for (var shapesID in globals.shapes) {
-            if(globals.shapes[shapesID].getProperties()['benumber']['val'] == $('#benumber').val()) {
+            if(globals.shapes[shapesID].getProperties() &&
+            globals.shapes[shapesID].getProperties()['benumber']['val'] == $('#benumber').val()) {
                 console.log('found: ' + shapesID);
+                results.push(shapesID);
             }
         }        
     }
+    document.getElementById('searchResults').innerHTML = JSON.stringify(results);
 }
 
 // setup shapes 
@@ -465,8 +401,8 @@ function getmPopup() {
 }
 
 // do i need this? hidepopup is only called once...
-function hidePopup() {
-    var getmPopupText = document.getElementById("getmPopupText");
-    getmPopupText.classList.toggle("show");
-    $(getmPopupText.parentElement).zIndex(-1);
-}
+// function hidePopup() {
+//     var getmPopupText = document.getElementById("getmPopupText");
+//     getmPopupText.classList.toggle("show");
+//     $(getmPopupText.parentElement).zIndex(-1);
+// }

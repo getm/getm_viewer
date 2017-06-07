@@ -4,12 +4,12 @@ import * as ol from 'openlayers';
 import './css/draw.css';
 import {setupShapes} from './getm';
 import {fillLayerInfoDefaults} from './layerinfo';
-import {globals} from './globals';
+import {globals, windowSetup} from './globals';
 import {Shape} from './Shape';
 
 // go over which i need
 var draw;
-var deleteInteraction;//, selectInteraction;
+var deleteInteraction;
 var radioSelection;
 
 var style = new ol.style.Style({
@@ -21,6 +21,7 @@ var style = new ol.style.Style({
         color: 'transparent'
     })
 });
+
 var shapeCounts = {
     'rectangle': 0,
     'circle': 0,
@@ -30,53 +31,6 @@ var shapeCounts = {
     'polygon': 0
 }
 
-function windowSetup(id){
-    var popup = document.createElement('div');
-    popup.id = id+'Popup';
-    popup.className = 'popup';
-    document.getElementById('getmpage').appendChild(popup);
-
-    var popupText = document.createElement('div');
-    popupText.id = id+'PopupText';
-    popupText.className = 'popuptext';
-    popup.appendChild(popupText);
-
-    var windowHeaders = document.createElement('div');
-    windowHeaders.className = 'window-headers';
-    popupText.appendChild(windowHeaders);
-
-    var windowHeaderTitle = document.createElement('span');
-    windowHeaderTitle.innerHTML = id;
-    windowHeaders.appendChild(windowHeaderTitle);
-
-    var windowHeadersCloseBtn = document.createElement('button');
-    windowHeadersCloseBtn.className = "close";
-    windowHeadersCloseBtn.innerHTML = "&times;";
-    windowHeadersCloseBtn.onclick = function () {
-        popupText.classList.toggle("show");
-        $(popupText).zIndex(-1);
-    };
-    windowHeaders.appendChild(windowHeadersCloseBtn);
-
-    var windowContents = document.createElement('div');
-    windowContents.className = 'window-contents';
-    windowContents.id = id + '-contents';
-    popupText.appendChild(windowContents);
-
-    document.getElementById('searchBtn').onclick = function(){
-        if(popupText.classList.toggle("show")) {
-            $(popup).zIndex(2);
-        }
-    };
-
-    $(popup).draggable();
-    $(popupText).resizable({
-        handles: 'all'
-    });
-    return popup;
-}
-
-// TODO: do something about the draw functions? really repetitive code
 function drawShape(shapeType) {
     if(map.getInteractions().getArray().indexOf(draw) != -1) {
         draw.setActive(false);
@@ -196,15 +150,13 @@ function addRemoveFeatures() {
     });
 }
 
-// TODO: something about organizing this
 export function drawSetup() {
-    // TODO: encapsilate window creation rather than do a read send
     document.getElementById('drawButton').onclick = drawPopup;
     var app = document.getElementById("app");
     var drawDiv = windowSetup('draw');
-
     app.appendChild(drawDiv);
     drawDiv.classList.toggle('show');
+
     drawButtons();
     setupDelete();
 }
@@ -221,7 +173,6 @@ function drawPopup() {
     } 
 }
 
-// draw buttons
 function drawButtons() {
     var innerText = [ 'rectangle', 'circle', 'freeform', 'polyline', 'polygon', 'ellipse', 'delete'];
     var elementID = ['drawRect', 'drawCirc', 'drawFreeform', 'drawPolyline', 'drawPolygon', 'drawEllipse', 'delete'];
@@ -233,9 +184,11 @@ function drawButtons() {
         radioInput.setAttribute('type', 'radio');
         radioInput.setAttribute('value', innerText[i])
         radioInput.setAttribute('id', elementID[i]+'Option')
+        radioInput.setAttribute('class', 'drawButtonOption');
 
         var label = document.createElement('label');
         label.setAttribute('for', elementID[i]+'Option');
+        label.setAttribute('class', 'drawButtonOptionLabel');
         label.innerText = innerText[i];
 
         div.appendChild(radioInput);

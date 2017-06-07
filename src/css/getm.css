@@ -36,19 +36,18 @@ select{
 }
 
 #getmPopup.popup:before {
-    height: max-content;
+    height: 500px;
 }
 
 #getmPopup.popup:after {
-    position: fixed;
-    width: max-content;
+    
 }
 
 #getmPopup.popup{
+    position: fixed;
     display: unset;
     width: 50%;
     height: 500px;
-
+    top:25%;
     left: 25%;
-    right: 25%;
 }
