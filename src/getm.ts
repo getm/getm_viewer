@@ -76,6 +76,52 @@ function searchFiltersPopup() {
         $("#searchFilterPopup").zIndex(2);
     }
 }
+
+function windowSetup(){
+    var popup = document.createElement('div');
+    //popup.id = 'searchFilterPopup';
+    popup.className = 'popup';
+    document.getElementById('getmpage').appendChild(popup);
+
+    var popupText = document.createElement('div');
+    //popupText.id = 'searchFilterPopupText';
+    popupText.className = 'popuptext';
+    popup.appendChild(popupText);
+
+    var windowHeaders = document.createElement('div');
+    windowHeaders.className = 'window-headers';
+    popupText.appendChild(windowHeaders);
+
+    var windowHeaderTitle = document.createElement('span');
+    windowHeaderTitle.innerHTML = 'Search Filters';
+    windowHeaders.appendChild(windowHeaderTitle);
+
+    var windowHeadersCloseBtn = document.createElement('button');
+    windowHeadersCloseBtn.className = "close";
+    windowHeadersCloseBtn.innerHTML = "&times;";
+    windowHeadersCloseBtn.onclick = function () {
+        popupText.classList.toggle("show");
+        $(popupText).zIndex(-1);
+    };
+    windowHeaders.appendChild(windowHeadersCloseBtn);
+
+    var windowContents = document.createElement('div');
+    windowContents.className = 'window-contents';
+    popupText.appendChild(windowContents);
+
+    document.getElementById('searchBtn').onclick = function(){
+        if(popupText.classList.toggle("show")) {
+            $(popup).zIndex(2);
+        }
+    };
+
+    $(popup).draggable();
+    $(popupText).resizable({
+        handles: 'all'
+    });
+}
+
+
 function searchFiltersSetup() {
     var searchFilterPopup = document.createElement('div');
     searchFilterPopup.id = 'searchFilterPopup';
@@ -165,8 +211,8 @@ export function getmSetup() {
     getmPopupText.innerHTML=read.responseText;
 
     setupShapes();
-    searchFiltersSetup();
-
+    //searchFiltersSetup();
+    windowSetup();
 
     // TODO: not sure if i need this...
     var getmCloseBtn = document.createElement('button');
