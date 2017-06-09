@@ -4,13 +4,12 @@ import './css/getm.css';
 import * as ol from 'openlayers';
 import {GeoServerRestInterface} from './gsRestService';
 import {layerInfoPopup} from './layerinfo'; // to something about this?
-import {getmFiltersSetup} from './getmFilters';
 import {globals, windowSetup} from './globals';
 import {map} from './map';
 import {Shape} from './Shape';
 
-// for debugging
-document.getElementById('debug').innerHTML = "Debug Texts Go Here";
+const WILDCARD = '*';
+
 function loadSession(){
     // clear this session first;
     for (var shapesID in globals.shapes){
@@ -36,8 +35,7 @@ function loadSession(){
                 layer,
                 storageShapes[shapesID]['properties'],
                 storageShapes[shapesID]['objectID']
-            );
-           // layer.getSource().addFeature(feature);            
+            );     
         }
     }
     setupShapes();
@@ -57,29 +55,74 @@ function saveSession(){
     localStorage.shapes = JSON.stringify(storageShapes);
 }
 
-// function saveShapes(){
-//     var featureArray = [];
-//     for(var f in features) {
-//         if(features[f].getProperties()['shapelayer'] == currShapeLayer || currShapeLayer == 'all') {
-//             featureArray.push(features[f]);
-//         }
-//     }                
-//     var a = document.createElement('a');
-//     a.download = 'helloworld.kml';            
-//     var kml = new ol.format.KML().writeFeatures(featureArray);
-//     a.href = window.URL.createObjectURL(new Blob([kml], {'type': 'application/octet-stream'}));
-//     a.click();         
-// }
+function saveShapes(){
+    var featureArray = [];
+    for(var shapesID in globals.shapes) {
+        if(globals.shapes[shapesID].getLayer().getVisible()) {
+            featureArray.push(globals.shapes[shapesID].getFeature());
+        }
+    }                
+    var a = document.createElement('a');
+    a.download = 'shapes.shp';            
+    var shp = new ol.format.GeoJSON().writeFeatures(featureArray);
+    a.href = window.URL.createObjectURL(new Blob([shp], {'type': 'application/octet-stream'}));
+    a.click();         
+}
 
-function searchFiltersPopup() {
-    if(document.getElementById("searchFilterPopupText").classList.toggle("show")) {
-        $("#searchFilterPopup").zIndex(2);
+function search() {
+    var results = [];
+    for (var shapesID in globals.shapes) {
+        var foundShape = undefined;
+        if($('#catsearch').val()){
+            if($('#catsearch').val() == WILDCARD ||
+                (globals.shapes[shapesID].getProperty('catcode') == $('#catsearch').val())) {
+                    console.log('found: ' + shapesID);
+                    //results.push(shapesID);
+                    foundShape = shapesID;
+            }
+        }
+        if($('#besearch').val()) {
+            if($('#besearch').val() == WILDCARD ||
+            (globals.shapes[shapesID].getProperty('benumber') == $('#besearch').val())) {
+                console.log('found: ' + shapesID);
+                if(foundShape == shapesID)
+                    results.push(shapesID);
+            }
+        }
     }
+
+    document.getElementById('searchResults').innerHTML = JSON.stringify(results);
+}
+
+export function setup() {
+    // getmFiltersSetup();
+    searchFiltersSetup();
+    getmSetup();
+    mapLayerSetup();
+    debugSetup();
+
+    $('#saveBtn').click(saveShapes);
+    $('#saveSessBtn').click(saveSession);
+    $('#loadSessBtn').click(loadSession);   
+    $('#printBtn').click(printImg);
+}
+
+function printImg(e) {
+    e.preventDefault();
+    var canvas = document.getElementById("map").getElementsByClassName("ol-unselectable")[0];
+    var img = (canvas as any).toDataURL('image/png');
+    var popup = window.open();
+    popup.document.write('<img src="'+img+'"/>');
+    popup.focus(); //required for IE 
+    $(popup).ready(function(){
+        popup.window.print();
+        popup.close();
+    });
 }
 
 function searchFiltersSetup() {
     var searchFilterPopup = windowSetup('searchFilter');
-    document.getElementById('getmpage').appendChild(searchFilterPopup);
+    document.getElementById('app').appendChild(searchFilterPopup);
 
     var windowContents = document.getElementById('searchFilter-contents');
     var beSearchfilter = document.createElement('div');
@@ -90,7 +133,7 @@ function searchFiltersSetup() {
     beSearchfilter.appendChild(beSearchLabel);
 
     var beSearchInput = document.createElement('input');
-    beSearchInput.type = 'text';
+    beSearchInput.type = 'search';
     beSearchInput.id = 'besearch';
     beSearchfilter.appendChild(beSearchInput);
 
@@ -102,15 +145,16 @@ function searchFiltersSetup() {
     catSearchfilter.appendChild(catSearchLabel);
 
     var catSearchInput = document.createElement('input');
-    catSearchInput.type = 'text';
+    catSearchInput.type = 'search';
     catSearchInput.id = 'catsearch';
     catSearchfilter.appendChild(catSearchInput);
 
     var searchfilter = document.createElement('div');
     windowContents.appendChild(searchfilter);
 
-    var filterSearchBtn = document.createElement('button');
-    filterSearchBtn.innerHTML = 'Search';
+    var filterSearchBtn = document.createElement('input');
+    filterSearchBtn.type = 'button';
+    filterSearchBtn.value = 'Search';
     filterSearchBtn.id = 'filterSearchBtn';
     filterSearchBtn.onclick = search;
     searchfilter.appendChild(filterSearchBtn);
@@ -122,17 +166,6 @@ function searchFiltersSetup() {
     document.getElementById('searchBtn').onclick = searchFiltersPopup;
 }
 
-export function setup() {
-    getmFiltersSetup();
-    searchFiltersSetup();
-    getmSetup();
-
-    // $('#saveBtn').click(saveShapes);
-    $('#saveSessBtn').click(saveSession);
-    $('#loadSessBtn').click(loadSession);    
-}
-
-// remembers info, regenerate only if changes made to map
 function getmSetup() {
     var getm = windowSetup('getm');
     document.getElementById('getmButton').onclick = getmPopup;
@@ -161,35 +194,48 @@ function getmSetup() {
 
 }
 
-function search() {
-    var results = [];
-    document.getElementById('searchResults').innerHTML = "";
+function mapLayerSetup() {
+    var getm = windowSetup('mapLayer');
+    document.getElementById('mapLayerButton').onclick = mapLayerPopup;
 
-    // TODO: do the opposite of this...
-    if($('#catsearch').val()){
-        for (var shapesID in globals.shapes) {
-            if(globals.shapes[shapesID].getProperties() != undefined &&
-            globals.shapes[shapesID].getProperties()['catcode']['val'] == $('#catsearch').val()) {
-                console.log('found: ' + shapesID);
-                results.push(shapesID);
-            }
-        }
-    }
+    var div1 = document.createElement('div');
+    div1.align = 'center';
+    document.getElementById('mapLayer-contents').appendChild(div1);
 
-    if($('#besearch').val()) {
-        for (var shapesID in globals.shapes) {
-            if(globals.shapes[shapesID].getProperties() &&
-            globals.shapes[shapesID].getProperties()['benumber']['val'] == $('#benumber').val()) {
-                console.log('found: ' + shapesID);
-                results.push(shapesID);
-            }
-        }        
-    }
-    document.getElementById('searchResults').innerHTML = JSON.stringify(results);
+    var div2 = document.createElement('div'); 
+    div2.id = 'wmslayer';
+    div1.appendChild(div2);
+
+    var span1 = document.createElement('span');
+    span1.innerHTML = 'WMS Layer: ';
+    div2.appendChild(span1);
+
+    var span2 = document.createElement('span');
+    span2.className = 'layer-select';
+    div2.appendChild(span2);
+
+    var div3 = document.createElement('div'); 
+    div3.id = 'shapeLayer';
+    div1.appendChild(div3);
+
+    var span3 = document.createElement('span');
+    span3.innerHTML = 'Shape Layer: ';
+    div3.appendChild(span3);
+
+    var span4 = document.createElement('select');
+    span4.className = 'shape-layer-select';
+    div3.appendChild(span4);
+}
+
+function debugSetup() {
+    var debug = windowSetup('debug');
+    document.getElementById('debugButton').onclick = debugPopup; 
+    document.getElementById('debug-contents').innerHTML = 'DEBUG TEXTS GO HERE';
 }
 
 // setup shapes 
 export function setupShapes() {
+    console.log('setupShapes');
     var insertEntries = [];
     var updateEntries = [];
     var deleteEntries = [];
@@ -231,15 +277,16 @@ export function setupShapes() {
         var select = document.createElement('select');
         select.multiple = true;
         select.id = shapeActions[a] + 'Select';
+        select.size = 10;
         div1.appendChild(select);
 
         for (var x of shapeEntries[a]) {
             var opt = document.createElement('option');
             opt.innerHTML = x;
-            // opt.ondblclick = function(){
-            //     (<HTMLInputElement>document.getElementById('tgt_name')).value = this.innerHTML;
-            //     layerInfoPopup();
-            // };
+            opt.ondblclick = function(){
+                (<HTMLInputElement>document.getElementById('tgt_name')).value = this.innerHTML;
+                layerInfoPopup();
+            };
             select.appendChild(opt);
         }
 
@@ -252,20 +299,6 @@ export function setupShapes() {
         $(input).css('color', 'black');
         input.onclick = buttonActions[a];
         div2.appendChild(input);
-    }
-}
-
-// callback function for database stuffs
-function updateShapesCallback(response, status, asdf) {
-    if(response!= []) {
-        for(var i in response){
-            if(globals.debug)
-                console.log('old object id is ' + globals.shapes[response[i]['id']].getObjectID() );
-            globals.shapes[response[i]['id']].setObjectID(response[i]['objectID']);
-            if(globals.debug)
-                console.log('new object id is ' +  response[i]['objectID']);
-            setupShapes();
-        }
     }
 }
 
@@ -289,6 +322,19 @@ function normalizeCoord(coord) {
     return coord;
 };
 
+// callback function for database stuffs
+function updateShapesCallback(response, status, asdf) {
+    if(response!= []) {
+        for(var i in response){
+            if(globals.debug)
+                console.log('old object id is ' + globals.shapes[response[i]['id']].getObjectID() );
+            globals.shapes[response[i]['id']].setObjectID(response[i]['objectID']);
+            if(globals.debug)
+                console.log('new object id is ' +  response[i]['objectID']);
+            setupShapes();
+        }
+    }
+}
 
 function buildInsert() {
     var records = [];
@@ -317,7 +363,6 @@ function buildInsert() {
     return {'records':records};
 }
 
-// TODO: update and insert look almost identical...
 function buildUpdate() {
     var records = [];
     var updateSelect = document.getElementById('updateShapesSelect');
@@ -393,16 +438,26 @@ function insertShapes() {
      });
 }
 
-// toggle getm popup
 function getmPopup() {
     if(document.getElementById("getmPopupText").classList.toggle("show")) {
         $("#getmPopup").zIndex(2);
     }
 }
 
-// do i need this? hidepopup is only called once...
-// function hidePopup() {
-//     var getmPopupText = document.getElementById("getmPopupText");
-//     getmPopupText.classList.toggle("show");
-//     $(getmPopupText.parentElement).zIndex(-1);
-// }
+function mapLayerPopup() {
+    if(document.getElementById("mapLayerPopupText").classList.toggle("show")) {
+        $("#mapLayerPopup").zIndex(2);
+    }
+}
+
+function searchFiltersPopup() {
+    if(document.getElementById("searchFilterPopupText").classList.toggle("show")) {
+        $("#searchFilterPopup").zIndex(2);
+    }
+}
+
+function debugPopup() {
+    if(document.getElementById("debugPopupText").classList.toggle("show")) {
+        $("#debugPopup").zIndex(2);
+    }
+}

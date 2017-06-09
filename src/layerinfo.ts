@@ -4,8 +4,8 @@ import * as ol from 'openlayers';
 import {utils} from './getmValidation/getmUtils';
 import {GeoServerRestInterface} from './gsRestService';
 import {map, shapeLayer} from './map';
-import {globals} from './globals';
-
+import {globals, windowSetup} from './globals';
+import {setupShapes} from './getm';
 var required;
 var vals=['benumber', 'osuffix', 'tgt_coor', 'tgt_name', 'catcode', 
     'country', 'label', 'feat_nam', 'out_ty', 'notional', 'ce_l', 'ce_w', 
@@ -29,8 +29,8 @@ function setRequired(response) {
 export function layerInfoPopup(){
     $('#layerInfoPopupText').addClass('show');
     $('#layerInfoPopup').zIndex(2);
-    var id = globals.selectedFeatureID;
-    if(globals.shapes[id].getProperties() != undefined)
+
+    if(globals.shapes[globals.selectedFeatureID].getProperties() != undefined)
         retrieveValues();
     else
         fillLayerInfoDefaults();
@@ -94,40 +94,47 @@ function retrieveValues() {
             (<HTMLInputElement>document.getElementById(vals[val])).value = "";
         }
     }
-    (<HTMLSelectElement>(document.getElementById('layerinfolayer')).firstChild).value = globals.shapes[id].getLayer().get('name');
+    (<HTMLSelectElement>document.getElementById('layerinfolayer')).value = globals.shapes[id].getLayer().get('name');
 }
 
 function assignValues() {
-    var id = globals.selectedFeatureID;
+    var id = (<HTMLInputElement>document.getElementById('tgt_name')).value;
     var fields = {};
     var entry = {};
 
     for(var val in vals) {
-        if((<HTMLInputElement>document.getElementById(vals[val])).value != undefined 
-        && (<HTMLInputElement>document.getElementById(vals[val])).value.length > 0 ) {
+        if(id != undefined && id.length > 0 ) {
             try{
                 fields[vals[val]] =  {'val' : (<HTMLInputElement>document.getElementById(vals[val])).value, 'type': types[val] };
             } catch(e) {
-                console.log('exception in assigning ' + id + ' field ' + vals[val]);
+                console.log('exception in assigning ' + (<HTMLInputElement>document.getElementById(vals[val])).value + ' field ' + vals[val]);
             }
         }
     }
-    
+
+    // setting variable name
+    if(id != globals.selectedFeatureID) {
+        globals.shapes[globals.selectedFeatureID].getFeature().set('id', id);
+        var temp = globals.shapes[globals.selectedFeatureID];
+        delete globals.shapes[globals.selectedFeatureID];
+        globals.shapes[id] = temp;
+    }
+
     var feature = globals.shapes[id].getFeature();
+    // setting shape layer
     if(globals.shapes[id].getLayer() != shapeLayer) {
-        console.log('layers are different');
         globals.shapes[id].getLayer().getSource().removeFeature(globals.shapes[id].getFeature());
         globals.shapes[id].setLayer(shapeLayer);
         globals.shapes[id].getLayer().getSource().addFeature(globals.shapes[id].getFeature());
     }
     globals.shapes[id].setProperties(fields);
+    setupShapes();
     console.log('assigned values to ' + id);
 }
 
 // TODO: something about this....
 export function fillLayerInfoDefaults() {
-    (<HTMLInputElement>(document.getElementById('layerinfolayer').firstChild)).value = shapeLayer.get('name');
-    console.log('curr shape layer is ' + shapeLayer.get('name'));
+    (<HTMLInputElement>document.getElementById('layerinfolayer')).value = shapeLayer.get('name');
     (<HTMLInputElement>document.getElementById('benumber')).value = '0000-00000';
     (<HTMLInputElement>document.getElementById('osuffix')).value = 'AS000';
     (<HTMLInputElement>document.getElementById('tgt_coor')).value = '1.2N 1.2E';
@@ -178,13 +185,13 @@ function hideLayerInfoPopup() {
 }
 
 function assignAndClose(){
-    var form =  document.getElementById('layerinfoform'); 
+    var form =  document.getElementById('layerInfoForm'); 
     var s = 'form has ' + form.children.length + ' stuffs<br/>'
     for(var i = 0; i < form.children.length-1; i++) {
         s = s +'child ' + (i+1) + ' is ' + (<HTMLElement>(form.children[i].firstChild)).id + ': ' + (<HTMLInputElement>(form.children[i].firstChild)).value 
         + ' with type ' + (<HTMLInputElement>(form.children[i].firstChild)).type +'<br/>'
     }
-    document.getElementById('debug').innerHTML = s;
+    document.getElementById('debug-contents').innerHTML = s;
 
     assignValues();
     hideLayerInfoPopup();
@@ -198,25 +205,54 @@ export function layerInfoSetup(){
         error: function(response, status, asdf){console.log("errors: " + status + '\n' + response);}
     });
     var app = document.getElementById("app");
-    var layerInfoDiv = document.createElement('div');
-    var read = new XMLHttpRequest();
-    read.open('GET', 'layerinfo.html', false);
-    read.send();
-    layerInfoDiv.innerHTML = read.responseText;
+    var layerInfoDiv = windowSetup('layerInfo');
     app.appendChild(layerInfoDiv);
 
+    var layerInfoContents = document.getElementById('layerInfo-contents');
+    var layerInfoForm = document.createElement('form');
+    layerInfoForm.id = 'layerInfoForm';
+    layerInfoContents.appendChild(layerInfoForm);
+
+    var div = document.createElement('div');
+    layerInfoForm.appendChild(div);
+
+    var shapeLayerSelect = document.createElement('select');
+    shapeLayerSelect.className = "shape-layer-select";
+    shapeLayerSelect.id = "layerinfolayer";
+    div.appendChild(shapeLayerSelect);
+
+    for(var val in vals) {
+        var div = document.createElement('div');
+        layerInfoForm.appendChild(div);
+
+        var input = document.createElement('input');
+        input.type = 'text';
+        input.id = vals[val];
+        input.placeholder = vals[val];
+        input.value = vals[val];
+        input.onchange = function(){
+            validateLayerInfo(this.id, types[vals.indexOf(this.id)]);
+        }
+        div.appendChild(input);
+
+        var msg = document.createElement('span');
+        msg.className = 'msg';
+        msg.id = vals[val] + '-msg';
+        div.appendChild(msg);
+
+        var br = document.createElement('br');
+        div.appendChild(br);
+    }
+
+    var div2 = document.createElement('div');
+    layerInfoForm.appendChild(div2);
+
+    var submit = document.createElement('input');
+    submit.type = 'button';
+    submit.id = 'submitlayerinfo';
+    submit.value = 'Submit';
+    div2.appendChild(submit);
     $('#submitlayerinfo').click(assignAndClose);
-
-    var layerInfoCloseBtn = document.createElement('button');
-    layerInfoCloseBtn.className = "close";
-    layerInfoCloseBtn.innerHTML = "&times;";
-    document.getElementById("layerInfo-close").appendChild(layerInfoCloseBtn);
-    layerInfoCloseBtn.onclick = hideLayerInfoPopup;
-
-    $('#layerInfoPopup').draggable();
-    $('#layerInfoPopupText').resizable({
-        handles: 'all'
-    });
 
     map.getViewport().addEventListener('contextmenu', function (e) {
         e.preventDefault();
@@ -232,20 +268,19 @@ export function layerInfoSetup(){
         }
 
     });
-    for(var val in vals){
-        (<HTMLInputElement>document.getElementById(vals[val])).onchange = function(){
-            validateLayerInfo(this.id, types[vals.indexOf(this.id)]);
-        }
 
-    }
 }
 
 function validateLayerInfo(val, t) {
     // correct
-    if(typeCheck((<HTMLInputElement>document.getElementById(val)), t))
+        console.log('val is ' + val + '-msg');    
+    if(typeCheck((<HTMLInputElement>document.getElementById(val)), t)) {
         (<HTMLInputElement>document.getElementById(val)).className.replace(' wrong','')
     // incorrect and not marked as wrong
-    else if((<HTMLInputElement>document.getElementById(val)).className.indexOf(' wrong') !== -1)
+    } else if((<HTMLInputElement>document.getElementById(val)).className.indexOf(' wrong') !== -1) {
         (<HTMLInputElement>document.getElementById(val)).className = (<HTMLInputElement>document.getElementById(val)).className + ' wrong';
+        console.log('val is ' + val + '-msg');
+        document.getElementById(val+'-msg').className = 'msgasdf';
+    }
 }
 

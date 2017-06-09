@@ -23,6 +23,11 @@ export var Shape = function(feature, layer, properties, objectID=-1){
     this.setProperties = function(properties) {
         this.properties = properties;
     }
+    this.getProperty = function(property){
+        if(this.properties == null || this.properties[property] == null)
+            return null
+        return this.properties[property]['val'];
+    }
     this.getObjectID = function(){
         return this.objectID;
     }

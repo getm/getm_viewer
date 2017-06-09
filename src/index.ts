@@ -5,7 +5,6 @@ import {navSetup} from './nav';
 import {drawSetup} from './draw';
 import {layerInfoSetup} from './layerinfo';
 import './css/index.css';
-import './css/getmFilters.css';
 // opens up the overlay
 
 // Expose jQuery so Bootstrap can use it.

@@ -1,39 +1,17 @@
 #layerInfoPopup.popup {
     width: max-content;
-    margin: auto;
-    top: 50px;
-    max-height: max-content;
+    top: 100px;
+    height: max-content;
+    min-width: 200px;
+    width: 20%;
+    right: 0px;
+}
+
+
+#layerInfo-contents {
     height: 400px;
 }
 
-#layerInfoPopup.popup:before {
-    height: 300px;
-}
-
-#layerInfoPopup.popup:after {
-    position: fixed;
-    height: max-content;
-}
-
-
-#layerInfoPopupText.popuptext {
-    margin: 0px;
-    min-width: 200px;
-    height: 100%;
-}
-
-#layerinfoform {
- padding: 10px;
- width: 100%;
-}
-
-.layerinfoselect {
-    width:auto;
-}
-
-#layerinfolayer {
-    width:auto;
-}
 .wrong {
     border: 2px solid red;
 }
@@ -42,27 +20,37 @@
     border: 2px solid darkblue;
 }
 
-.required ~ .msg{
-    display: inline;
+#layerInfoForm div{
+    text-align: left;
+}
 
-    /*float: right;*/
+#layerInfoForm input {
+    /*left: 0px;*/
+    position: relative;
+    width: 67%;
+    left: 0%;
 }
 
 .required ~ .msg:after{
-        content: "Required";
+    /*content: "Required";*/
 }
 
-.wrong ~ .msg:webkit{
-        content: "Syntax error";
+.wrong ~ .msg:after{
+    /*content: "Syntax error";*/
 }
 
 .msg{ 
+    display: inline-table;
     position: relative;
-    right:0px;
+    right: 0%;
+    text-align: center;
     background-color: black;
-    width: 50px;
-    height: 100px;
+    width: 33%;
+    /*height: 100px;*/
     overflow-y: auto;
-    /*display: none;*/
-    border: 2px black;
+}
+
+#layerInfo-contents {
+    width: 100%;
+    left: 0px;
 }

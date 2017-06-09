@@ -1,77 +1,62 @@
-<div class="popup" id="layerInfoPopup">
-    <div class="popuptext" id="layerInfoPopupText">
-        <div class="window-headers">
-            <span class="window-header-title">Layer Information</span>
-            <span id="layerInfo-close"></span>
-        </div>
-        <div class="window-contents">
-            <form  id="layerinfoform"  >
-                <!--<div class="layerinfoselect layer-select" id="layerinfolayer"></div>-->
-                <div class="layerinfoselect " id="layerinfolayer"><select class = "shape-layer-select"></select></div>
-                <div><input type="text" id="benumber" placeholder="benumber" class="layerinfoinput"><span class='msg'></span></div>
-                <div><input type="text" id="osuffix" placeholder="osuffix" class="layerinfoinput"><span class='msg'></span></div>
-                <div><input type="text" id="tgt_coor" placeholder="target coordinate" class="layerinfoinput"><span class='msg'></span></div>
-                <div><input type="text" id="tgt_name" placeholder="target name" class="layerinfoinput"><span class='msg'></span></div>
-                <div><input type="text" id="catcode" placeholder="cat code" class="layerinfoinput"><span class='msg'></span></div>
-                <div><input type="text" id="country" placeholder="country code" class="layerinfoinput"><span class='msg'></span></div>
-                <div><input type="text" id="label" placeholder="label" class="layerinfoinput"><span class='msg'></span></div>
-                <div><input type="text" id="feat_nam" placeholder="feature name" class="layerinfoinput"><span class='msg'></span></div>
-                <div><select id="out_ty" placeholder="outline type" class="layerinfoselect">
-                    <option> outlinetype1 </option>
-                    <option> outlinetype2 </option>
-                    <option> outlinetype3 </option>
-                </select></div>
-                <div><select id="notional" class="layerinfoselect">
-                    <option> yes </option>
-                    <option> no </option>
-                </select></div>
-                <div><input type="number" id="ce_l" placeholder="0.0" class="layerinfoinput"><span class='msg'></span></div>
-                <div><input type="number" id="ce_w" placeholder="0.0" class="layerinfoinput"><span class='msg'></span></div>
-                <div><input type="number" id="ce_h" placeholder="0.0" class="layerinfoinput"><span class='msg'></span></div>
-                <div><input type="text" id="c_pvchar" placeholder="ce pvchar" class="layerinfoinput"><span class='msg'></span></div>
-                <div><select id="conf_lvl" class="layerinfoselect">
-                    <option> Confirmed </option>
-                    <option> Probable </option>
-                    <option> Possible </option>
-                </select></div>
-                <div><input type="text" id="icod" placeholder="icod" class="layerinfoinput"><span class='msg'></span></div>
-                <div><input type="text" id="qc_level" placeholder="ce pvchar" class="layerinfoinput"><span class='msg'></span></div>
-                <div><select id="class" class="layerinfoselect">
-                    <option> UNCLASSIFIED </option>
-                    <option> SUPER CLASSIFIED </option>
-                </select></div>    
-                <div><select id="release" class="layerinfoselect">
-                    <option> x </option>
-                    <option> a </option>
-                    <option> b </option>
-                    <option> c </option>
-                    <option> d </option>
-                </select></div>        
-                <div><input type="text" id="control" placeholder="ce pvchar" class="layerinfoinput"><span class='msg'></span></div>
-                <div><select id="drv_from" class="layerinfoselect"></select></div>
-                <div><select id="c_reason" class="layerinfoselect"></select></div>
-                <div><input type="text" id="decl_on" placeholder="ce pvchar" class="layerinfoinput"><span class='msg'></span></div>
-                <div><input type="text" id="source" placeholder="ce pvchar" class="layerinfoinput"><span class='msg'></span></div>
-                <div><select id="c_method" class="layerinfoselect"></select></div>
-                <div><input type="text" id="doi"  class="layerinfoinput"><span class='msg'></span></div>
-                <div><input type="text" id="c_date" class="layerinfoinput"><span class='msg'></span></div>
-                <div><input type="number" id="circ_er" placeholder="0.0" class="layerinfoinput"><span class='msg'></span></div>
-                <div><input type="number" id="lin_er" placeholder="0.0" class="layerinfoinput"><span class='msg'></span></div>
-                <div><input type="text" id="history" placeholder="ce pvchar" class="layerinfoinput"><span class='msg'></span></div>
-                <div><select id="producer" class="layerinfoselect">
-                    <option> 1 </option>
-                    <option> 2 </option>
-                    <option> 3 </option>
-                    <option> 4 </option>
-                    <option> 5 </option>
-                </select></div>     
-                <div><input type="text" id="analyst" class="layerinfoinput"><span class='msg'></span></div>
-                <div><input type="text" id="qc" class="layerinfoinput"><span class='msg'></span></div>
-                <div><input type="text" id="class_by" class="layerinfoinput"><span class='msg'></span></div>
-                <div><input type="text" id="tot" class="layerinfoinput"><span class='msg'></span></div>
-                <div><input type="text" id="shape" class="layerinfoinput"><span class='msg'></span></div>
-                <div><input type="button" id="submitlayerinfo" value="Submit"></div>
-            </form>
-        </div>
-    </div>
-</div>
+
+<div><input type="text" id="benumber" placeholder="benumber"><span class='msg'></span></div>
+<div><input type="text" id="osuffix" placeholder="osuffix"><span class='msg'></span></div>
+<div><input type="text" id="tgt_coor" placeholder="target coordinate"><span class='msg'></span></div>
+<div><input type="text" id="tgt_name" placeholder="target name"><span class='msg'></span></div>
+<div><input type="text" id="catcode" placeholder="cat code"><span class='msg'></span></div>
+<div><input type="text" id="country" placeholder="country code"><span class='msg'></span></div>
+<div><input type="text" id="label" placeholder="label"><span class='msg'></span></div>
+<div><input type="text" id="feat_nam" placeholder="feature name"><span class='msg'></span></div>
+<div><select id="out_ty" placeholder="outline type" >
+    <option> outlinetype1 </option>
+    <option> outlinetype2 </option>
+    <option> outlinetype3 </option>
+</select></div>
+<div><select id="notional" >
+    <option> yes </option>
+    <option> no </option>
+</select></div>
+<div><input type="number" id="ce_l" placeholder="0.0"><span class='msg'></span></div>
+<div><input type="number" id="ce_w" placeholder="0.0"><span class='msg'></span></div>
+<div><input type="number" id="ce_h" placeholder="0.0"><span class='msg'></span></div>
+<div><input type="text" id="c_pvchar" placeholder="ce pvchar"><span class='msg'></span></div>
+<div><select id="conf_lvl" >
+    <option> Confirmed </option>
+    <option> Probable </option>
+    <option> Possible </option>
+</select></div>
+<div><input type="text" id="icod" placeholder="icod"><span class='msg'></span></div>
+<div><input type="text" id="qc_level" placeholder="ce pvchar"><span class='msg'></span></div>
+<div><select id="class" >
+    <option> UNCLASSIFIED </option>
+</select></div>    
+<div><select id="release" >
+    <option> a </option>
+    <option> b </option>
+    <option> c </option>
+    <option> d </option>
+</select></div>        
+<div><input type="text" id="control" placeholder="ce pvchar"><span class='msg'></span></div>
+<div><select id="drv_from" ></select></div>
+<div><select id="c_reason" ></select></div>
+<div><input type="text" id="decl_on" placeholder="ce pvchar"><span class='msg'></span></div>
+<div><input type="text" id="source" placeholder="ce pvchar"><span class='msg'></span></div>
+<div><select id="c_method" ></select></div>
+<div><input type="text" id="doi" ><span class='msg'></span></div>
+<div><input type="text" id="c_date"><span class='msg'></span></div>
+<div><input type="number" id="circ_er" placeholder="0.0"><span class='msg'></span></div>
+<div><input type="number" id="lin_er" placeholder="0.0"><span class='msg'></span></div>
+<div><input type="text" id="history" placeholder="ce pvchar"><span class='msg'></span></div>
+<div><select id="producer" >
+    <option> 1 </option>
+    <option> 2 </option>
+    <option> 3 </option>
+    <option> 4 </option>
+    <option> 5 </option>
+</select></div>     
+<div><input type="text" id="analyst"><span class='msg'></span></div>
+<div><input type="text" id="qc"><span class='msg'></span></div>
+<div><input type="text" id="class_by"><span class='msg'></span></div>
+<div><input type="text" id="tot"><span class='msg'></span></div>
+<div><input type="text" id="shape"><span class='msg'></span></div>
+<div><input type="button" id="submitlayerinfo" value="Submit"></div>

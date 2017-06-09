@@ -12,16 +12,6 @@ var draw;
 var deleteInteraction;
 var radioSelection;
 
-var style = new ol.style.Style({
-    stroke: new ol.style.Stroke({
-        color: [0, 0, 255, 0.5],
-        width: 2
-    }),
-    fill: new ol.style.Fill({
-        color: 'transparent'
-    })
-});
-
 var shapeCounts = {
     'rectangle': 0,
     'circle': 0,
@@ -57,22 +47,20 @@ function drawShape(shapeType) {
                 source: shapeSource,
                 type: 'Circle',
                 geometryFunction: function(coordinates, geometry) {
-                    if (!geometry) {
-                        console.log('geom');
-                        geometry =new ol.geom.Circle(null);
+                    if(!geometry) {
+                        geometry = new ol.geom.Circle([coordinates[0][0], coordinates[0][1]], 0.0000001, 'XY');
+                        geometry = ol.geom.Polygon.fromCircle((<ol.geom.Circle>geometry), 200);
                     }
-                    console.warn('coordinates reads');
-                    console.log(coordinates[0]);
-                    var a = (coordinates[0][0] - coordinates[1][0]);
-                    a = (a < 0) ? (a * -1): a;
-                    console.log('radius reads ' + a);
-
-                    (<ol.geom.Circle>geometry).setCenterAndRadius([(coordinates[0][0] + coordinates[1][0])/2, (coordinates[0][1] + coordinates[1][1])/2], 
-                        a/2, 
-                        'XY');
-                    ol.geom.Polygon.fromCircle(<ol.geom.Circle>geometry, 0, 0).applyTransform(function(g1, g2, dim){
-                        return g2;
-                    });
+                    var extent = geometry.getExtent();
+                    var center = [0.5*(extent[0] + extent[2]), 0.5 * (extent[1] + extent[3])];   
+                    var scaleX = 2*(center[0] - coordinates[1][0]) / (extent[0] - extent[2]);
+                    var scaleY = 2*(center[1] - coordinates[1][1]) / (extent[1] - extent[3]);
+                    if(scaleX == 0) scaleX = 1;
+                    if(scaleY == 0) scaleY = 1;
+                    var transX = (coordinates[0][0]+coordinates[1][0])/2 - center[0];
+                    var transY = (coordinates[0][1]+coordinates[1][1])/2 - center[1];
+                    geometry.translate(transX, transY);   
+                    geometry.scale(scaleX, scaleY);
                     return geometry;
                 }
             });
@@ -103,6 +91,10 @@ function drawShape(shapeType) {
     }
     if(draw != undefined) {
         draw.on('drawend', function(e) {
+            // avoid duplicate naming
+            while(globals.shapes[shapeType + shapeCounts[shapeType]] != null) {
+                shapeCounts[shapeType]++;
+            }
             console.log('done drawing: ' + shapeType + shapeCounts[shapeType]);
             e.feature.setProperties({ 
                 'id': shapeType + shapeCounts[shapeType]
@@ -135,6 +127,7 @@ function setupDelete(){
         delete globals.shapes[e.element.get('id')];
         radioSelection = null;
         (<HTMLInputElement>document.querySelector('input[name = "draw-select"]:checked')).checked = false;
+                deleteInteraction.setActive(false);  
         setupShapes();
     });
     deleteInteraction.setActive(false);
@@ -143,7 +136,7 @@ function setupDelete(){
 
 function addRemoveFeatures() {
     shapeLayer.getSource().on('removefeature', function(evt){
-        deleteInteraction.setActive(false);     
+   
     });
     shapeLayer.getSource().on('addfeature', function(evt){
         setupShapes();
@@ -203,9 +196,6 @@ function drawButtons() {
                 drawShape(radioSelection);
             }
         };
-        if(innerText[i] == 'ellipse') {
-            radioInput.className = radioInput.className + ' inprogress';
-        }
         radioInput.name = 'draw-select';
     }
 

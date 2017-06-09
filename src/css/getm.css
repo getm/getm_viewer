@@ -24,30 +24,30 @@ select{
     width: 90%;
 }
 
-
 #debug {
     padding: 30px;
 }
 
-/* Toggle this class - hide and show the popup */
+#debug-contents{
+    height: 400px;
+}
 
 #getmPopupText.popuptext{
     height: 100%;
-}
-
-#getmPopup.popup:before {
-    height: 500px;
-}
-
-#getmPopup.popup:after {
-    
 }
 
 #getmPopup.popup{
     position: fixed;
     display: unset;
     width: 50%;
-    height: 500px;
     top:25%;
     left: 25%;
+}
+
+#searchFilterPopup.popup{
+    position: fixed;
+    display: unset;
+    top:25%;
+    width: 33%;
+    left: 33%
 }

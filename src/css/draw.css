@@ -1,44 +1,26 @@
 #drawPopup.popup {
     width: max-content;
-    height:280px;
+    height: max-content;
     display:unset;
     top:25%;
-    bottom: 25%;
-}
-
-#drawPopup.popup:before {
-    height: 280px;
-}
-
-#drawPopup.popup:after {
     position: fixed;
-    height: max-content;
-}
-
-#drawPopupText.popuptext{
-    height: 100%;
-}
-
-#drawPopupText.popuptext button {
-    color: #000;
-}
-
-input {
-    color: #77f;
 }
 
 .drawButtonOption {
     display: none;
 }
+
 .drawButtonOption:checked ~ .drawButtonOptionLabel {
     -webkit-box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.4);
 	-moz-box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.4);
 	box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.4);
 }
+
 .drawButtonOptionLabel {
     -webkit-appearance: button;
     padding: 2px 8px;
     border-radius: 4px;
     color: black;
     font-weight: normal;
+    width: max-content;
 }
