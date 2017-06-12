@@ -7,7 +7,7 @@
     top:50px;
     position:absolute;
     width: 100%;
-    padding: 20px;
+    /*padding: 20px;*/
 }
 
 body {
@@ -45,7 +45,6 @@ body {
     visibility: hidden;
     position: fixed;
     z-index: -1;
-    -webkit-user-drag: element;
 }
 
 /* The actual popup */

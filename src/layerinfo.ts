@@ -204,7 +204,8 @@ export function layerInfoSetup(){
         success: function(response, status, asdf){setRequired(response); console.log('response reads'); console.log(JSON.parse(response))},
         error: function(response, status, asdf){console.log("errors: " + status + '\n' + response);}
     });
-    var app = document.getElementById("app");
+
+    var app = document.getElementById('app');
     var layerInfoDiv = windowSetup('layerInfo');
     app.appendChild(layerInfoDiv);
 
@@ -258,8 +259,6 @@ export function layerInfoSetup(){
         e.preventDefault();
         var feature = map.forEachFeatureAtPixel(map.getEventPixel(e),
             function (feature, layer) {
-                console.log('context menu pls');
-                console.log(feature);
                 return feature;
         });
         if (feature) {

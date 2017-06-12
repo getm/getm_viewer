@@ -1,10 +1,10 @@
 export var globals = {
-    debug: true,
+    debug: false,
     selectedFeatureID: undefined,
     shapes: {}
 }
 
-export function windowSetup(id){
+export function windowSetup(id, headerTitle=id){
     var popup = document.createElement('div');
     popup.id = id+'Popup';
     popup.className = 'popup';
@@ -20,7 +20,7 @@ export function windowSetup(id){
     popupText.appendChild(windowHeaders);
 
     var windowHeaderTitle = document.createElement('span');
-    windowHeaderTitle.innerHTML = id;
+    windowHeaderTitle.innerHTML = headerTitle;
     windowHeaders.appendChild(windowHeaderTitle);
 
     var windowHeadersCloseBtn = document.createElement('button');

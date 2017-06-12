@@ -69,7 +69,34 @@ function saveShapes(){
     a.click();         
 }
 
-function search() {
+
+function besearch(){
+    var results = [];
+    for (var shapesID in globals.shapes) {   
+        if($('#besearch').val()) {
+            if($('#besearch').val() == WILDCARD ||
+            (globals.shapes[shapesID].getProperty('benumber') == $('#besearch').val())) {
+                results.push(shapesID);
+            }
+        }
+    }
+    document.getElementById('besearchResults').innerHTML = JSON.stringify(results);
+}
+
+function catsearch() {
+    var results = [];
+    for (var shapesID in globals.shapes) {
+        if($('#catsearch').val()){
+            if($('#catsearch').val() == WILDCARD ||
+                (globals.shapes[shapesID].getProperty('catcode') == $('#catsearch').val())) {
+                    results.push(shapesID);
+            }
+        }
+    }
+    document.getElementById('catsearchResults').innerHTML = JSON.stringify(results);
+}
+
+/*function search() {
     var results = [];
     for (var shapesID in globals.shapes) {
         var foundShape = undefined;
@@ -92,14 +119,13 @@ function search() {
     }
 
     document.getElementById('searchResults').innerHTML = JSON.stringify(results);
-}
+}*/
 
 export function setup() {
-    // getmFiltersSetup();
-    searchFiltersSetup();
+    catsearchFiltersSetup();
+    besearchFiltersSetup();
     getmSetup();
     mapLayerSetup();
-    debugSetup();
 
     $('#saveBtn').click(saveShapes);
     $('#saveSessBtn').click(saveSession);
@@ -120,23 +146,11 @@ function printImg(e) {
     });
 }
 
-function searchFiltersSetup() {
-    var searchFilterPopup = windowSetup('searchFilter');
-    document.getElementById('app').appendChild(searchFilterPopup);
+function catsearchFiltersSetup() {
+    var catsearchFilterPopup = windowSetup('catsearchFilter', 'Cat Search');
+    document.getElementById('app').appendChild(catsearchFilterPopup);
 
-    var windowContents = document.getElementById('searchFilter-contents');
-    var beSearchfilter = document.createElement('div');
-    windowContents.appendChild(beSearchfilter);
-
-    var beSearchLabel = document.createElement('span'); 
-    beSearchLabel.innerHTML = 'BE Search: ';
-    beSearchfilter.appendChild(beSearchLabel);
-
-    var beSearchInput = document.createElement('input');
-    beSearchInput.type = 'search';
-    beSearchInput.id = 'besearch';
-    beSearchfilter.appendChild(beSearchInput);
-
+    var windowContents = document.getElementById('catsearchFilter-contents');
     var catSearchfilter = document.createElement('div');
     windowContents.appendChild(catSearchfilter);
 
@@ -149,21 +163,63 @@ function searchFiltersSetup() {
     catSearchInput.id = 'catsearch';
     catSearchfilter.appendChild(catSearchInput);
 
-    var searchfilter = document.createElement('div');
-    windowContents.appendChild(searchfilter);
+    var catsearchfilter = document.createElement('div');
+    windowContents.appendChild(catsearchfilter);
 
-    var filterSearchBtn = document.createElement('input');
-    filterSearchBtn.type = 'button';
-    filterSearchBtn.value = 'Search';
-    filterSearchBtn.id = 'filterSearchBtn';
-    filterSearchBtn.onclick = search;
-    searchfilter.appendChild(filterSearchBtn);
+    var catfilterSearchBtn = document.createElement('input');
+    catfilterSearchBtn.type = 'button';
+    catfilterSearchBtn.value = 'Search';
+    catfilterSearchBtn.id = 'catfilterSearchBtn';
+    catfilterSearchBtn.onclick = catsearch;
+    catsearchfilter.appendChild(catfilterSearchBtn);
+
+    var catsearchResults = document.createElement('div');
+    catsearchResults.className = 'window-contents';
+    catsearchResults.id = 'catsearchResults';
+    document.getElementById('catsearchFilterPopupText').appendChild(catsearchResults);
+    document.getElementById('catsearchBtn').onclick = function() {
+        if(document.getElementById("catsearchFilterPopupText").classList.toggle("show")) {
+            $("#catsearchFilterPopup").zIndex(2);
+        }        
+    }
+}
+
+function besearchFiltersSetup() {
+    var besearchFilterPopup = windowSetup('besearchFilter', 'BE Search');
+    document.getElementById('app').appendChild(besearchFilterPopup);
+
+    var windowContents = document.getElementById('besearchFilter-contents');
+    var beSearchfilter = document.createElement('div');
+    windowContents.appendChild(beSearchfilter);
+
+    var beSearchLabel = document.createElement('span'); 
+    beSearchLabel.innerHTML = 'BE Search: ';
+    beSearchfilter.appendChild(beSearchLabel);
+
+    var beSearchInput = document.createElement('input');
+    beSearchInput.type = 'search';
+    beSearchInput.id = 'besearch';
+    beSearchfilter.appendChild(beSearchInput);
+
+    var besearchfilter = document.createElement('div');
+    windowContents.appendChild(besearchfilter);
+
+    var befilterSearchBtn = document.createElement('input');
+    befilterSearchBtn.type = 'button';
+    befilterSearchBtn.value = 'Search';
+    befilterSearchBtn.id = 'befilterSearchBtn';
+    befilterSearchBtn.onclick = besearch;
+    besearchfilter.appendChild(befilterSearchBtn);
 
     var searchResults = document.createElement('div');
     searchResults.className = 'window-contents';
-    searchResults.id = 'searchResults';
-    document.getElementById('searchFilterPopupText').appendChild(searchResults);
-    document.getElementById('searchBtn').onclick = searchFiltersPopup;
+    searchResults.id = 'besearchResults';
+    document.getElementById('besearchFilterPopupText').appendChild(searchResults);
+    document.getElementById('besearchBtn').onclick = function(){
+        if(document.getElementById("besearchFilterPopupText").classList.toggle("show")) {
+            $("#besearchFilterPopup").zIndex(2);
+        }
+    }
 }
 
 function getmSetup() {
@@ -195,7 +251,7 @@ function getmSetup() {
 }
 
 function mapLayerSetup() {
-    var getm = windowSetup('mapLayer');
+    var getm = windowSetup('mapLayer', 'Map Layers');
     document.getElementById('mapLayerButton').onclick = mapLayerPopup;
 
     var div1 = document.createElement('div');
@@ -225,12 +281,6 @@ function mapLayerSetup() {
     var span4 = document.createElement('select');
     span4.className = 'shape-layer-select';
     div3.appendChild(span4);
-}
-
-function debugSetup() {
-    var debug = windowSetup('debug');
-    document.getElementById('debugButton').onclick = debugPopup; 
-    document.getElementById('debug-contents').innerHTML = 'DEBUG TEXTS GO HERE';
 }
 
 // setup shapes 
@@ -323,14 +373,10 @@ function normalizeCoord(coord) {
 };
 
 // callback function for database stuffs
-function updateShapesCallback(response, status, asdf) {
+function updateShapesCallback(response, status, xhr) {
     if(response!= []) {
         for(var i in response){
-            if(globals.debug)
-                console.log('old object id is ' + globals.shapes[response[i]['id']].getObjectID() );
             globals.shapes[response[i]['id']].setObjectID(response[i]['objectID']);
-            if(globals.debug)
-                console.log('new object id is ' +  response[i]['objectID']);
             setupShapes();
         }
     }
@@ -412,7 +458,6 @@ function deleteShapes() {
          data: JSON.stringify(buildDelete()),
          contentType: 'application/json',
          success: updateShapesCallback,
-         error: function(response, status, asdf){if(globals.debug) console.log("delete errors: " + status + '\n' + JSON.stringify(response));}
      });
 }
 
@@ -423,7 +468,6 @@ function updateShapes() {
         data: JSON.stringify(buildUpdate()),
         contentType: 'application/json',
         success: updateShapesCallback,
-        error: function(response, status, asdf){if(globals.debug) console.log("update errors: " + status + '\n' + response);}
     });
 }
 
@@ -434,7 +478,6 @@ function insertShapes() {
         data: JSON.stringify(buildInsert()),
         contentType: 'application/json',
          success: updateShapesCallback,
-         error: function(response, status, asdf){if(globals.debug) console.log("insert errors: " + status + '\n' + response);}
      });
 }
 
@@ -447,17 +490,5 @@ function getmPopup() {
 function mapLayerPopup() {
     if(document.getElementById("mapLayerPopupText").classList.toggle("show")) {
         $("#mapLayerPopup").zIndex(2);
-    }
-}
-
-function searchFiltersPopup() {
-    if(document.getElementById("searchFilterPopupText").classList.toggle("show")) {
-        $("#searchFilterPopup").zIndex(2);
-    }
-}
-
-function debugPopup() {
-    if(document.getElementById("debugPopupText").classList.toggle("show")) {
-        $("#debugPopup").zIndex(2);
     }
 }

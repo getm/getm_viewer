@@ -99,7 +99,6 @@ function drawShape(shapeType) {
             e.feature.setProperties({ 
                 'id': shapeType + shapeCounts[shapeType]
             });
-            
             var shape = new Shape(e.feature, shapeLayer, null);
             globals.shapes[shapeType + shapeCounts[shapeType]] = shape;
             shapeCounts[shapeType]++;
@@ -146,7 +145,7 @@ function addRemoveFeatures() {
 export function drawSetup() {
     document.getElementById('drawButton').onclick = drawPopup;
     var app = document.getElementById("app");
-    var drawDiv = windowSetup('draw');
+    var drawDiv = windowSetup('draw', 'Draw');
     app.appendChild(drawDiv);
     drawDiv.classList.toggle('show');
 
