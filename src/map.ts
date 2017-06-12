@@ -5,10 +5,6 @@ import {globals} from './globals';
 import {setupShapes} from './getm';
 
 const BASE_MAP_LAYER = 0;
-// const AIRPORTS_LAYER = 1;
-// const ROADS_LAYER = 2;
-// const STATE_ROUTES_LAYER = 3;
-// const SHAPES_LAYER = 4;
 var attribution = new ol.control.Attribution({});
 
 var controls = new ol.Collection([new ol.control.FullScreen(),attribution, new ol.control.Zoom()])

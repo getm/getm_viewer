@@ -6,18 +6,21 @@ import {GeoServerRestInterface} from './gsRestService';
 import {map, shapeLayer} from './map';
 import {globals, windowSetup} from './globals';
 import {setupShapes} from './getm';
+
 var required;
 var vals=['benumber', 'osuffix', 'tgt_coor', 'tgt_name', 'catcode', 
     'country', 'label', 'feat_nam', 'out_ty', 'notional', 'ce_l', 'ce_w', 
     'ce_h', 'c_pvchar', 'conf_lvl', 'icod', 'qc_level', 'class', 'release', 
     'control', 'drv_from', 'c_reason', 'decl_on', 'source', 'c_method', 'doi', 
-    'c_date', 'circ_er', 'lin_er', 'history', 'producer', 'analyst', 'qc', 'class_by', 'tot','shape'];
+    'c_date', 'circ_er', 'lin_er', /*'history'*/, 'producer', 'analyst', /*'qc',*/ 'class_by', 
+    'tot','shape', 'chng_req', 'd_state'];
 
 var types=['java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 
     'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.math.BigDecimal', 'java.math.BigDecimal', 
     'java.math.BigDecimal', 'java.lang.String', 'java.lang.String', 'java.sql.Timestamp', 'java.lang.Short', 'java.lang.String', 'java.lang.String', 
     'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.sql.Timestamp', 
-    'java.sql.Timestamp', 'java.math.BigDecimal', 'java.math.BigDecimal', 'java.lang.Short', 'java.lang.Short', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'com.vividsolutions.jts.geom.Geometry'];
+    'java.sql.Timestamp', 'java.math.BigDecimal', 'java.math.BigDecimal', /*'java.lang.Short',*/ 'java.lang.Short', 'java.lang.String', /*'java.lang.String',*/ 'java.lang.String', 
+    'java.lang.String', 'com.vividsolutions.jts.geom.Geometry', 'java.lang.String', 'java.lang.Short'];
 
 
 function setRequired(response) {
@@ -27,13 +30,16 @@ function setRequired(response) {
 }
 
 export function layerInfoPopup(){
-    $('#layerInfoPopupText').addClass('show');
-    $('#layerInfoPopup').zIndex(2);
-
     if(globals.shapes[globals.selectedFeatureID].getProperties() != undefined)
         retrieveValues();
     else
-        fillLayerInfoDefaults();
+        clearLayerInfoContents();
+    (<HTMLInputElement>document.getElementById('tgt_name')).value = globals.selectedFeatureID;   
+    for(var val in vals) 
+        validateLayerInfo(vals[val], types[val]); 
+     
+    $('#layerInfoPopupText').addClass('show');
+    $('#layerInfoPopup').zIndex(2);     
 }
 
 function typeCheck(val, type) {
@@ -132,8 +138,14 @@ function assignValues() {
     console.log('assigned values to ' + id);
 }
 
+function clearLayerInfoContents() {
+    for(var val in vals) {
+        (<HTMLInputElement>document.getElementById(vals[val])).value ="";
+    }
+}
+
 // TODO: something about this....
-export function fillLayerInfoDefaults() {
+function fillLayerInfoDefaults() {
     (<HTMLInputElement>document.getElementById('layerinfolayer')).value = shapeLayer.get('name');
     (<HTMLInputElement>document.getElementById('benumber')).value = '0000-00000';
     (<HTMLInputElement>document.getElementById('osuffix')).value = 'AS000';
@@ -184,25 +196,11 @@ function hideLayerInfoPopup() {
     $(layerInfoPopupText.parentElement).zIndex(-1);
 }
 
-function assignAndClose(){
-    var form =  document.getElementById('layerInfoForm'); 
-    var s = 'form has ' + form.children.length + ' stuffs<br/>'
-    for(var i = 0; i < form.children.length-1; i++) {
-        s = s +'child ' + (i+1) + ' is ' + (<HTMLElement>(form.children[i].firstChild)).id + ': ' + (<HTMLInputElement>(form.children[i].firstChild)).value 
-        + ' with type ' + (<HTMLInputElement>(form.children[i].firstChild)).type +'<br/>'
-    }
-    document.getElementById('debug-contents').innerHTML = s;
-
-    assignValues();
-    hideLayerInfoPopup();
-}
-
 export function layerInfoSetup(){
     $.ajax({
         type: 'GET',
         url: GeoServerRestInterface.getLayersUrl(),
-        success: function(response, status, asdf){setRequired(response); console.log('response reads'); console.log(JSON.parse(response))},
-        error: function(response, status, asdf){console.log("errors: " + status + '\n' + response);}
+        success: function(response, status, asdf){setRequired(response);},
     });
 
     var app = document.getElementById('app');
@@ -230,9 +228,11 @@ export function layerInfoSetup(){
         input.type = 'text';
         input.id = vals[val];
         input.placeholder = vals[val];
-        input.value = vals[val];
         input.onchange = function(){
             validateLayerInfo(this.id, types[vals.indexOf(this.id)]);
+            if (this.classList.contains('wrong')){
+                document.getElementById(this.id + '-msg').innerHTML="Wrong: correct syntax is " + '<correct syntax>';
+            }
         }
         div.appendChild(input);
 
@@ -253,7 +253,10 @@ export function layerInfoSetup(){
     submit.id = 'submitlayerinfo';
     submit.value = 'Submit';
     div2.appendChild(submit);
-    $('#submitlayerinfo').click(assignAndClose);
+    $('#submitlayerinfo').click(function(){
+        assignValues();
+        hideLayerInfoPopup();
+    });
 
     map.getViewport().addEventListener('contextmenu', function (e) {
         e.preventDefault();
@@ -271,15 +274,12 @@ export function layerInfoSetup(){
 }
 
 function validateLayerInfo(val, t) {
-    // correct
-        console.log('val is ' + val + '-msg');    
+    // correct 
     if(typeCheck((<HTMLInputElement>document.getElementById(val)), t)) {
         (<HTMLInputElement>document.getElementById(val)).className.replace(' wrong','')
     // incorrect and not marked as wrong
     } else if((<HTMLInputElement>document.getElementById(val)).className.indexOf(' wrong') !== -1) {
         (<HTMLInputElement>document.getElementById(val)).className = (<HTMLInputElement>document.getElementById(val)).className + ' wrong';
-        console.log('val is ' + val + '-msg');
-        document.getElementById(val+'-msg').className = 'msgasdf';
+        document.getElementById(val+'-msg').className = 'msg';
     }
 }
-

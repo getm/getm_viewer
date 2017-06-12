@@ -31,13 +31,13 @@
     left: 0%;
 }
 
-.required ~ .msg:after{
-    /*content: "Required";*/
+/*.required ~ .msg:after{
+    /*content: "Required";
 }
 
 .wrong ~ .msg:after{
-    /*content: "Syntax error";*/
-}
+    /*content: "Syntax error";
+}*/
 
 .msg{ 
     display: inline-table;

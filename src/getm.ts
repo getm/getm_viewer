@@ -7,7 +7,6 @@ import {layerInfoPopup} from './layerinfo'; // to something about this?
 import {globals, windowSetup} from './globals';
 import {map} from './map';
 import {Shape} from './Shape';
-
 const WILDCARD = '*';
 
 function loadSession(){
@@ -21,15 +20,13 @@ function loadSession(){
         var storageShapes = JSON.parse(localStorage.shapes);
         for(var shapesID in storageShapes) {
             var layer = null;
-            console.log('loading: ' + shapesID);
             var feature = new ol.format.KML().readFeature(storageShapes[shapesID]['feature']);
-            for(var l of map.getLayerGroup().getLayers().getArray()){
+            for(var l of (<ol.layer.Group>map.getLayerGroup().getLayers().getArray()[2]).getLayers().getArray()){         
                 if( (<ol.layer.Vector>l).get('name') == storageShapes[shapesID]['layer']){
-                    (<ol.layer.Vector>l).getSource().addFeature(feature);     
                     layer = l;
                 }
             }
-
+            (<ol.layer.Vector>layer).getSource().addFeature(feature);    
             globals.shapes[shapesID] = new Shape(
                 feature,
                 layer,
@@ -44,8 +41,8 @@ function loadSession(){
 function saveSession(){
     var storageShapes = {};
     for(var shapesID in globals.shapes) {
-        console.log('saving: ' + shapesID);
         var storageShape = {};
+
         storageShape['feature'] = new ol.format.KML().writeFeatures([globals.shapes[shapesID].getFeature()]);
         storageShape['layer'] = globals.shapes[shapesID].getLayer().get('name');
         storageShape['properties'] = globals.shapes[shapesID].getProperties();
@@ -68,7 +65,6 @@ function saveShapes(){
     a.href = window.URL.createObjectURL(new Blob([shp], {'type': 'application/octet-stream'}));
     a.click();         
 }
-
 
 function besearch(){
     var results = [];
@@ -95,31 +91,6 @@ function catsearch() {
     }
     document.getElementById('catsearchResults').innerHTML = JSON.stringify(results);
 }
-
-/*function search() {
-    var results = [];
-    for (var shapesID in globals.shapes) {
-        var foundShape = undefined;
-        if($('#catsearch').val()){
-            if($('#catsearch').val() == WILDCARD ||
-                (globals.shapes[shapesID].getProperty('catcode') == $('#catsearch').val())) {
-                    console.log('found: ' + shapesID);
-                    //results.push(shapesID);
-                    foundShape = shapesID;
-            }
-        }
-        if($('#besearch').val()) {
-            if($('#besearch').val() == WILDCARD ||
-            (globals.shapes[shapesID].getProperty('benumber') == $('#besearch').val())) {
-                console.log('found: ' + shapesID);
-                if(foundShape == shapesID)
-                    results.push(shapesID);
-            }
-        }
-    }
-
-    document.getElementById('searchResults').innerHTML = JSON.stringify(results);
-}*/
 
 export function setup() {
     catsearchFiltersSetup();
@@ -224,8 +195,11 @@ function besearchFiltersSetup() {
 
 function getmSetup() {
     var getm = windowSetup('getm');
-    document.getElementById('getmButton').onclick = getmPopup;
-
+    document.getElementById('getmButton').onclick = function(){    
+        if(document.getElementById("getmPopupText").classList.toggle("show")) {
+            $("#getmPopup").zIndex(2);
+        };
+    }
     var div1 = document.createElement('div');
     div1.id = 'layer';
     div1.align = 'center';
@@ -252,7 +226,11 @@ function getmSetup() {
 
 function mapLayerSetup() {
     var getm = windowSetup('mapLayer', 'Map Layers');
-    document.getElementById('mapLayerButton').onclick = mapLayerPopup;
+    document.getElementById('mapLayerButton').onclick = function(){
+        if(document.getElementById("mapLayerPopupText").classList.toggle("show")) {
+            $("#mapLayerPopup").zIndex(2);
+        }
+    };
 
     var div1 = document.createElement('div');
     div1.align = 'center';
@@ -285,14 +263,10 @@ function mapLayerSetup() {
 
 // setup shapes 
 export function setupShapes() {
-    console.log('setupShapes');
     var insertEntries = [];
     var updateEntries = [];
     var deleteEntries = [];
     for(var shapesID in globals.shapes) {
-        console.log('working on feature ' + shapesID + 
-            ' with layer ' + globals.shapes[shapesID].getProperties() + 
-            ' and shape layer ' + globals.shapes[shapesID].getLayer().get('name'));
         if(globals.shapes[shapesID].getLayer().getVisible()) {
             if(globals.shapes[shapesID].objectID == -1)
                 insertEntries.push(shapesID);
@@ -387,14 +361,11 @@ function buildInsert() {
     var insertSelect = document.getElementById('insertShapesSelect');
     var selectedOptions = (<HTMLSelectElement>insertSelect).selectedOptions;
 
-    console.log('selected insert options has this many elements ' + selectedOptions.length);
-
     for(var option = 0; option < selectedOptions.length; option++) {
         var layer = (globals.shapes[selectedOptions[option].text]).getLayer().get('name').toString();
         var geojson = new ol.format.GeoJSON().writeFeatureObject(globals.shapes[selectedOptions[option].text].getFeature());
         for(var coordinate in geojson['geometry']['coordinates']) {
             for(var coord in geojson['geometry']['coordinates'][coordinate]) {
-                console.log(geojson['geometry']['coordinates'][coordinate][coord]);
                 if(typeof geojson['geometry']['coordinates'][coordinate][coord] != 'number')
                     geojson['geometry']['coordinates'][coordinate][coord] = normalizeCoord(geojson['geometry']['coordinates'][coordinate][coord]);
             }
@@ -414,13 +385,11 @@ function buildUpdate() {
     var updateSelect = document.getElementById('updateShapesSelect');
     var selectedOptions = (<HTMLSelectElement>updateSelect).selectedOptions;
 
-    console.log('selected update options has this many elements ' + selectedOptions.length);
     for(var option = 0; option < selectedOptions.length; option++) {
         var layer = (globals.shapes[selectedOptions[option].text]).getLayer().get('name').toString();
         var geojson = new ol.format.GeoJSON().writeFeatureObject(globals.shapes[selectedOptions[option].text].getFeature());
         for(var coordinate in geojson['geometry']['coordinates']) {
             for(var coord in geojson['geometry']['coordinates'][coordinate]) {
-                console.log(geojson['geometry']['coordinates'][coordinate][coord]);
                 if(typeof geojson['geometry']['coordinates'][coordinate][coord] != 'number')
                     geojson['geometry']['coordinates'][coordinate][coord] = normalizeCoord(geojson['geometry']['coordinates'][coordinate][coord]);
             }
@@ -440,7 +409,6 @@ function buildDelete() {
     var deleteSelect = document.getElementById('deleteShapesSelect');
     var selectedOptions = (<HTMLSelectElement>deleteSelect).selectedOptions;
 
-    console.log('selected delete options has this many elements ' + selectedOptions.length);
     for(var option = 0; option < selectedOptions.length; option++) {
         var entry= {};
         entry['id'] = selectedOptions[option].text;
@@ -479,16 +447,4 @@ function insertShapes() {
         contentType: 'application/json',
          success: updateShapesCallback,
      });
-}
-
-function getmPopup() {
-    if(document.getElementById("getmPopupText").classList.toggle("show")) {
-        $("#getmPopup").zIndex(2);
-    }
-}
-
-function mapLayerPopup() {
-    if(document.getElementById("mapLayerPopupText").classList.toggle("show")) {
-        $("#mapLayerPopup").zIndex(2);
-    }
 }

@@ -3,7 +3,6 @@ import * as $ from 'jquery';
 import * as ol from 'openlayers';
 import './css/draw.css';
 import {setupShapes} from './getm';
-import {fillLayerInfoDefaults} from './layerinfo';
 import {globals, windowSetup} from './globals';
 import {Shape} from './Shape';
 
@@ -27,7 +26,6 @@ function drawShape(shapeType) {
         map.removeInteraction(draw);
     }
     var shapeSource = shapeLayer.getSource();
-    console.log('draw is undefined and shape is ' + shapeType);
     switch(shapeType) {
         case 'rectangle': 
             draw = new ol.interaction.Draw({
@@ -39,7 +37,8 @@ function drawShape(shapeType) {
         case 'circle':
             draw = new ol.interaction.Draw({
                 source: shapeSource,
-                type: "Circle"
+                type: "Circle",
+                geometryFunction: ol.interaction.Draw.createRegularPolygon(200,0)
             });
             break;
         case 'ellipse':
@@ -95,7 +94,6 @@ function drawShape(shapeType) {
             while(globals.shapes[shapeType + shapeCounts[shapeType]] != null) {
                 shapeCounts[shapeType]++;
             }
-            console.log('done drawing: ' + shapeType + shapeCounts[shapeType]);
             e.feature.setProperties({ 
                 'id': shapeType + shapeCounts[shapeType]
             });
@@ -134,9 +132,6 @@ function setupDelete(){
 }
 
 function addRemoveFeatures() {
-    shapeLayer.getSource().on('removefeature', function(evt){
-   
-    });
     shapeLayer.getSource().on('addfeature', function(evt){
         setupShapes();
     });
