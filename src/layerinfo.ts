@@ -120,10 +120,15 @@ function assignValues() {
 
     // setting variable name
     if(id != globals.selectedFeatureID) {
-        globals.shapes[globals.selectedFeatureID].getFeature().set('id', id);
-        var temp = globals.shapes[globals.selectedFeatureID];
-        delete globals.shapes[globals.selectedFeatureID];
-        globals.shapes[id] = temp;
+        if(globals.shapes[id] == undefined) {
+            globals.shapes[globals.selectedFeatureID].getFeature().set('id', id);
+            var temp = globals.shapes[globals.selectedFeatureID];
+            delete globals.shapes[globals.selectedFeatureID];
+            globals.shapes[id] = temp;
+        } else {
+            // don't write over what currently exists
+            (<HTMLInputElement>document.getElementById('tgt_name')).value = globals.selectedFeatureID;
+        }
     }
 
     var feature = globals.shapes[id].getFeature();
@@ -255,7 +260,7 @@ export function layerInfoSetup(){
     div2.appendChild(submit);
     $('#submitlayerinfo').click(function(){
         assignValues();
-        hideLayerInfoPopup();
+        //hideLayerInfoPopup();
     });
 
     map.getViewport().addEventListener('contextmenu', function (e) {
