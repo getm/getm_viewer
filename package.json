@@ -1,5 +1,5 @@
 {
-  "name": "getm_map",
+  "name": "getm",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -22,6 +22,7 @@
     "css-loader": "^0.28.1",
     "extract-text-webpack-plugin": "^2.1.0",
     "gulp": "^3.9.1",
+    "gulp-util": "^3.0.8",
     "gulp-zip": "^4.0.0",
     "gutil": "^1.6.4",
     "style-loader": "^0.17.0",
