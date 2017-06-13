@@ -22,6 +22,9 @@ var types=['java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lan
     'java.sql.Timestamp', 'java.math.BigDecimal', 'java.math.BigDecimal', /*'java.lang.Short',*/ 'java.lang.Short', 'java.lang.String', /*'java.lang.String',*/ 'java.lang.String', 
     'java.lang.String', 'com.vividsolutions.jts.geom.Geometry', 'java.lang.String', 'java.lang.Short'];
 
+var errMsg=[
+    'Regex: /[0,1][0.8]\d{2}[A-Z,-][A-Z,0-9]\d{4}/ <br/>Example: 1234-12345'
+];
 
 function setRequired(response) {
     response = JSON.parse(response);
@@ -49,6 +52,7 @@ function typeCheck(val, type) {
         switch(val.id) {
             case 'benumber':
                 correct = utils.verifyBeNumber(val, required.indexOf(val.id) != -1);
+                document.getElementById('benumber-msg').innerHTML = '';
                 break;
             case 'osuffix':
                 correct = utils.verifyOSuffix(val, required.indexOf(val.id) != -1);
@@ -244,7 +248,7 @@ export function layerInfoSetup(){
         }
         div.appendChild(input);
 
-        var msg = document.createElement('span');
+        var msg = document.createElement('div');
         msg.className = 'msg';
         msg.id = vals[val] + '-msg';
         div.appendChild(msg);
