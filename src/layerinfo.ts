@@ -2,7 +2,7 @@ import './css/layerinfo.css'
 import * as $ from 'jquery';
 import * as ol from 'openlayers';
 import {utils} from './getmValidation/getmUtils';
-import {GeoServerRestInterface} from './gsRestService';
+import {GeoServerRestInterface} from '../dist/config.js';
 import {map, shapeLayer} from './map';
 import {globals, windowSetup} from './globals';
 import {setupShapes} from './getm';
@@ -33,7 +33,8 @@ export function layerInfoPopup(){
     if(globals.shapes[globals.selectedFeatureID].getProperties() != undefined)
         retrieveValues();
     else
-        clearLayerInfoContents();
+        fillLayerInfoDefaults();
+        //clearLayerInfoContents();
     (<HTMLInputElement>document.getElementById('tgt_name')).value = globals.selectedFeatureID;   
     for(var val in vals) 
         validateLayerInfo(vals[val], types[val]); 
@@ -175,7 +176,7 @@ function fillLayerInfoDefaults() {
     (<HTMLInputElement>document.getElementById('control')).value = 'none';
     (<HTMLInputElement>document.getElementById('drv_from')).value = 'none';
     (<HTMLInputElement>document.getElementById('c_reason')).value = 'none';
-    (<HTMLInputElement>document.getElementById('decl_on')).value = 'none';
+    (<HTMLInputElement>document.getElementById('decl_on')).value = '';
     (<HTMLInputElement>document.getElementById('source')).value = 'none';
     (<HTMLInputElement>document.getElementById('c_method')).value = 'none';
     // (<HTMLInputElement>document.getElementById('doi')).value = '2017-02-12';
@@ -184,13 +185,15 @@ function fillLayerInfoDefaults() {
     (<HTMLInputElement>document.getElementById('c_date')).value = '02/12/2017';    
     (<HTMLInputElement>document.getElementById('circ_er')).value = '0.0';
     (<HTMLInputElement>document.getElementById('lin_er')).value = '0.0';
-    (<HTMLInputElement>document.getElementById('history')).value = '0';
+    //(<HTMLInputElement>document.getElementById('history')).value = '0';
     (<HTMLInputElement>document.getElementById('producer')).value = '1';
     (<HTMLInputElement>document.getElementById('analyst')).value = 'none';
-    (<HTMLInputElement>document.getElementById('qc')).value = 'none';
+    //(<HTMLInputElement>document.getElementById('qc')).value = 'none';
     (<HTMLInputElement>document.getElementById('class_by')).value = 'none';
-    (<HTMLInputElement>document.getElementById('tot')).value = 'none';
+    (<HTMLInputElement>document.getElementById('tot')).value = '';
     (<HTMLInputElement>document.getElementById('shape')).value = '-';
+    (<HTMLInputElement>document.getElementById('chng_req')).value = 'none';
+    (<HTMLInputElement>document.getElementById('d_state')).value = '0';
 
     assignValues();
 }

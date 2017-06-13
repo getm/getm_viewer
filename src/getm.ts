@@ -2,7 +2,7 @@ import * as $ from 'jquery';
 import 'jqueryui';
 import './css/getm.css';
 import * as ol from 'openlayers';
-import {GeoServerRestInterface} from './gsRestService';
+import {GeoServerRestInterface} from '../dist/config.js';
 import {layerInfoPopup} from './layerinfo'; // to something about this?
 import {globals, windowSetup} from './globals';
 import {map} from './map';

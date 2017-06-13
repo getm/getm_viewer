@@ -3,6 +3,7 @@ import * as ol from 'openlayers';
 import * as $ from 'jquery';
 import {globals} from './globals';
 import {setupShapes} from './getm';
+import {wfsRestInterface} from '../dist/config.js';
 
 const BASE_MAP_LAYER = 0;
 var attribution = new ol.control.Attribution({});
@@ -32,8 +33,7 @@ map.setView(new ol.View({
 
 var wfs_airports_source = new ol.source.Vector({
     format: new ol.format.GML3(),
-    url: 'http://localhost:9002/' +
-    'geoserver/wfs/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=wfs:cl_airports&maxFeatures=50' + '&outputFormat=GML3',
+    url: wfsRestInterface.getAirportsUrl(),
     strategy: ol.loadingstrategy.bbox,
     attributions: [new ol.Attribution({
         html: '<div id="airports_attribution">Airports</div>'
@@ -42,7 +42,7 @@ var wfs_airports_source = new ol.source.Vector({
 
 var wfs_roads_source = new ol.source.Vector({
     format: new ol.format.GML3(),
-    url: 'http://localhost:9002/' + 'geoserver/wfs/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=wfs:cl_roads' + '&outputFormat=GML3',
+    url: wfsRestInterface.getRoadsUrl(),
     strategy: ol.loadingstrategy.bbox,
     attributions: [new ol.Attribution({
         html: '<div id="roads_attribution">Roads</div>'
@@ -51,7 +51,7 @@ var wfs_roads_source = new ol.source.Vector({
 
 var wfs_state_routes_source = new ol.source.Vector({
     format: new ol.format.GML3(),
-    url: 'http://localhost:9002/' + 'geoserver/wfs/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=wfs:cl_state_routes' + '&outputFormat=GML3',
+    url: wfsRestInterface.getStateRoutesUrl(),
     strategy: ol.loadingstrategy.bbox,
     attributions: [new ol.Attribution({
         html: '<div id="state_routes_attribution">State Routes</div>'
@@ -169,11 +169,7 @@ function populateMap() {
 function populateShape(){
     // generate the sources and layers for the shapes
     for(var i = 0; i < shapeLayerOptions.length; i++) {
-        var source = new ol.source.Vector({
-            // attributions: [new ol.Attribution({
-            //     html: '<div class="shape_layer_attribution" style="color:yellow">' + shapeLayerOptions[i] + '</div>'
-            // })]
-        });
+        var source = new ol.source.Vector({});
         var vector = new ol.layer.Vector({source: source, visible: false, style: style});
         vector.set('selectable', true);
         vector.set('name', shapeLayerOptions[i]);
