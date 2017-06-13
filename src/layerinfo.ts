@@ -2,7 +2,7 @@ import './css/layerinfo.css'
 import * as $ from 'jquery';
 import * as ol from 'openlayers';
 import {utils} from './getmValidation/getmUtils';
-import {GeoServerRestInterface} from '../dist/config.js';
+import '../dist/config.js';
 import {map, shapeLayer} from './map';
 import {globals, windowSetup} from './globals';
 import {setupShapes} from './getm';
@@ -10,27 +10,42 @@ import {setupShapes} from './getm';
 var required;
 var vals=['benumber', 'osuffix', 'tgt_coor', 'tgt_name', 
     'catcode', 'country', 'label', 'feat_nam', 'out_ty', 'notional', 'ce_l', 'ce_w', 
-    'ce_h', 'c_pvchar', 'conf_lvl', 'icod', /*'qc_level',*/ 'class', 'release', 
-    'control', 'drv_from', 'c_reason', 'decl_on', 'source', 'c_method', 'doi', 
-    'c_date', 'circ_er', 'lin_er', /*'history'*/, 'producer', 'analyst', 'qc', 'class_by', 
-    'tot','shape', 'chng_req', 'd_state'];
+    'ce_h', 'c_pvchar', 'conf_lvl', 'icod', /*'qc_level',*/ 'class', 
+    'release', 'control', 'drv_from', 'c_reason', 'decl_on', 
+    'source', 'c_method', 'doi', 
+    'c_date', 'circ_er', 
+    'lin_er', /*'history'*/ 'producer', 'analyst', 'qc', 
+    'class_by', 'tot','shape', 'chng_req', 'd_state'];
 
 var types=['java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 
     'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.math.BigDecimal', 'java.math.BigDecimal', 
-    'java.math.BigDecimal', 'java.lang.String', 'java.lang.String', 'java.sql.Timestamp', /*'java.lang.Short',*/ 'java.lang.String', 'java.lang.String', 
-    'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.sql.Timestamp', 
-    'java.sql.Timestamp', 'java.math.BigDecimal', 'java.math.BigDecimal', /*'java.lang.Short',*/ 'java.lang.Short', 'java.lang.String', 'java.lang.String', 'java.lang.String', 
-    'java.lang.String', 'com.vividsolutions.jts.geom.Geometry', 'java.lang.String', 'java.lang.Short'];
+    'java.math.BigDecimal', 'java.lang.String', 'java.lang.String', 'java.sql.Timestamp', /*'java.lang.Short',*/ 'java.lang.String', 
+    'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 
+    'java.lang.String', 'java.lang.String', 'java.sql.Timestamp', 
+    'java.sql.Timestamp', 'java.math.BigDecimal', 
+    'java.math.BigDecimal', /*'java.lang.Short',*/ 'java.lang.Short', 'java.lang.String', 'java.lang.String', 
+    'java.lang.String', 'java.lang.String', 'com.vividsolutions.jts.geom.Geometry', 'java.lang.String', 'java.lang.Short'];
 
 var errRegex=[
     '/[0,1][0.8]\d{2}[A-Z,-][A-Z,0-9]\d{4}/', '/[A-Z]{2}\d{3}/','/^(\d{1,2}[\d.]{0,1}\d{0,3})[NS][ ](\d{1,3}[\d.]{0,1}\d{0,3})[EW]/', '/[A-Z,a-z,0-9,\s]{1-256}/',
     '/\d{5}/', '/[A-Z]{2}/', '/[A-Z,a-z,0-9,\s]{0-254}/', '/[A-Z,a-z,0-9,\s]{1-50}/', '/[A-Z,a-z,0-9,\s]{1-3}/', 'float in meters', 'float in meters', 
-    'float in meters', '/[A-Z,a-z,0-9,\s]{1-20}/','/[A-Z,a-z,0-9,\s]{1-24}/', '/([0-1]{0,1}\d{0,1}[/][0-3]{0,1}\d{0,1}[/]\d{4})(?![^\0])/',,
+    'float in meters', '/[A-Z,a-z,0-9]{1-20}/','/[A-Z,a-z,0-9]{1-24}/', '/([0-1]{0,1}\d{0,1}[/][0-3]{0,1}\d{0,1}[/]\d{4})(?![^\0])/', /** ,*/ '/[A-Z,a-z,0-9]{1-12}/',
+    '/[A-Z,a-z,0-9]{1}/', '/[A-Z,a-z,0-9]{1-32}/', '/[A-Z,a-z,0-9,/s]{1-48}/', '/[A-Z,a-z,0-9, /s]{1-20}/', '/[2][5][x][1][,][ ]\d{8}/', 
+    '/[A-Z,a-z,0-9]{1-20}/..idk', '/[A-Z,a-z,0-9,/s]{1-64}/', '/([0-1]{0,1}\d{0,1}[/][0-3]{0,1}\d{0,1}[/]\d{4})(?![^\0])/', 
+    '/([0-1]{0,1}\d{0,1}[/][0-3]{0,1}\d{0,1}[/]\d{4})(?![^\0])/', '-1', 
+    '-1', /**, */ '/\d{1-3}/', '/[A-Z,a-z,0-9]{1-50}/', '/[A-Z,a-z,0-9]{1-50}/',
+    '/[A-Z,a-z,0-9]{1-50}/', '/\d{4}[Z]/', '/[A-Z,a-z,0-9]{1-50}/', '/[A-Z,a-z,0-9]{1-50}/', '/\d{1-3}/'
 ];
 var errExample=[
     '1234-12345', 'DD001', '123456N 1234567E', 'SPIRIT OF ST LOUIS AIR PORT',
     '80000', 'US', 'Runway', 'Installation', 'Yes', '4000', '100', 
-    '0', 'RC', 'Confirmed', '1/30/2015', /* ,*/ 'UNCLASSIFIED'
+    '0', 'RC', 'Confirmed', '1/30/2015', /* ,*/ 'UNCLASSIFIED', 
+    'x', 'control', 'GEOINT SCG Annex', '1.4 (a)(c)(g)', '25x1, 20400210',
+    '25MAR07IK0101063po_22665', 'Stereo DPPDB collection', '03/25/2007',
+    '6/13/2017', '-1',
+    '-1', /**/ '1', '1234567', '1234567',
+    '1234567', '1259Z', '-', 'ABCD01', '12'
+
 
 ];
 function setRequired(response) {
@@ -265,8 +280,8 @@ export function layerInfoSetup(){
             validateLayerInfo(this.id, types[vals.indexOf(this.id)]);
             if (this.classList.contains('wrong')){
                 document.getElementById(this.id + '-msg').innerHTML="correct syntax is <br/>" 
-                + '<b>Regex:</b> ' + errRegex[0] + '<br/>' 
-                + '<b>Example:</b> ' + errExample[0];
+                + '<b>Regex:</b> ' + errRegex[vals.indexOf(this.id)] + '<br/>' 
+                + '<b>Example:</b> ' + errExample[vals.indexOf(this.id)];
             }
         }
         div.appendChild(input);

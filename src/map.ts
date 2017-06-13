@@ -3,7 +3,6 @@ import * as ol from 'openlayers';
 import * as $ from 'jquery';
 import {globals} from './globals';
 import {setupShapes} from './getm';
-import {wfsRestInterface} from '../dist/config.js';
 
 const BASE_MAP_LAYER = 0;
 var attribution = new ol.control.Attribution({});
@@ -92,38 +91,71 @@ var wfs_state_routes_layer = new ol.layer.Vector({
 });
 
 // if(globals.debug)
-      map.getView().fit([-117.90295999999988, 35.551014000000066, -117.54647999999992, 35.71793700000006], map.getSize());
+map.getView().fit([-117.90295999999988, 35.551014000000066, -117.54647999999992, 35.71793700000006], map.getSize());
+ol.source.WMTS
+const mapLayers = {};
+var mapLayerCount = 0;
 
-const test0Layer = new ol.layer.Tile({
-    source: new ol.source.OSM() 
-});
-const test1Layer = new ol.layer.Tile({
-    source: new ol.source.BingMaps({
-        key: 'AujpfmQXbCtjzvhFvRij8xuM4AMDhnOjUec2XypfwBTDMyWAR8qr_y2WyHrWX_OG',
-        imagerySet: 'Aerial'
-    })
-});
-const test2Layer = new ol.layer.Tile({
-    source: new ol.source.Stamen({layer: 'watercolor'})
-});
-const test3Layer =  new ol.layer.Image({
-    source: new ol.source.ImageWMS({
-        url: 'https://ahocevar.com/geoserver/wms',
-        params: {'LAYERS': 'ne:ne'},
-        projection: 'EPSG:4326',
-        ratio: 1,
-        serverType: 'geoserver',
-    })
-});
+for (var i in baseMapConfigs) {
+    if(baseMapConfigs[i].arcgis_wmts == true) {
+        var projection = ol.proj.get(baseMapConfigs[i].srs);
+        var projectionExtent = projection.getExtent();
+        var size = ol.extent.getWidth(projectionExtent) / baseMapConfigs[i].tilesize;
+        var levels = baseMapConfigs[i].levels;
+        var resolutions = new Array(levels);   
+        var matrixIds = new Array(levels);
+        for (var j = 0; j < levels; ++j) {
+            resolutions[j] = size / Math.pow(2, j);
+            matrixIds[j] = j;
+        }
 
-var mapLayers = [test0Layer, test1Layer, test2Layer, test3Layer];
+        mapLayers['layer' + i] = new ol.layer.Tile({
+            // 'title': baseMapConfigs[i].title,
+            visible: true,
+            // type: 'base',
+            preload: 2,
+            source: new ol.source.WMTS({
+                url: baseMapConfigs[i].url,
+                format: 'image/jpeg',
+                matrixSet: baseMapConfigs[i].srs,
+                projection: projection,
+                tileGrid: new ol.tilegrid.WMTS({
+                    origin: ol.extent.getTopLeft(projectionExtent),
+                    resolutions: resolutions,
+                    matrixIds: matrixIds
+                }),
+                style: 'default',
+                wrapX: true,
+                requestEncoding: 'REST',
+                layer: baseMapConfigs[i].layer
+            })
+        })
+    } else {
+        mapLayers['layer' + i] = new ol.layer.Tile({
+            // 'title': baseMapConfigs[i].title,
+            visible: true,
+            // type: 'base',
+            preload: 2,
+            source: new ol.source.TileWMS({
+                url: baseMapConfigs[i].url,
+                params: {
+                    LAYERS: baseMapConfigs[i].layer,
+                    VERSION: baseMapConfigs[i].version,
+                    FORMAT: 'image/jpeg',
+                    SRS: 'EPSG:4326'
+                },
+                projection: 'EPSG:4326'
+            })
+        })
+    }
+}
+
 export var shapeLayer;
-
 var shapeLayerOptions = ['tm_prime', 'tm_prod', 'tm_release', 'all'];
 var shapeLayers = [];
 
 function populateMap() {
-    var mapLayerOptions = ['layer0', 'layer1', 'layer2', 'layer3'];   
+    var mapLayerOptions = Object.keys(mapLayers);   
     var currMapLayer = mapLayerOptions[0]; 
     var mapLayerSelect = document.getElementsByClassName('layer-select');
     var mapSelect = document.createElement('select');
@@ -140,7 +172,7 @@ function populateMap() {
         var cln = mapSelect.cloneNode(true);
         (<HTMLSelectElement>cln).onchange = function(){
             currMapLayer = (<HTMLSelectElement>this).value; 
-            map.getLayerGroup().getLayers().setAt(BASE_MAP_LAYER, mapLayers[(<HTMLSelectElement>this).selectedIndex]);
+            map.getLayerGroup().getLayers().setAt(BASE_MAP_LAYER, mapLayers[(<HTMLSelectElement>this).value]);
             
         };
         mapLayerSelect[i].appendChild(cln);
@@ -221,7 +253,7 @@ function populateShape(){
 export function populateLayers(){
     populateMap();
     populateShape();
-    var layers = [test0Layer, // basemap layer
+    var layers = [mapLayers['layer0'], // basemap layer
         new ol.layer.Group({layers: [wfs_airports_layer, wfs_roads_layer, wfs_state_routes_layer]}),  // wfs layers
         new ol.layer.Group({layers: shapeLayers}) // shape layers
     ];

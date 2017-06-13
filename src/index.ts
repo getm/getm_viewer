@@ -10,12 +10,12 @@ import './css/index.css';
 // Expose jQuery so Bootstrap can use it.
 (window as any).$ = $;
 (window as any).jQuery = $;
-
 navSetup();
 setup();
 drawSetup();
 layerInfoSetup();
 m.populateLayers();
+console.log('done with index')
 
 
 // TODO: plug these in somewhere
