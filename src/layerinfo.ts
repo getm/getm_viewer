@@ -8,24 +8,31 @@ import {globals, windowSetup} from './globals';
 import {setupShapes} from './getm';
 
 var required;
-var vals=['benumber', 'osuffix', 'tgt_coor', 'tgt_name', 'catcode', 
-    'country', 'label', 'feat_nam', 'out_ty', 'notional', 'ce_l', 'ce_w', 
-    'ce_h', 'c_pvchar', 'conf_lvl', 'icod', 'qc_level', 'class', 'release', 
+var vals=['benumber', 'osuffix', 'tgt_coor', 'tgt_name', 
+    'catcode', 'country', 'label', 'feat_nam', 'out_ty', 'notional', 'ce_l', 'ce_w', 
+    'ce_h', 'c_pvchar', 'conf_lvl', 'icod', /*'qc_level',*/ 'class', 'release', 
     'control', 'drv_from', 'c_reason', 'decl_on', 'source', 'c_method', 'doi', 
-    'c_date', 'circ_er', 'lin_er', /*'history'*/, 'producer', 'analyst', /*'qc',*/ 'class_by', 
+    'c_date', 'circ_er', 'lin_er', /*'history'*/, 'producer', 'analyst', 'qc', 'class_by', 
     'tot','shape', 'chng_req', 'd_state'];
 
-var types=['java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 
-    'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.math.BigDecimal', 'java.math.BigDecimal', 
-    'java.math.BigDecimal', 'java.lang.String', 'java.lang.String', 'java.sql.Timestamp', 'java.lang.Short', 'java.lang.String', 'java.lang.String', 
+var types=['java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 
+    'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.math.BigDecimal', 'java.math.BigDecimal', 
+    'java.math.BigDecimal', 'java.lang.String', 'java.lang.String', 'java.sql.Timestamp', /*'java.lang.Short',*/ 'java.lang.String', 'java.lang.String', 
     'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.sql.Timestamp', 
-    'java.sql.Timestamp', 'java.math.BigDecimal', 'java.math.BigDecimal', /*'java.lang.Short',*/ 'java.lang.Short', 'java.lang.String', /*'java.lang.String',*/ 'java.lang.String', 
+    'java.sql.Timestamp', 'java.math.BigDecimal', 'java.math.BigDecimal', /*'java.lang.Short',*/ 'java.lang.Short', 'java.lang.String', 'java.lang.String', 'java.lang.String', 
     'java.lang.String', 'com.vividsolutions.jts.geom.Geometry', 'java.lang.String', 'java.lang.Short'];
 
-var errMsg=[
-    'Regex: /[0,1][0.8]\d{2}[A-Z,-][A-Z,0-9]\d{4}/ <br/>Example: 1234-12345'
+var errRegex=[
+    '/[0,1][0.8]\d{2}[A-Z,-][A-Z,0-9]\d{4}/', '/[A-Z]{2}\d{3}/','/^(\d{1,2}[\d.]{0,1}\d{0,3})[NS][ ](\d{1,3}[\d.]{0,1}\d{0,3})[EW]/', '/[A-Z,a-z,0-9,\s]{1-256}/',
+    '/\d{5}/', '/[A-Z]{2}/', '/[A-Z,a-z,0-9,\s]{0-254}/', '/[A-Z,a-z,0-9,\s]{1-50}/', '/[A-Z,a-z,0-9,\s]{1-3}/', 'float in meters', 'float in meters', 
+    'float in meters', '/[A-Z,a-z,0-9,\s]{1-20}/','/[A-Z,a-z,0-9,\s]{1-24}/', '/([0-1]{0,1}\d{0,1}[/][0-3]{0,1}\d{0,1}[/]\d{4})(?![^\0])/',,
 ];
+var errExample=[
+    '1234-12345', 'DD001', '123456N 1234567E', 'SPIRIT OF ST LOUIS AIR PORT',
+    '80000', 'US', 'Runway', 'Installation', 'Yes', '4000', '100', 
+    '0', 'RC', 'Confirmed', '1/30/2015', /* ,*/ 'UNCLASSIFIED'
 
+];
 function setRequired(response) {
     response = JSON.parse(response);
     response.required.push('benumber'); // TODO: remove
@@ -174,7 +181,7 @@ function fillLayerInfoDefaults() {
     (<HTMLInputElement>document.getElementById('conf_lvl')).value = 'Confirmed';
     // (<HTMLInputElement>document.getElementById('icod')).value = '2017-02-12';
     (<HTMLInputElement>document.getElementById('icod')).value = '02/12/2017';
-    (<HTMLInputElement>document.getElementById('qc_level')).value = '0';
+    //(<HTMLInputElement>document.getElementById('qc_level')).value = '0';
     (<HTMLInputElement>document.getElementById('class')).value = 'UNCLASSIFIED';
     (<HTMLInputElement>document.getElementById('release')).value = 'x';
     (<HTMLInputElement>document.getElementById('control')).value = 'none';
@@ -192,7 +199,7 @@ function fillLayerInfoDefaults() {
     //(<HTMLInputElement>document.getElementById('history')).value = '0';
     (<HTMLInputElement>document.getElementById('producer')).value = '1';
     (<HTMLInputElement>document.getElementById('analyst')).value = 'none';
-    //(<HTMLInputElement>document.getElementById('qc')).value = 'none';
+    (<HTMLInputElement>document.getElementById('qc')).value = 'none';
     (<HTMLInputElement>document.getElementById('class_by')).value = 'none';
     (<HTMLInputElement>document.getElementById('tot')).value = '';
     (<HTMLInputElement>document.getElementById('shape')).value = '-';
@@ -236,6 +243,20 @@ export function layerInfoSetup(){
         var div = document.createElement('div');
         layerInfoForm.appendChild(div);
 
+        var msglabelcontainer = document.createElement('div');
+        msglabelcontainer.className='label';
+        div.appendChild(msglabelcontainer);
+
+        var label = document.createElement('span');
+        label.innerHTML = vals[val].charAt(0).toUpperCase() + vals[val].slice(1) + ': ';
+        label.className = '';
+        msglabelcontainer.appendChild(label);
+
+        var msg = document.createElement('span');
+        msg.className = 'msg';
+        msg.id = vals[val] + '-msg';
+        msglabelcontainer.appendChild(msg);
+        
         var input = document.createElement('input');
         input.type = 'text';
         input.id = vals[val];
@@ -243,15 +264,12 @@ export function layerInfoSetup(){
         input.onchange = function(){
             validateLayerInfo(this.id, types[vals.indexOf(this.id)]);
             if (this.classList.contains('wrong')){
-                document.getElementById(this.id + '-msg').innerHTML="Wrong: correct syntax is " + '<correct syntax>';
+                document.getElementById(this.id + '-msg').innerHTML="correct syntax is <br/>" 
+                + '<b>Regex:</b> ' + errRegex[0] + '<br/>' 
+                + '<b>Example:</b> ' + errExample[0];
             }
         }
         div.appendChild(input);
-
-        var msg = document.createElement('div');
-        msg.className = 'msg';
-        msg.id = vals[val] + '-msg';
-        div.appendChild(msg);
 
         var br = document.createElement('br');
         div.appendChild(br);
