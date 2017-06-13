@@ -37,7 +37,6 @@ export function windowSetup(id, headerTitle=id){
     windowContents.id = id + '-contents';
     popupText.appendChild(windowContents);
 
-
     $(popup).draggable();
     $(popupText).resizable({
         handles: 'all'
