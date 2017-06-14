@@ -1,160 +1,109 @@
 import './css/map.css';
 import * as ol from 'openlayers';
 import * as $ from 'jquery';
-import {globals} from './globals';
 import {setupShapes} from './getm';
 
-const BASE_MAP_LAYER = 0;
-var attribution = new ol.control.Attribution({});
-
-var controls = new ol.Collection([new ol.control.FullScreen(),attribution, new ol.control.Zoom()])
+var attribution = new ol.control.Attribution();
+const wfsLayersGroup = new ol.layer.Group();
+const shapeLayersGroup = new ol.layer.Group();
+const mapLayers = {};
+const wfsLayers = {};
+export var shapeLayer;
 export const map = new ol.Map({
     target: 'map',
-    controls: controls
-});
-var fill = new ol.style.Fill({
-    color: 'rgba(255,255,255,0.4)'
-});
-var style = new ol.style.Style({
-    stroke: new ol.style.Stroke({
-        color: 'rgba(255,0,0,1)'
+    controls: new ol.Collection([new ol.control.FullScreen(), attribution, new ol.control.Zoom()]),
+    view: new ol.View({
+        projection: 'EPSG:4326',
+        center: [0, 0],
+        zoom: 3
     }),
-    fill:fill
-});
-map.setView(new ol.View({
-    // projection: 'EPSG:900913',
-    projection: 'EPSG:4326',
-    // maxZoom: 19,
-    //zoom: 12,
-    center: [0, 0],
-    zoom: 3
-}));
-
-var wfs_airports_source = new ol.source.Vector({
-    format: new ol.format.GML3(),
-    url: wfsRestInterface.getAirportsUrl(),
-    strategy: ol.loadingstrategy.bbox,
-    attributions: [new ol.Attribution({
-        html: '<div id="airports_attribution">Airports</div>'
-    })]
+    logo: false
 });
 
-var wfs_roads_source = new ol.source.Vector({
-    format: new ol.format.GML3(),
-    url: wfsRestInterface.getRoadsUrl(),
-    strategy: ol.loadingstrategy.bbox,
-    attributions: [new ol.Attribution({
-        html: '<div id="roads_attribution">Roads</div>'
-    })]
-});
+function populateBaseMapLayers() {
+    for (var i in baseMapConfigs) {
+        if(baseMapConfigs[i].arcgis_wmts == true) {
+            var projection = ol.proj.get(baseMapConfigs[i].srs);
+            var projectionExtent = projection.getExtent();
+            var size = ol.extent.getWidth(projectionExtent) / baseMapConfigs[i].tilesize;
+            var levels = baseMapConfigs[i].levels;
+            var resolutions = new Array(levels);   
+            var matrixIds = new Array(levels);
+            for (var j = 0; j < levels; ++j) {
+                resolutions[j] = size / Math.pow(2, j);
+                matrixIds[j] = j;
+            }
 
-var wfs_state_routes_source = new ol.source.Vector({
-    format: new ol.format.GML3(),
-    url: wfsRestInterface.getStateRoutesUrl(),
-    strategy: ol.loadingstrategy.bbox,
-    attributions: [new ol.Attribution({
-        html: '<div id="state_routes_attribution">State Routes</div>'
-    })]
-});
-
-var wfs_airports_layer = new ol.layer.Vector({
-    source: wfs_airports_source,
-    style: new ol.style.Style({
-        stroke: new ol.style.Stroke({
-            color: 'rgba(0, 0, 255, 1.0)',
-            width: 2
-        })
-    }),
-    visible: false,
-});
-
-var wfs_roads_layer = new ol.layer.Vector({
-    source: wfs_roads_source,
-    style: new ol.style.Style({
-        stroke: new ol.style.Stroke({
-            color: 'rgba(255, 0, 0, 1.0)',
-            width: 2
-        })
-    }),
-    visible: false
-});
-
-var wfs_state_routes_layer = new ol.layer.Vector({
-    source: wfs_state_routes_source,
-    style: new ol.style.Style({
-        stroke: new ol.style.Stroke({
-            color: 'rgba(0, 255, 0, 1.0)',
-            width: 2
-        })
-    }),
-    visible: false
-});
-
-// if(globals.debug)
-map.getView().fit([-117.90295999999988, 35.551014000000066, -117.54647999999992, 35.71793700000006], map.getSize());
-ol.source.WMTS
-const mapLayers = {};
-var mapLayerCount = 0;
-
-for (var i in baseMapConfigs) {
-    if(baseMapConfigs[i].arcgis_wmts == true) {
-        var projection = ol.proj.get(baseMapConfigs[i].srs);
-        var projectionExtent = projection.getExtent();
-        var size = ol.extent.getWidth(projectionExtent) / baseMapConfigs[i].tilesize;
-        var levels = baseMapConfigs[i].levels;
-        var resolutions = new Array(levels);   
-        var matrixIds = new Array(levels);
-        for (var j = 0; j < levels; ++j) {
-            resolutions[j] = size / Math.pow(2, j);
-            matrixIds[j] = j;
+            mapLayers[baseMapConfigs[i].title] = new ol.layer.Tile({
+                visible: true,
+                preload: 2,
+                source: new ol.source.WMTS({
+                    url: baseMapConfigs[i].url,
+                    format: 'image/jpeg',
+                    matrixSet: baseMapConfigs[i].srs,
+                    projection: projection,
+                    tileGrid: new ol.tilegrid.WMTS({
+                        origin: ol.extent.getTopLeft(projectionExtent),
+                        resolutions: resolutions,
+                        matrixIds: matrixIds
+                    }),
+                    style: 'default',
+                    wrapX: true,
+                    requestEncoding: 'REST',
+                    layer: baseMapConfigs[i].layer
+                })
+            })
+        } else {
+            mapLayers[baseMapConfigs[i].title] = new ol.layer.Tile({
+                visible: true,
+                preload: 2,
+                source: new ol.source.TileWMS({
+                    url: baseMapConfigs[i].url,
+                    params: {
+                        LAYERS: baseMapConfigs[i].layer,
+                        VERSION: baseMapConfigs[i].version,
+                        FORMAT: 'image/jpeg',
+                        SRS: 'EPSG:4326'
+                    },
+                    projection: 'EPSG:4326'
+                })
+            })
         }
-
-        mapLayers['layer' + i] = new ol.layer.Tile({
-            // 'title': baseMapConfigs[i].title,
-            visible: true,
-            // type: 'base',
-            preload: 2,
-            source: new ol.source.WMTS({
-                url: baseMapConfigs[i].url,
-                format: 'image/jpeg',
-                matrixSet: baseMapConfigs[i].srs,
-                projection: projection,
-                tileGrid: new ol.tilegrid.WMTS({
-                    origin: ol.extent.getTopLeft(projectionExtent),
-                    resolutions: resolutions,
-                    matrixIds: matrixIds
-                }),
-                style: 'default',
-                wrapX: true,
-                requestEncoding: 'REST',
-                layer: baseMapConfigs[i].layer
-            })
-        })
-    } else {
-        mapLayers['layer' + i] = new ol.layer.Tile({
-            // 'title': baseMapConfigs[i].title,
-            visible: true,
-            // type: 'base',
-            preload: 2,
-            source: new ol.source.TileWMS({
-                url: baseMapConfigs[i].url,
-                params: {
-                    LAYERS: baseMapConfigs[i].layer,
-                    VERSION: baseMapConfigs[i].version,
-                    FORMAT: 'image/jpeg',
-                    SRS: 'EPSG:4326'
-                },
-                projection: 'EPSG:4326'
-            })
-        })
     }
 }
 
-export var shapeLayer;
-var shapeLayerOptions = ['tm_prime', 'tm_prod', 'tm_release', 'all'];
-var shapeLayers = [];
+function populateWFSLayers(){
+    for(var i in wfsMapConfigs) {
+        wfsLayers['wfs_' + wfsMapConfigs[i].name + '_layer'] = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                format: (wfsMapConfigs[i].format == 'GML3') ? new ol.format.GML3() : 
+                        (wfsMapConfigs[i].format == 'GML2') ? new ol.format.GML2() : null, // TODO: fix this later
+                url: wfsMapConfigs[i].hostAddress + wfsMapConfigs[i].url + '&outputFormat=' + wfsMapConfigs[i].format,
+                strategy: ol.loadingstrategy.bbox,
+                attributions: [new ol.Attribution({
+                    html: '<div style="color:' + wfsMapConfigs[i].color + '" class="wfs_legend">' + wfsMapConfigs[i].title + '</div>' //id="' + wfsMapConfigs[i].name + '_attributions' + '"
+                })],
+            }),
+            visible: false,
+            style: new ol.style.Style({
+                    stroke: new ol.style.Stroke({
+                        color: wfsMapConfigs[i].color,
+                        width: 2
+                    })
+                }),        
+            //
+        });
+        wfsLayersGroup.getLayers().insertAt(wfsLayersGroup.getKeys().length, wfsLayers['wfs_' + wfsMapConfigs[i].name + '_layer']);
+        $('#' + wfsMapConfigs[i].name +'_checkbox').click(function(){
+            wfsLayers['wfs_' +  this.id.replace('_checkbox', '_layer')].setVisible(this.checked);
+        });  
+    }
+}
 
 function populateMap() {
+    populateBaseMapLayers();
+    populateWFSLayers();    
+
     var mapLayerOptions = Object.keys(mapLayers);   
     var currMapLayer = mapLayerOptions[0]; 
     var mapLayerSelect = document.getElementsByClassName('layer-select');
@@ -172,43 +121,35 @@ function populateMap() {
         var cln = mapSelect.cloneNode(true);
         (<HTMLSelectElement>cln).onchange = function(){
             currMapLayer = (<HTMLSelectElement>this).value; 
-            map.getLayerGroup().getLayers().setAt(BASE_MAP_LAYER, mapLayers[(<HTMLSelectElement>this).value]);
-            
+            map.getLayerGroup().getLayers().setAt(0, mapLayers[(<HTMLSelectElement>this).value]);
         };
         mapLayerSelect[i].appendChild(cln);
     }
-    
-    // toggle airports
-    $('#airports_checkbox').click(function(){
-        wfs_airports_layer.setVisible((<HTMLInputElement>document.getElementById('airports_checkbox')).checked);
-    });
-
-    // toggle roads
-    $('#roads_checkbox').click(function(){
-        wfs_roads_layer.setVisible((<HTMLInputElement>document.getElementById('roads_checkbox')).checked);
-    });
-
-    // toggle state routes
-    $('#state_routes_checkbox').click(function(){
-        wfs_state_routes_layer.setVisible((<HTMLInputElement>document.getElementById('state_routes_checkbox')).checked);
-    });
-
-    $('#legend').click(function(){
-        attribution.setCollapsed(!attribution.getCollapsed());
-    });
 }
 
 function populateShape(){
+    shapeLayerOptions.push('all');
     // generate the sources and layers for the shapes
     for(var i = 0; i < shapeLayerOptions.length; i++) {
         var source = new ol.source.Vector({});
-        var vector = new ol.layer.Vector({source: source, visible: false, style: style});
+        var vector = new ol.layer.Vector({
+            source: source, 
+            visible: false, 
+            style:  new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: 'rgba(255,0,0,1)'
+                }),
+                fill:new ol.style.Fill({
+                    color: 'rgba(255,255,255,0.4)'
+                })
+            })
+        });
         vector.set('selectable', true);
         vector.set('name', shapeLayerOptions[i]);
-        shapeLayers.push(vector);
+        shapeLayersGroup.getLayers().insertAt(i, vector);
     }
 
-    shapeLayer = shapeLayers[0];
+    shapeLayer = shapeLayersGroup.getLayers().item(0);
     shapeLayer.setVisible(true);
     var shapeLayerSelect = document.getElementsByClassName('shape-layer-select');
 
@@ -234,15 +175,15 @@ function populateShape(){
         (<HTMLSelectElement>shapeLayerSelect[i]).onchange = function(){
             // set other layers false and set this layer true, unless option is all, which case all true
             if((<HTMLSelectElement>this).selectedIndex < (<HTMLSelectElement>this).length -1) {
-                shapeLayer = shapeLayers[(<HTMLSelectElement>this).selectedIndex];
+                shapeLayer = shapeLayersGroup.getLayers().item((<HTMLSelectElement>this).selectedIndex);
                 for(var j = 0; j < (<HTMLSelectElement>this).length - 1; j++ ){
-                    shapeLayers[j].setVisible(false);
+                    shapeLayersGroup.getLayers().item(j).setVisible(false);
                 }
-                shapeLayers[(<HTMLSelectElement>this).selectedIndex].setVisible(true);                
+                shapeLayersGroup.getLayers().item((<HTMLSelectElement>this).selectedIndex).setVisible(true);                
             } else  {
-                shapeLayer = shapeLayers[0]; // all is set to default value
+                shapeLayer = shapeLayersGroup.getLayers().item(0);; // all is set to default value
                 for(var j = 0; j < (<HTMLSelectElement>this).length - 1; j++ ){
-                    shapeLayers[j].setVisible(true);
+                    shapeLayersGroup.getLayers().item(j).setVisible(true);
                 }
             }
             setupShapes();     
@@ -250,14 +191,20 @@ function populateShape(){
     }
 }
 
-export function populateLayers(){
+export function setupMap() {
+    map.getView().fit([-117.90295999999988, 35.551014000000066, -117.54647999999992, 35.71793700000006], map.getSize());
+    $('#legend').click(function(){
+        attribution.setCollapsed(!attribution.getCollapsed());
+    });
+
     populateMap();
     populateShape();
-    var layers = [mapLayers['layer0'], // basemap layer
-        new ol.layer.Group({layers: [wfs_airports_layer, wfs_roads_layer, wfs_state_routes_layer]}),  // wfs layers
-        new ol.layer.Group({layers: shapeLayers}) // shape layers
-    ];
+
     map.setLayerGroup(new ol.layer.Group({
-        layers: layers
+        layers: [
+            mapLayers[Object.keys(mapLayers)[0]], // basemap 
+            wfsLayersGroup, // wfs layers
+            shapeLayersGroup // shape layers
+        ]
     }));
 }

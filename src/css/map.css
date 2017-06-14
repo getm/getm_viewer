@@ -29,22 +29,7 @@ h5 {
     top: 3em;
 }
 
-#airports_attribution{
-    color:blue;
-    font-size: 16px;
-    padding: 5px;
-    font-weight: bold;
-}
-
-#roads_attribution{
-    color:red;
-    font-size: 16px;
-    padding: 5px;
-    font-weight: bold;
-}
-
-#state_routes_attribution{
-    color:green;
+.wfs_legend{
     font-size: 16px;
     padding: 5px;
     font-weight: bold;

@@ -98,6 +98,7 @@ export function setup() {
     getmSetup();
     mapLayerSetup();
 
+    // TODO: dynamically add to nav bar and do the clicky stuff
     $('#saveBtn').click(saveShapes);
     $('#saveSessBtn').click(saveSession);
     $('#loadSessBtn').click(loadSession);   

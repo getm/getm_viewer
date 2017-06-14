@@ -1,22 +1,17 @@
 import * as $ from 'jquery';
 import m = require('./map');
-import {setup, setupShapes} from './getm';
+import {setup} from './getm';
 import {navSetup} from './nav';
 import {drawSetup} from './draw';
 import {layerInfoSetup} from './layerinfo';
 import './css/index.css';
-// opens up the overlay
 
 // Expose jQuery so Bootstrap can use it.
 (window as any).$ = $;
 (window as any).jQuery = $;
+
 navSetup();
 setup();
 drawSetup();
 layerInfoSetup();
-m.populateLayers();
-console.log('done with index')
-
-
-// TODO: plug these in somewhere
-//$('#getm-shape-layer-select').change(setupShapes);
+m.setupMap();

@@ -20,7 +20,6 @@ var vals=[
 
 var types=[
     'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 
-
     'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.math.BigDecimal', 'java.math.BigDecimal', 
     'java.math.BigDecimal', 'java.lang.String', 'java.lang.String', 'java.sql.Timestamp', /*'java.lang.Short',*/ 'java.lang.String', 
     'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 'java.lang.String', 
@@ -52,7 +51,6 @@ var errExample=[
 
 function matchRegex(r, s) {
    var match = s.match(r);
-   console.log('match reads' + match);
    return match != null && s == match[0];
 }
 
@@ -77,14 +75,10 @@ export function layerInfoPopup(){
 }
 
 function typeCheck(val) {
-    var correct;
     if(val != undefined) {
-        console.log('checking for matches for ' + val.value.trim());
-        console.log(new RegExp(errRegex[vals.indexOf(val.id)]));
-        console.log(matchRegex(new RegExp(errRegex[vals.indexOf(val.id)]), val.value.trim()));
         return matchRegex(new RegExp(errRegex[vals.indexOf(val.id)]), val.value.trim());
     }
-    return correct;
+    return false;
 }
 
 function retrieveValues() {
@@ -136,7 +130,6 @@ function assignValues() {
     }
     globals.shapes[id].setProperties(fields);
     setupShapes();
-    console.log('assigned values to ' + id);
 }
 
 function clearLayerInfoContents() {
@@ -145,9 +138,7 @@ function clearLayerInfoContents() {
     }
 }
 
-// TODO: something about this....
 function fillLayerInfoDefaults() {
-
     for(var val in vals){
         (<HTMLInputElement>document.getElementById(vals[val])).value = errExample[val];
     }
@@ -228,7 +219,6 @@ export function layerInfoSetup(){
     div2.appendChild(submit);
     $('#submitlayerinfo').click(function(){
         assignValues();
-        //hideLayerInfoPopup();
     });
 
     map.getViewport().addEventListener('contextmenu', function (e) {
@@ -249,22 +239,14 @@ export function layerInfoSetup(){
 function validateLayerInfo(val) {
     // correct 
     if(typeCheck((<HTMLInputElement>document.getElementById(val)))) {
-        console.log('corrected ' + val);
         (<HTMLInputElement>document.getElementById(val)).classList.remove('wrong')
+        document.getElementById(val + '-msg').innerHTML='';
     // incorrect and not marked as wrong
     } else if(!(<HTMLInputElement>document.getElementById(val)).classList.contains('wrong')) {
-        console.log('marking as incorrect');
         (<HTMLInputElement>document.getElementById(val)).classList.add('wrong');
         document.getElementById(val+'-msg').className = 'msg';
-    } else console.log('still wrong');
-
-    if ((<HTMLInputElement>document.getElementById(val)).classList.contains('wrong')){
-        console.log('writing err msg');
         document.getElementById(val + '-msg').innerHTML='correct syntax is <br/> '
-        + '<b>Regex:</b> ' + errRegex[vals.indexOf(val)] + '<br/>' 
-        + '<b>Example:</b> ' + errExample[vals.indexOf(val)];
-    }  else {
-        console.log('undoing stuff')
-        document.getElementById(val + '-msg').innerHTML='';
-    }
+                + '<b>Regex:</b> ' + errRegex[vals.indexOf(val)] + '<br/>' 
+                + '<b>Example:</b> ' + errExample[vals.indexOf(val)];        
+    } 
 }
