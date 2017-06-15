@@ -14,13 +14,14 @@ export const map = new ol.Map({
     controls: new ol.Collection([new ol.control.FullScreen(), attribution, new ol.control.Zoom()]),
     view: new ol.View({
         projection: 'EPSG:4326',
-        center: [0, 0],
-        zoom: 3
+        center: [20, 0],
+        zoom: 5
     }),
     logo: false
 });
 
 function populateBaseMapLayers() {
+    var baseMapConfigs = CGSWeb_Map.Options.baseMapConfigs;
     for (var i in baseMapConfigs) {
         if(baseMapConfigs[i].arcgis_wmts == true) {
             var projection = ol.proj.get(baseMapConfigs[i].srs);
@@ -71,14 +72,74 @@ function populateBaseMapLayers() {
         }
     }
 }
+function normalizeExtent(extent) {
+		// Check if total Lon > 360.
+		if(extent[0] > 0 && extent[2] > 0 && extent[2] - extent[0] > 360) {
+			// Entire extent east of 0.
+			extent[0] = -180;
+			extent[2] = 180;
+		} else if(extent[0] < 0 && extent[2] < 0 && Math.abs(extent[0]) - Math.abs(extent[2]) > 360) {
+			// Entire extent west of 0.
+			extent[0] = -180;
+			extent[2] = 180;
+		} else if(extent[0] < 0 && extent[2] > 0 && Math.abs(extent[0]) + Math.abs(extent[2]) > 360) {
+			// Extent contains 0.
+			extent[0] = -180;
+			extent[2] = 180;
+		}
 
+		// Check if total Lat > 180.
+		if(extent[1] > 0 && extent[3] > 0 && extent[3] - extent[1] > 180) {
+			// Entire extent north of 0.
+			extent[1] = -90;
+			extent[3] = 90;
+		} else if(extent[1] < 0 && extent[3] < 0 && Math.abs(extent[1]) - Math.abs(extent[3]) > 180) {
+			// Entire extent south of 0.
+			extent[1] = -90;
+			extent[3] = 90;
+		} else if(extent[1] < 0 && extent[3] > 0 && Math.abs(extent[1]) + Math.abs(extent[3]) > 180) {
+			// Extent contains 0.
+			extent[1] = -90;
+			extent[3] = 90;
+		}
+
+		// Shift lon to range (-360, 360).
+		var max = Math.max(Math.abs(extent[0]), Math.abs(extent[2]));
+		var revs = Math.floor(max / 360);
+		if(extent[0] > 0 && extent[2] > 0) {
+			extent[0] = extent[0] - revs*360;
+			extent[2] = extent[2] - revs*360;
+		} else if(extent[0] < 0 && extent[2] < 0) {
+			extent[0] = extent[0] + revs*360;
+			extent[2] = extent[2] + revs*360;
+		}
+
+		if(extent[2] > 180) {
+			// Wrap to the east.
+			return [
+			    [extent[0], extent[1], 180, extent[3]],
+			    [-180, extent[1], -180 + (extent[2] - 180), extent[3]],
+			];
+		} else if(extent[0] < -180) {
+			// Wrap to the west.
+			return [
+				[-180, extent[1], extent[2], extent[3]],
+				[180 + (extent[0] + 180), extent[1], 180, extent[3]],
+			];
+		} else {
+			return [extent];
+		}
+	}
 function populateWFSLayers(){
     for(var i in wfsMapConfigs) {
         wfsLayers['wfs_' + wfsMapConfigs[i].name + '_layer'] = new ol.layer.Vector({
             source: new ol.source.Vector({
                 format: (wfsMapConfigs[i].format == 'GML3') ? new ol.format.GML3() : 
                         (wfsMapConfigs[i].format == 'GML2') ? new ol.format.GML2() : null, // TODO: fix this later
-                url: wfsMapConfigs[i].hostAddress + wfsMapConfigs[i].url + '&outputFormat=' + wfsMapConfigs[i].format,
+                url: wfsMapConfigs[i].hostAddress + wfsMapConfigs[i].url 
+                        + '&outputFormat=' + wfsMapConfigs[i].format
+                        + '&bbox=' + map.getView().calculateExtent(map.getSize()).join(',') + '&srs=EPSG:4326'
+                ,
                 strategy: ol.loadingstrategy.bbox,
                 attributions: [new ol.Attribution({
                     html: '<div style="color:' + wfsMapConfigs[i].color + '" class="wfs_legend">' + wfsMapConfigs[i].title + '</div>' //id="' + wfsMapConfigs[i].name + '_attributions' + '"
@@ -86,12 +147,11 @@ function populateWFSLayers(){
             }),
             visible: false,
             style: new ol.style.Style({
-                    stroke: new ol.style.Stroke({
-                        color: wfsMapConfigs[i].color,
-                        width: 2
-                    })
-                }),        
-            //
+                stroke: new ol.style.Stroke({
+                    color: wfsMapConfigs[i].color,
+                    width: 2
+                })
+            }),        
         });
         wfsLayersGroup.getLayers().insertAt(wfsLayersGroup.getKeys().length, wfsLayers['wfs_' + wfsMapConfigs[i].name + '_layer']);
         $('#' + wfsMapConfigs[i].name +'_checkbox').click(function(){
@@ -131,13 +191,14 @@ function populateShape(){
     shapeLayerOptions.push('all');
     // generate the sources and layers for the shapes
     for(var i = 0; i < shapeLayerOptions.length; i++) {
-        var source = new ol.source.Vector({});
+        var source = new ol.source.Vector();
         var vector = new ol.layer.Vector({
             source: source, 
             visible: false, 
             style:  new ol.style.Style({
                 stroke: new ol.style.Stroke({
-                    color: 'rgba(255,0,0,1)'
+                    color: 'rgba(255,0,0,1)',
+                    width: 3
                 }),
                 fill:new ol.style.Fill({
                     color: 'rgba(255,255,255,0.4)'
@@ -192,7 +253,7 @@ function populateShape(){
 }
 
 export function setupMap() {
-    map.getView().fit([-117.90295999999988, 35.551014000000066, -117.54647999999992, 35.71793700000006], map.getSize());
+    // map.getView().fit([-117.90295999999988, 35.551014000000066, -117.54647999999992, 35.71793700000006], map.getSize());
     $('#legend').click(function(){
         attribution.setCollapsed(!attribution.getCollapsed());
     });

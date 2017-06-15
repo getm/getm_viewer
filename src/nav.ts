@@ -1,7 +1,7 @@
 export function navSetup() {
     var nav = document.createElement('nav');
-    nav.className = "navbar navbar-inverse navbar-fixed-top";
-    document.getElementById('app').appendChild(nav);
+    nav.className = "navbar navbar-inverse";
+    document.getElementById('nav').appendChild(nav);
 
     var navContainer = document.createElement('div');
     navContainer.className = 'container-fluid';

@@ -1,0 +1,250 @@
+h5 {
+    color: blue;
+}
+
+#map {
+    height: 100%;
+
+    height: 500px;
+    z-index: 0;
+}
+
+#map:-moz-full-screen {
+    height: 100%;
+}
+
+#map:-webkit-full-screen {
+    height: 100%;
+}
+
+#map:-ms-fullscreen {
+    height: 100%;
+}
+
+#map:fullscreen {
+    height: 100%;
+}
+
+.ol-rotate {
+    top: 3em;
+}
+
+.wfs_legend{
+    font-size: 16px;
+    padding: 5px;
+    font-weight: bold;
+}
+
+.shape_layer_attribution{
+    color:black;
+    font-size: 16px;
+    font-weight: 2;
+    padding: 5px;
+}
+
+.ol-attribution.ol-unselectable.ol-control:not(.ol-collapsed){
+    background-color: rgba(255,255,255,0);
+}#insertShapes {
+    float: left;
+    width: 33%;
+}
+
+#updateShapes {
+    float: left;
+    width: 33%;
+}
+
+#deleteShapes {
+    float: left;
+    width: 33%;
+}
+
+#layer{
+    padding-left: 10px;
+    padding-bottom: 30px;
+    padding-right: 10px;
+}
+
+select{
+    color: #000;
+    width: 90%;
+}
+
+#debug {
+    padding: 30px;
+}
+
+#debug-contents{
+    height: 400px;
+}
+
+#getmPopupText.popuptext{
+    height: 100%;
+}
+
+#getmPopup.popup{
+    position: fixed;
+    display: unset;
+    width: 50%;
+    top:25%;
+    left: 25%;
+}
+
+#searchFilterPopup.popup{
+    position: fixed;
+    display: unset;
+    top:25%;
+    width: 33%;
+    left: 33%
+}
+#layerInfoPopup.popup {
+    width: max-content;
+    top: 100px;
+    height: max-content;
+    min-width: 200px;
+    width: 20%;
+    right: 0px;
+}
+
+#layerInfo-contents {
+    height: 400px;
+}
+
+.wrong {
+    border: 2px solid red;
+}
+
+.required{
+    border: 2px solid darkblue;
+}
+
+#layerInfoForm div{
+    text-align: left;
+}
+
+#layerInfoForm input {
+    /*left: 0px;*/
+    position: relative;
+    width: 100%;
+    left: 0%;
+}
+
+.msg{ 
+    /*display: inline-table;*/
+    /*position: relative;*/
+    /*right: 0%;*/
+    /*text-align: center;*/
+    /*background-color: black;*/
+    width: 100%;
+    /*//height: 40px;*/
+    overflow-y: auto;
+}
+
+#layerInfo-contents {
+    width: 100%;
+    left: 0px;
+}
+#drawPopup.popup {
+    width: max-content;
+    height: max-content;
+    display:unset;
+    top:25%;
+    position: fixed;
+}
+
+.drawButtonOption {
+    display: none;
+}
+
+.drawButtonOption:checked ~ .drawButtonOptionLabel {
+    -webkit-box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.4);
+	-moz-box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.4);
+	box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.4);
+}
+
+.drawButtonOptionLabel {
+    -webkit-appearance: button;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: black;
+    font-weight: normal;
+    width: max-content;
+}.inprogress{
+    background-color: orange;
+}
+
+.page-contents{
+    padding-top: 50px; /* nav bar has height of 50px */    
+    top:50px;
+    position:absolute;
+    width: 100%;
+    /*padding: 20px;*/
+}
+
+body {
+    background-color: #bba;/*#ddf;*/
+}
+
+#wmslayer {
+    width: 200px;
+}
+
+.window-contents {
+    background-color: #555;/*#dbc;/*#fde; /*#555;/* for debugging #555 for final*/
+    overflow-x:hidden;
+    overflow-y: auto;
+    border-radius: 6px;
+    height: 100%;
+    padding: 20px;
+}
+
+.popup .show {
+    visibility: visible;
+    -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s;
+}
+
+.popuptext {
+    visibility: hidden;
+    padding-bottom: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
+    padding-top: 10px;
+} 
+
+.popup {
+    visibility: hidden;
+    position: fixed;
+    z-index: -1;
+}
+
+/* The actual popup */
+.popup .popuptext {
+    min-width: 40px;
+    min-height: 40px;
+    background-color:  #333;/*#faa;;  /*find suitable color later*/
+    color: #fff;
+    text-align: center;
+    border-radius: 6px;
+    border: 1px solid ; /*#ccc*/
+    margin: 0;
+}
+
+.popup .popuptext input {
+    color: black;
+}
+
+.window-headers{
+    padding-bottom: 5px;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 100%;
+    margin: auto;  
+}
+
+.close{
+    float: none;
+    right: 10px; /*padding offset*/
+    position: absolute;
+    overflow: visible;
+}

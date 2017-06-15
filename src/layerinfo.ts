@@ -101,7 +101,8 @@ function assignValues() {
     for(var val in vals) {
         if(id != undefined && id.length > 0 ) {
             try{
-                fields[vals[val]] =  {'val' : (<HTMLInputElement>document.getElementById(vals[val])).value, 'type': types[val] };
+                if((<HTMLInputElement>document.getElementById(vals[val])).value.length > 0)
+                    fields[vals[val]] =  {'val' : (<HTMLInputElement>document.getElementById(vals[val])).value, 'type': types[val] };
             } catch(e) {
                 console.log('exception in assigning ' + (<HTMLInputElement>document.getElementById(vals[val])).value + ' field ' + vals[val]);
             }
