@@ -10,7 +10,7 @@ import {setupShapes} from './getm';
 var required;
 var vals=[
     'benumber', 'osuffix', 'tgt_coor', 'tgt_name',
-    'catcode', 'country', 'label', 'feat_nam', 'out_ty', 'notional', 'ce_l', 'ce_w', 
+    'catcode', 'country', 'label', 'feat_name', 'out_ty', 'notional', 'ce_l', 'ce_w', 
     'ce_h', 'c_pvchar', 'conf_lvl', 'icod', /*'qc_level',*/ 'class', 
     'release', 'control', 'drv_from', 'c_reason', 'decl_on', 
     'source', 'c_method', 'doi', 
@@ -26,7 +26,8 @@ var types=[
     'java.lang.String', 'java.lang.String', 'java.sql.Timestamp', 
     'java.sql.Timestamp', 'java.math.BigDecimal', 
     'java.math.BigDecimal', /*'java.lang.Short',*/ 'java.lang.Short', 'java.lang.String', 'java.lang.String', 
-    'java.lang.String', 'java.lang.String', 'com.vividsolutions.jts.geom.Geometry', 'java.lang.String', 'java.lang.Short'];
+    'java.lang.String', 'java.lang.String', 'com.vividsolutions.jts.geom.Geometry', 'java.lang.String', 'java.lang.Short'
+];
 
 var errRegex=[
     '[0,1][0-8]\\d{2}[A-Z,-][A-Z,0-9]\\d{4}', '[A-Z]{2}\\d{3}','^(\\d{1,2}[\\d.]{0,1}\\d{0,3})[NS][ ](\\d{1,3}[\\d.]{0,1}\\d{0,3})[EW]', '[A-Z,a-z,0-9,\\s]{1,256}',
@@ -61,11 +62,12 @@ function setRequired(response) {
 }
 
 export function layerInfoPopup(){
-    if(globals.shapes[globals.selectedFeatureID].getProperties() != undefined)
-        retrieveValues();
-    else
+    if(globals.shapes[globals.selectedFeatureID] == undefined || globals.shapes[globals.selectedFeatureID].getProperties() == undefined)
         fillLayerInfoDefaults();
         //clearLayerInfoContents();
+    else
+        retrieveValues();
+
     (<HTMLInputElement>document.getElementById('tgt_name')).value = globals.selectedFeatureID;   
     for(var val in vals) 
         validateLayerInfo(vals[val]); 
@@ -116,6 +118,7 @@ function assignValues() {
             var temp = globals.shapes[globals.selectedFeatureID];
             delete globals.shapes[globals.selectedFeatureID];
             globals.shapes[id] = temp;
+            globals.selectedFeatureID = id;
         } else {
             // don't write over what currently exists
             (<HTMLInputElement>document.getElementById('tgt_name')).value = globals.selectedFeatureID;

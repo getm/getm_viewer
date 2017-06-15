@@ -42,7 +42,7 @@ CGSWeb_Map.Options = {
 			arcgis_wmts: true,
 			tilesize: 256,
 			levels: 20,
-			srs: "EPSG:3857"
+			srs: "EPSG:4326"
 	    },
 	    {
 	    	title: "Web Map Server",
@@ -152,24 +152,24 @@ var wfsMapConfigs = [
         title: 'Airports',
         name: 'airports',
         hostAddress: 'http://localhost:9002/',
-        url: 'geoserver/wfs/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=wfs:cl_airports',
-        format: 'GML2',
+        url: 'geoserver/wfs/ows?service=WFS&request=GetFeature&typeName=wfs:cl_airports',
+        version: '1.1.0',
         color: 'rgba(255,0,0,1)'
     },
     {
         title: 'Roads',
         name: 'roads',
         hostAddress: 'http://localhost:9002/',
-        url: 'geoserver/wfs/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=wfs:cl_roads',
-        format: 'GML2',
+        url: 'geoserver/wfs/ows?service=WFS&request=GetFeature&typeName=wfs:cl_roads',
+        version: '1.1.0',
         color: 'rgba(0,0,255,1)'
     },
     {
         title: 'State Routes',
         name: 'state_routes',
         hostAddress: 'http://localhost:9002/',
-        url: 'geoserver/wfs/ows?service=WFS&version=1.1.0&request=GetFeature&typeName=wfs:cl_state_routes',
-        format: 'GML2',
+        url: 'geoserver/wfs/ows?service=WFS&request=GetFeature&typeName=wfs:cl_state_routes',
+        version: '1.1.0',
         color: 'rgba(0,255,0,1)'
     }     
 ];

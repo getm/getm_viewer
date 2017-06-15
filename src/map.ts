@@ -13,9 +13,9 @@ export const map = new ol.Map({
     target: 'map',
     controls: new ol.Collection([new ol.control.FullScreen(), attribution, new ol.control.Zoom()]),
     view: new ol.View({
-        projection: 'EPSG:4326',
+        projection: ol.proj.get('EPSG:4326'),
         center: [20, 0],
-        zoom: 5
+        zoom: 2
     }),
     logo: false
 });
@@ -25,6 +25,7 @@ function populateBaseMapLayers() {
     for (var i in baseMapConfigs) {
         if(baseMapConfigs[i].arcgis_wmts == true) {
             var projection = ol.proj.get(baseMapConfigs[i].srs);
+            console.log('projection reads ' + baseMapConfigs[i].srs);
             var projectionExtent = projection.getExtent();
             var size = ol.extent.getWidth(projectionExtent) / baseMapConfigs[i].tilesize;
             var levels = baseMapConfigs[i].levels;
@@ -55,6 +56,7 @@ function populateBaseMapLayers() {
                 })
             })
         } else {
+            console.log('projection reads EPSG:4326');
             mapLayers[baseMapConfigs[i].title] = new ol.layer.Tile({
                 visible: true,
                 preload: 2,
@@ -72,92 +74,107 @@ function populateBaseMapLayers() {
         }
     }
 }
+
 function normalizeExtent(extent) {
-		// Check if total Lon > 360.
-		if(extent[0] > 0 && extent[2] > 0 && extent[2] - extent[0] > 360) {
-			// Entire extent east of 0.
-			extent[0] = -180;
-			extent[2] = 180;
-		} else if(extent[0] < 0 && extent[2] < 0 && Math.abs(extent[0]) - Math.abs(extent[2]) > 360) {
-			// Entire extent west of 0.
-			extent[0] = -180;
-			extent[2] = 180;
-		} else if(extent[0] < 0 && extent[2] > 0 && Math.abs(extent[0]) + Math.abs(extent[2]) > 360) {
-			// Extent contains 0.
-			extent[0] = -180;
-			extent[2] = 180;
-		}
+    // Check if total Lon > 360.
+    if(extent[0] > 0 && extent[2] > 0 && extent[2] - extent[0] > 360) {
+        // Entire extent east of 0.
+        extent[0] = -180;
+        extent[2] = 180;
+    } else if(extent[0] < 0 && extent[2] < 0 && Math.abs(extent[0]) - Math.abs(extent[2]) > 360) {
+        // Entire extent west of 0.
+        extent[0] = -180;
+        extent[2] = 180;
+    } else if(extent[0] < 0 && extent[2] > 0 && Math.abs(extent[0]) + Math.abs(extent[2]) > 360) {
+        // Extent contains 0.
+        extent[0] = -180;
+        extent[2] = 180;
+    }
 
-		// Check if total Lat > 180.
-		if(extent[1] > 0 && extent[3] > 0 && extent[3] - extent[1] > 180) {
-			// Entire extent north of 0.
-			extent[1] = -90;
-			extent[3] = 90;
-		} else if(extent[1] < 0 && extent[3] < 0 && Math.abs(extent[1]) - Math.abs(extent[3]) > 180) {
-			// Entire extent south of 0.
-			extent[1] = -90;
-			extent[3] = 90;
-		} else if(extent[1] < 0 && extent[3] > 0 && Math.abs(extent[1]) + Math.abs(extent[3]) > 180) {
-			// Extent contains 0.
-			extent[1] = -90;
-			extent[3] = 90;
-		}
+    // Check if total Lat > 180.
+    if(extent[1] > 0 && extent[3] > 0 && extent[3] - extent[1] > 180) {
+        // Entire extent north of 0.
+        extent[1] = -90;
+        extent[3] = 90;
+    } else if(extent[1] < 0 && extent[3] < 0 && Math.abs(extent[1]) - Math.abs(extent[3]) > 180) {
+        // Entire extent south of 0.
+        extent[1] = -90;
+        extent[3] = 90;
+    } else if(extent[1] < 0 && extent[3] > 0 && Math.abs(extent[1]) + Math.abs(extent[3]) > 180) {
+        // Extent contains 0.
+        extent[1] = -90;
+        extent[3] = 90;
+    }
 
-		// Shift lon to range (-360, 360).
-		var max = Math.max(Math.abs(extent[0]), Math.abs(extent[2]));
-		var revs = Math.floor(max / 360);
-		if(extent[0] > 0 && extent[2] > 0) {
-			extent[0] = extent[0] - revs*360;
-			extent[2] = extent[2] - revs*360;
-		} else if(extent[0] < 0 && extent[2] < 0) {
-			extent[0] = extent[0] + revs*360;
-			extent[2] = extent[2] + revs*360;
-		}
+    // Shift lon to range (-360, 360).
+    var max = Math.max(Math.abs(extent[0]), Math.abs(extent[2]));
+    var revs = Math.floor(max / 360);
+    if(extent[0] > 0 && extent[2] > 0) {
+        extent[0] = extent[0] - revs*360;
+        extent[2] = extent[2] - revs*360;
+    } else if(extent[0] < 0 && extent[2] < 0) {
+        extent[0] = extent[0] + revs*360;
+        extent[2] = extent[2] + revs*360;
+    }
 
-		if(extent[2] > 180) {
-			// Wrap to the east.
-			return [
-			    [extent[0], extent[1], 180, extent[3]],
-			    [-180, extent[1], -180 + (extent[2] - 180), extent[3]],
-			];
-		} else if(extent[0] < -180) {
-			// Wrap to the west.
-			return [
-				[-180, extent[1], extent[2], extent[3]],
-				[180 + (extent[0] + 180), extent[1], 180, extent[3]],
-			];
-		} else {
-			return [extent];
-		}
-	}
+    if(extent[2] > 180) {
+        // Wrap to the east.
+        return [
+            [extent[1], extent[0], extent[3], 180],
+            [extent[1], -180, extent[3], -180 + (extent[2] - 180)],
+        ];
+    } else if(extent[0] < -180) {
+        // Wrap to the west.
+        return [
+            [extent[1], -180,extent[3], extent[2]],
+            [extent[1], 180 + (extent[0] + 180), extent[3], 180],
+        ];
+    } else {
+        return [extent[1], extent[0], extent[3], extent[2]];
+    }
+}
+
+
 function populateWFSLayers(){
-    for(var i in wfsMapConfigs) {
-        wfsLayers['wfs_' + wfsMapConfigs[i].name + '_layer'] = new ol.layer.Vector({
+    wfsMapConfigs.forEach(function(wfsMapConfig){
+        wfsLayers['wfs_' + wfsMapConfig.name + '_layer'] = new ol.layer.Vector({
             source: new ol.source.Vector({
-                format: (wfsMapConfigs[i].format == 'GML3') ? new ol.format.GML3() : 
-                        (wfsMapConfigs[i].format == 'GML2') ? new ol.format.GML2() : null, // TODO: fix this later
-                url: wfsMapConfigs[i].hostAddress + wfsMapConfigs[i].url 
-                        + '&outputFormat=' + wfsMapConfigs[i].format
-                        + '&bbox=' + map.getView().calculateExtent(map.getSize()).join(',') + '&srs=EPSG:4326'
-                ,
+                format: (wfsMapConfig.version == '1.1.0') ? new ol.format.GML3() : 
+                        (wfsMapConfig.version == '1.0.0') ? new ol.format.GML2() : 
+                        (wfsMapConfig.format == 'KML') ? new ol.format.KML() : undefined, // TODO: fix this later
+                url: function(extent,resolution,proj) {
+                    // var norm = normalizeExtent(extent)[0];
+                    // var temp = norm[0];
+                    // norm[0] = norm[1];
+                    // norm[1] = temp;
+                    // temp = norm[2];
+                    // norm[2] = norm[3];
+                    // norm[3] = temp;
+                    return wfsMapConfig.hostAddress + wfsMapConfig.url 
+                        // + '&outputFormat=' + wfsMapConfig.format
+                        + '&version=' + wfsMapConfig.version
+                        + '&srs=EPSG:4326'
+                        + '&bbox=' + normalizeExtent(extent).join(',') ;//+ '&srs=EPSG:4326';
+                },
                 strategy: ol.loadingstrategy.bbox,
                 attributions: [new ol.Attribution({
-                    html: '<div style="color:' + wfsMapConfigs[i].color + '" class="wfs_legend">' + wfsMapConfigs[i].title + '</div>' //id="' + wfsMapConfigs[i].name + '_attributions' + '"
+                    html: '<div style="color:' + wfsMapConfig.color + '" class="wfs_legend">' + wfsMapConfig.title + '</div>' //id="' + wfsMapConfigs[i].name + '_attributions' + '"
                 })],
             }),
             visible: false,
             style: new ol.style.Style({
                 stroke: new ol.style.Stroke({
-                    color: wfsMapConfigs[i].color,
-                    width: 2
+                    color: wfsMapConfig.color,
+                    width: 3
                 })
             }),        
         });
-        wfsLayersGroup.getLayers().insertAt(wfsLayersGroup.getKeys().length, wfsLayers['wfs_' + wfsMapConfigs[i].name + '_layer']);
-        $('#' + wfsMapConfigs[i].name +'_checkbox').click(function(){
+        
+        wfsLayersGroup.getLayers().insertAt(wfsLayersGroup.getKeys().length, wfsLayers['wfs_' + wfsMapConfig.name + '_layer']);
+        $('#' + wfsMapConfig.name +'_checkbox').click(function(){
             wfsLayers['wfs_' +  this.id.replace('_checkbox', '_layer')].setVisible(this.checked);
         });  
-    }
+    });
 }
 
 function populateMap() {
