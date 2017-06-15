@@ -3,8 +3,6 @@ h5 {
 }
 
 #map {
-    height: 100%;
-
     height: 500px;
     z-index: 0;
 }
@@ -44,6 +42,501 @@ h5 {
 
 .ol-attribution.ol-unselectable.ol-control:not(.ol-collapsed){
     background-color: rgba(255,255,255,0);
+}
+
+.securityBanner {
+	font-weight: bold;
+	z-index: 2;
+}
+
+#topBanner {
+	position: fixed; 
+	top: 0; 
+	left: 0; 
+	right: 0; 
+	background-color: green; 
+	text-align: center; 
+	margin: 0;
+}
+
+#bottomBanner {
+	position: fixed; 
+	bottom: 0; 
+	left: 0; 
+	right: 0; 
+	background-color: green; 
+	text-align: center; 
+	margin: 0;
+}
+
+/*************************************************************************************************************/
+/*body {
+	padding-top: 70px;
+	/* Required padding for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. 
+}*/
+
+.ol-control button {
+	background-color: rgba(40, 40, 40, 0.8) !important;
+}
+
+.ol-control button:hover {
+	background-color: rgba(40, 40, 40, 1) !important;
+}
+
+.ol-scale-line {
+	background: rgba(40, 40, 40, 0.8);
+	bottom: 2em;
+	left: 0.5em;
+}
+
+nav {
+	-webkit-box-shadow: 0 2px 5px #888888;
+	box-shadow: 0 2px 5px #888888;
+}
+
+.navbar-fixed-top {
+	top: 20px;
+}
+
+.navbar-nav>li>a, .navbar-brand {
+	padding-top: 4px !important;
+	padding-bottom: 0 !important;
+	height: 28px;
+}
+
+.navbar {
+	min-height: 28px !important;
+}
+
+#wrap .container,
+#wrap .container .container {
+	width: 100%;
+}
+
+.well {
+	background: rgba(120, 120, 120, 0.9);
+	padding: 15px 0 15px 0;
+	margin-left: auto;
+	margin-right: auto;
+	width: 100%;
+	position: relative;
+}
+
+.well.col-lg-12{
+	position: static;
+}
+
+.bold {
+	font-weight: bold;
+}
+
+.map {
+	position: relative;
+	margin-bottom: 10px;
+	background-color: #2C2C2C;
+	height: 615px;
+	-webkit-box-shadow: 2px 2px 5px #888888;
+	box-shadow: 2px 2px 5px #888888;
+}
+
+.map:-moz-full-screen {
+  	height: 100%;
+  	width: 100%;
+}
+
+.map:-webkit-full-screen {
+  	height: 100%;
+  	width: 100%;
+}
+
+.map:-ms-fullscreen {
+  	height: 100%;
+  	width: 100%;
+}
+
+.map:fullscreen {
+  	height: 100%;
+  	width: 100%;
+}
+
+.securityBanner {
+	font-weight: bold;
+	z-index: 2;
+}
+
+#info-col {
+	padding-left: 0;
+}
+
+#info-panel {
+	margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+#topBanner {
+	position: fixed; 
+	top: 0; 
+	left: 0; 
+	right: 0; 
+	background-color: green; 
+	text-align: center; 
+	margin: 0;
+}
+
+#bottomBanner {
+	position: fixed; 
+	bottom: 0; 
+	left: 0; 
+	right: 0; 
+	background-color: green; 
+	text-align: center; 
+	margin: 0;
+}
+
+.ol-mouse-position {
+	position: absolute;
+    background: rgba(40, 40, 40, 0.8);
+    border-radius: 4px;
+    color: #eee;
+    padding: 0 2px 0 2px;
+}
+
+.panel-body {
+	padding: 5px;
+}
+
+.date {
+	width: 150px;
+}
+
+.number {
+	width: 100px;
+}
+
+.text {
+	width: 100px;
+}
+
+.toggle-dppdb-col {
+	margin-top: 2px;
+}
+
+.toggle-sensors-col {
+	margin-top: 2px;
+}
+	
+.toggle-stereo-mates-col {
+	margin-top: 2px;
+}
+
+.minimizer-container {
+	position: absolute;
+	width: 25px;
+	height: 25px;
+	border: 4px solid rgba(0, 0, 0, 0.5);
+	border-radius: 7px;
+	display: block;
+	right: 0px;
+	bottom: 0px;
+	background-color: rgba(255, 255, 255, 0.5);
+	background-size: 20px 20px;
+}
+
+.toggle-extra-filters {
+	position: absolute;
+	width: 23px;
+	height: 23px;
+	/*background-image: url(../weblib/gwtLeaflet/images/toggle.png);*/
+	background-size: 20px 20px;
+	left: -3px;
+}
+
+.toggle-extra-filters.minimized {
+	top: -2px;
+	-webkit-transform: rotate(45deg);
+	transform: rotate(45deg);
+}
+
+.toggle-extra-filters {
+	top: -4px;
+	-webkit-transform: rotate(-135deg);
+	transform: rotate(-135deg);
+}
+
+.minimizer-container:hover {
+	background-color: rgba(255, 255, 255, 0.8);
+	border: 4px solid rgba(0, 0, 0, 0.8);
+}
+
+#date-range-form .form-group {
+	margin: 5px;
+}
+
+#filters-range-form .form-group {
+	margin-left: 4px;
+    margin-right: 4px;
+}
+
+#jump-form .form-group {
+	margin-left: 4px;
+    margin-right: 4px;
+}
+
+#enter-coordinate {
+	display: inline;
+    width: 120px;
+    height: 30px;
+    margin-left: -80px;
+    margin-top: 2px;
+    background-color: rgba(31, 31, 31, 0.8);
+    color: white;
+    border: none;
+    font-size: small;
+    font-weight: bold;
+    border: 1px solid white;
+    border-radius: 3px;
+}
+
+#enter-coordinate:hover {
+	background-color: rgba(77, 77, 77, 1);
+}
+
+.overlay-info {
+	position: absolute;
+	color: #eee;
+	bottom: 4px;
+	border-radius: 4px;
+	padding: 0 2px 0 2px;
+	background: rgba(40, 40, 40, 0.8);
+}
+
+.overlay-info p {
+	margin: 0 0 3px 0;
+}
+
+.counter {
+	position: absolute;
+    background: rgba(40, 40, 40, 0.8);
+    bottom: 4px;
+    left: 8px;
+    border-radius: 4px;
+    color: #eee;
+    padding: 0 2px 0 2px;
+}
+
+.layer-switcher {
+    position: absolute;
+    top: 7em;
+    left: 0.5em;
+    right: auto;
+}
+
+.ol-full-screen {
+	position: absolute;
+	top: 4.6em;
+	left: 0.5em;
+	right: auto;
+}
+
+.layer-switcher li.group > label {
+    margin-left: 0.5em;
+}
+
+.layer-switcher button {
+    float: left;
+}
+
+.well {
+	-webkit-box-shadow: 2px 2px 5px #888888;
+	box-shadow: 2px 2px 5px #888888;
+	border: none;
+    border-radius: 0;
+}
+
+.btn.active, .btn:active {
+	background-image: none;
+    outline: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+}
+
+.ol-popup-content {
+	padding: 0 25px 15px 15px;
+}
+
+hr {
+	margin-top: 5px;
+	margin-bottom: 5px;
+	border-top: 1px solid #888;
+}
+
+.ol-popup {
+	padding: 25px 0px 0px 0px;
+	border-radius: 5px;
+}
+
+.btn-default,
+.btn-default.focus,
+.btn-default:focus {
+	font-weight: bold;
+    color: #8a8a8a;
+    background-color: #fff;
+    border-color: #ccc;
+}
+
+.btn-default:hover {
+    background-color: #aaa;
+}
+
+.btn-default.active:hover {
+    background-color: #ccc;
+}
+
+.btn-default.active, 
+.btn-default:active, 
+.open>.dropdown-toggle.btn-default {
+    font-weight: bold;
+    background-color: #fff;
+    border-color: #ccc;
+}
+
+.btn-success,
+.btn-success.focus,
+.btn-success:focus {
+	font-weight: bold;
+	text-shadow: 0 0 10px #fff;
+    color: #8a8a8a;
+    background-color: #aaa;
+    border-color: #ccc;
+}
+
+.btn-success.active, 
+.btn-success:active, 
+.open>.dropdown-toggle.btn-success {
+    font-weight: bold;
+    text-shadow: 0 0 10px #fff;
+    color: #fff;
+    background-color: #4aab4a;
+    border-color: #ccc;
+}
+
+.btn-success.active:hover {
+	background-color: #237B17;
+	text-shadow: 0 0 10px #fff;
+    color: #fff;
+}
+
+.btn-success:hover {
+	background-color: #fff;
+	text-shadow: 0 0 10px #aaa;
+    color: #aaa;
+}
+
+.btn-warning,
+.btn-warning.focus,
+.btn-warning:focus {
+	font-weight: bold;
+	text-shadow: 0 0 10px #fff;
+    color: #8a8a8a;
+    background-color: #aaa;
+    border-color: #ccc;
+}
+
+.btn-warning.active, 
+.btn-warning:active, 
+.open>.dropdown-toggle.btn-warning {
+    font-weight: bold;
+    text-shadow: 0 0 10px #fff;
+    color: #fff;
+    background-color: #eca033;
+    border-color: #ccc;
+}
+
+.btn-warning.active:hover {
+	background-color: #B27E22;
+}
+
+.btn-warning:hover {
+	background-color: #fff;
+}
+
+.btn-stereo-mates, 
+.btn-stereo-mates.focus
+.btn-stereo-mates:focus
+{
+	font-weight: bold;
+	text-shadow: 0 0 10px #fff;
+    color: #8a8a8a;
+    background-color: #aaa;
+    border-color: #ccc;
+}
+
+.btn-stereo-mates.active, 
+.btn-stereo-mates:active
+.open>.dropdown-toggle.btn-stereo-mates
+{
+	font-weight: bold;
+    text-shadow: 0 0 10px #fff;
+    color: #fff;
+    background-color: #D41111;
+    border-color: #ccc;
+}
+
+.btn-stereo-mates.active:hover {
+	background-color: #AA0000;
+}
+
+.btn-stereo-mates:hover {
+	background-color: #fff;
+}
+
+.overview {
+	/*background: url(../images/ajax-loader.gif) center center no-repeat;*/
+	min-height: 24px;
+	min-width: 24px;
+	cursor: pointer;
+}
+
+.popup-table-2 {
+	width: 512px;
+}
+
+.popup-row {
+	width: 100%;
+}
+
+.popup-cell {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.popup-cell-left {
+	
+}
+
+.popup-cell-right {
+	width: 483px;
+	padding-left: 5px;
+	word-break: break-word;
+}
+
+.nowrap {
+	white-space: nowrap;
+}
+
+.break-word {
+	word-wrap: break-word;
+	word-break: break-word;
+}
+
+.map .ol-popup-content {
+	max-height: 300px;
+}
+
+div#overviewModal {
+	text-align: center;
+	overflow: auto;
+	max-height: 600px;
 }#insertShapes {
     float: left;
     width: 33%;
@@ -174,8 +667,8 @@ select{
 }
 
 .page-contents{
-    padding-top: 50px; /* nav bar has height of 50px */    
-    top:50px;
+    /*padding-top: 20px;  nav bar has height of 50px     */
+    top:20px;
     position:absolute;
     width: 100%;
     /*padding: 20px;*/
