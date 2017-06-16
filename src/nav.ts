@@ -49,7 +49,7 @@ export function navSetup() {
 
     // special case
     var wfsEntires = {};
-    for(var w of wfsMapConfigs) {
+    for(var w of CGSWeb_Map.Options.wfsMapConfigs) {
         wfsEntires[w.name+ '_entry'] = 
             '<input type="checkbox" id="' + w.name + '_checkbox">' +
             '<label for="' + w.name + '_checkbox">' + w.title + '</label>';

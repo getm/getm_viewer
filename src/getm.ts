@@ -72,23 +72,95 @@ function besearch(){
         if($('#besearch').val()) {
             if($('#besearch').val() == WILDCARD ||
             (globals.shapes[shapesID].getProperty('benumber') == $('#besearch').val())) {
-                results.push(shapesID);
+                results.push('' + shapesID + '');
             }
         }
     }
     document.getElementById('besearchResults').innerHTML = JSON.stringify(results);
 }
 
-function catsearch() {
-    var results = [];
-    for (var shapesID in globals.shapes) {
-        if($('#catsearch').val()){
-            if($('#catsearch').val() == WILDCARD ||
-                (globals.shapes[shapesID].getProperty('catcode') == $('#catsearch').val())) {
-                    results.push(shapesID);
-            }
-        }
+function normalizeExtent(extent) {
+    // Check if total Lon > 360.
+    if(extent[0] > 0 && extent[2] > 0 && extent[2] - extent[0] > 360) {
+        // Entire extent east of 0.
+        extent[0] = -180;
+        extent[2] = 180;
+    } else if(extent[0] < 0 && extent[2] < 0 && Math.abs(extent[0]) - Math.abs(extent[2]) > 360) {
+        // Entire extent west of 0.
+        extent[0] = -180;
+        extent[2] = 180;
+    } else if(extent[0] < 0 && extent[2] > 0 && Math.abs(extent[0]) + Math.abs(extent[2]) > 360) {
+        // Extent contains 0.
+        extent[0] = -180;
+        extent[2] = 180;
     }
+
+    // Check if total Lat > 180.
+    if(extent[1] > 0 && extent[3] > 0 && extent[3] - extent[1] > 180) {
+        // Entire extent north of 0.
+        extent[1] = -90;
+        extent[3] = 90;
+    } else if(extent[1] < 0 && extent[3] < 0 && Math.abs(extent[1]) - Math.abs(extent[3]) > 180) {
+        // Entire extent south of 0.
+        extent[1] = -90;
+        extent[3] = 90;
+    } else if(extent[1] < 0 && extent[3] > 0 && Math.abs(extent[1]) + Math.abs(extent[3]) > 180) {
+        // Extent contains 0.
+        extent[1] = -90;
+        extent[3] = 90;
+    }
+
+    // Shift lon to range (-360, 360).
+    var max = Math.max(Math.abs(extent[0]), Math.abs(extent[2]));
+    var revs = Math.floor(max / 360);
+    if(extent[0] > 0 && extent[2] > 0) {
+        extent[0] = extent[0] - revs*360;
+        extent[2] = extent[2] - revs*360;
+    } else if(extent[0] < 0 && extent[2] < 0) {
+        extent[0] = extent[0] + revs*360;
+        extent[2] = extent[2] + revs*360;
+    }
+
+    if(extent[2] > 180) {
+        // Wrap to the east.
+        return [
+            [extent[1], extent[0], extent[3], 180],
+            [extent[1], -180, extent[3], -180 + (extent[2] - 180)],
+        ];
+    } else if(extent[0] < -180) {
+        // Wrap to the west.
+        return [
+            [extent[1], -180,extent[3], extent[2]],
+            [extent[1], 180 + (extent[0] + 180), extent[3], 180],
+        ];
+    } else {
+        return [extent[1], extent[0], extent[3], extent[2]];
+    }
+}
+
+// catcode searches within range
+function catsearch() {
+    var extent = map.getView().calculateExtent(map.getSize());
+    var results = [];
+    (<ol.layer.Group>(map.getLayerGroup().getLayers().getArray()[2])).getLayers().getArray().forEach(function(layer){
+        (<ol.layer.Vector>layer).getSource().getFeaturesInExtent(extent).forEach(function(feature){
+            if($('#catsearch').val()){
+                if($('#catsearch').val() == WILDCARD ||
+                    (globals.shapes[feature.get('id')].getProperty('catcode') == $('#catsearch').val())) {
+                        results.push(feature.get('id'));
+                }
+            }            
+        })
+    });
+    
+    // for (var shapesID in globals.shapes) {
+    //     if($('#catsearch').val()){
+    //         if($('#catsearch').val() == WILDCARD ||
+    //             (globals.shapes[shapesID].getProperty('catcode') == $('#catsearch').val())) {
+    //                 results.push(shapesID);
+    //         }
+    //     }
+    // }
     document.getElementById('catsearchResults').innerHTML = JSON.stringify(results);
 }
 
@@ -309,7 +381,8 @@ export function setupShapes() {
             var opt = document.createElement('option');
             opt.innerHTML = x;
             opt.ondblclick = function(){
-                (<HTMLInputElement>document.getElementById('tgt_name')).value = this.innerHTML;
+                // (<HTMLInputElement>document.getElementById('tgt_name')).value = this.innerHTML;
+                globals.selectedFeatureID = this.innerHTML;
                 layerInfoPopup();
             };
             select.appendChild(opt);

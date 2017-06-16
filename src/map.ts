@@ -136,22 +136,15 @@ function normalizeExtent(extent) {
 
 
 function populateWFSLayers(){
+    var wfsMapConfigs = CGSWeb_Map.Options.wfsMapConfigs;
     wfsMapConfigs.forEach(function(wfsMapConfig){
         wfsLayers['wfs_' + wfsMapConfig.name + '_layer'] = new ol.layer.Vector({
             source: new ol.source.Vector({
                 format: (wfsMapConfig.version == '1.1.0') ? new ol.format.GML3() : 
                         (wfsMapConfig.version == '1.0.0') ? new ol.format.GML2() : 
-                        (wfsMapConfig.format == 'KML') ? new ol.format.KML() : undefined, // TODO: fix this later
+                        undefined,
                 url: function(extent,resolution,proj) {
-                    // var norm = normalizeExtent(extent)[0];
-                    // var temp = norm[0];
-                    // norm[0] = norm[1];
-                    // norm[1] = temp;
-                    // temp = norm[2];
-                    // norm[2] = norm[3];
-                    // norm[3] = temp;
                     return wfsMapConfig.hostAddress + wfsMapConfig.url 
-                        // + '&outputFormat=' + wfsMapConfig.format
                         + '&version=' + wfsMapConfig.version
                         + '&srs=EPSG:4326'
                         + '&bbox=' + normalizeExtent(extent).join(',') ;//+ '&srs=EPSG:4326';
