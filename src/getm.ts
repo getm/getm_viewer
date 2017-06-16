@@ -382,8 +382,8 @@ export function setupShapes() {
             opt.innerHTML = x;
             opt.ondblclick = function(){
                 // (<HTMLInputElement>document.getElementById('tgt_name')).value = this.innerHTML;
-                globals.selectedFeatureID = this.innerHTML;
-                layerInfoPopup();
+                // globals.selectedFeatureID = this.innerHTML;
+                // layerInfoPopup();
             };
             select.appendChild(opt);
         }

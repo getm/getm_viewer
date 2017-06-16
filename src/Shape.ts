@@ -28,6 +28,7 @@ export var Shape = function(feature, layer, properties, objectID=-1){
             return null
         return this.properties[property]['val'];
     }
+    
     this.getObjectID = function(){
         return this.objectID;
     }
