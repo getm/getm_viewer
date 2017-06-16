@@ -136,8 +136,7 @@ function normalizeExtent(extent) {
 
 
 function populateWFSLayers(){
-    var wfsMapConfigs = CGSWeb_Map.Options.wfsMapConfigs;
-    wfsMapConfigs.forEach(function(wfsMapConfig){
+    CGSWeb_Map.Options.wfsMapConfigs.forEach(function(wfsMapConfig){
         wfsLayers['wfs_' + wfsMapConfig.name + '_layer'] = new ol.layer.Vector({
             source: new ol.source.Vector({
                 format: (wfsMapConfig.version == '1.1.0') ? new ol.format.GML3() : 
@@ -170,10 +169,14 @@ function populateWFSLayers(){
     });
 }
 
+function populateAdditionalLayers(){
+    //
+}
+
 function populateMap() {
     populateBaseMapLayers();
     populateWFSLayers();    
-
+    populateAdditionalLayers();
     var mapLayerOptions = Object.keys(mapLayers);   
     var currMapLayer = mapLayerOptions[0]; 
     var mapLayerSelect = document.getElementsByClassName('layer-select');

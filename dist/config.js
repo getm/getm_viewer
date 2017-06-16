@@ -126,6 +126,11 @@ CGSWeb_Map.Options = {
 	// 	stereomate: 'stereomate',
 	// 	overview : 'overview'
 	// },
+	additionalLayersConfigs:[
+		{
+			//
+		}
+	],
 	wfsMapConfigs: [
 		{
 			title: 'Airports',

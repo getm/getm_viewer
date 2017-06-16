@@ -68,15 +68,22 @@ function saveShapes(){
 
 function besearch(){
     var results = [];
+    document.getElementById('besearchResults').innerHTML = "";
     for (var shapesID in globals.shapes) {   
         if($('#besearch').val()) {
             if($('#besearch').val() == WILDCARD ||
             (globals.shapes[shapesID].getProperty('benumber') == $('#besearch').val())) {
-                results.push('' + shapesID + '');
+                var result = document.createElement('div');
+                result.innerHTML = shapesID;
+                result.onclick = function(){
+                    globals.selectedFeatureID = this.innerHTML;
+                    layerInfoPopup();
+                }
+                document.getElementById('besearchResults').appendChild(result);
             }
         }
     }
-    document.getElementById('besearchResults').innerHTML = JSON.stringify(results);
+    
 }
 
 function normalizeExtent(extent) {
@@ -141,27 +148,25 @@ function normalizeExtent(extent) {
 // catcode searches within range
 function catsearch() {
     var extent = map.getView().calculateExtent(map.getSize());
-    var results = [];
+    document.getElementById('catsearchResults').innerHTML = "";
     (<ol.layer.Group>(map.getLayerGroup().getLayers().getArray()[2])).getLayers().getArray().forEach(function(layer){
         (<ol.layer.Vector>layer).getSource().getFeaturesInExtent(extent).forEach(function(feature){
             if($('#catsearch').val()){
                 if($('#catsearch').val() == WILDCARD ||
                     (globals.shapes[feature.get('id')].getProperty('catcode') == $('#catsearch').val())) {
-                        results.push(feature.get('id'));
+                        //results.push(feature.get('id'));
+                        var result = document.createElement('div');
+                        result.innerHTML = feature.get('id');
+                        result.onclick = function(){
+                            globals.selectedFeatureID = this.innerHTML;
+                            layerInfoPopup();
+                        }
+                        document.getElementById('catsearchResults').appendChild(result);
+
                 }
             }            
         })
     });
-    
-    // for (var shapesID in globals.shapes) {
-    //     if($('#catsearch').val()){
-    //         if($('#catsearch').val() == WILDCARD ||
-    //             (globals.shapes[shapesID].getProperty('catcode') == $('#catsearch').val())) {
-    //                 results.push(shapesID);
-    //         }
-    //     }
-    // }
-    document.getElementById('catsearchResults').innerHTML = JSON.stringify(results);
 }
 
 export function setup() {
@@ -381,9 +386,8 @@ export function setupShapes() {
             var opt = document.createElement('option');
             opt.innerHTML = x;
             opt.ondblclick = function(){
-                // (<HTMLInputElement>document.getElementById('tgt_name')).value = this.innerHTML;
-                // globals.selectedFeatureID = this.innerHTML;
-                // layerInfoPopup();
+                globals.selectedFeatureID = this.innerHTML;
+                layerInfoPopup();
             };
             select.appendChild(opt);
         }
