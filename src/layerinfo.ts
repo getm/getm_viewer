@@ -332,7 +332,11 @@ function clearLayerInfoContents() {
 
 function retrieveValidProperties() {
     layerInfoRequirements.forEach(function(layerInfoReq){
-        (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = globals.shapes[globals.selectedFeatureID].getFeature().getProperties()[layerInfoReq.val];
+        if(globals.shapes[globals.selectedFeatureID].getFeature().getProperties()[layerInfoReq.val] != undefined) {
+            (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value =globals.shapes[globals.selectedFeatureID].getFeature().getProperties()[layerInfoReq.val];
+        } else {
+            (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = "";
+        }        
     });    
 }
 

@@ -16,11 +16,12 @@ const config = {
         ]
     },
     plugins: [
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                warnings: false
-            }
-        }),
+        // new webpack.optimize.UglifyJsPlugin({
+        //     compress: {
+        //         warnings: false
+        //     },
+        //     include: /.js$/
+        // }),
         new ExtractTextPlugin('map.bundle.css'),
     ]
 };

@@ -3,7 +3,7 @@ h5 {
 }
 
 #map {
-    height: 500px;
+    height: max-content;
     z-index: 0;
 }
 
