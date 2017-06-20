@@ -186,7 +186,7 @@ function populateLayers(){
                 layer.set('name', layerConfig.name);
                 globals.counts[layerConfig.name] = 0;
                 layer.set('selectable', true);
-                $('#' + layerConfig.name +'_checkbox').click(function(){
+                $('#' + layerConfig.name.replace(/\W/g, '') +'_checkbox').click(function(){
                     layer.setVisible(this.checked);
                 }); 
                 layers.push(layer);

@@ -1,7 +1,6 @@
 import './css/layerinfo.css'
 import * as $ from 'jquery';
 import * as ol from 'openlayers';
-import '../dist/config.js';
 import {map} from './map';
 import {globals, windowSetup} from './globals';
 import {setupShapes} from './getm';

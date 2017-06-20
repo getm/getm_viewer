@@ -2,7 +2,6 @@ import * as $ from 'jquery';
 import 'jqueryui';
 import './css/getm.css';
 import * as ol from 'openlayers';
-import '../dist/config.js';
 import {layerInfoPopup} from './layerinfo'; // to something about this?
 import {globals, windowSetup} from './globals';
 import {map} from './map';
@@ -265,7 +264,7 @@ function wfsSetup() {
 
         var input = document.createElement('input');
         input.type = 'checkbox';
-        input.id = wfsMapConfig.name.trim() + '_checkbox';
+        input.id = wfsMapConfig.name.replace(/\W/g, '') + '_checkbox';
         div.appendChild(input);
 
         var label = document.createElement('label');
