@@ -1,7 +1,20 @@
 export var globals = {
     debug: false,
     selectedFeatureID: undefined,
-    shapes: {}
+    selectedFeature: undefined, // idk
+    selectedLayer: undefined, // idk
+    shapes: {},
+    wfsFeatures: [],
+    featuresArray: [],
+    shapeLayer: undefined,
+    counts: {
+        'rectangle': 0,
+        'circle': 0,
+        'ellipse': 0,
+        'freeform': 0,
+        'polyline': 0,
+        'polygon': 0,
+    }
 }
 
 export function windowSetup(id, headerTitle=id){

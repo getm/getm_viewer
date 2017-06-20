@@ -2,13 +2,13 @@ import './css/map.css';
 import * as ol from 'openlayers';
 import * as $ from 'jquery';
 import {setupShapes} from './getm';
-
+import {globals} from './globals';
 var attribution = new ol.control.Attribution();
-const wfsLayersGroup = new ol.layer.Group();
-const shapeLayersGroup = new ol.layer.Group();
-const mapLayers = {};
+
+const layerGroups = [];
 const wfsLayers = {};
-export var shapeLayer;
+const features = {};
+
 export const map = new ol.Map({
     target: 'map',
     controls: new ol.Collection([new ol.control.FullScreen(), attribution, new ol.control.Zoom()]),
@@ -21,28 +21,27 @@ export const map = new ol.Map({
 });
 
 function populateBaseMapLayers() {
-    var baseMapConfigs = CGSWeb_Map.Options.baseMapConfigs;
-    for (var i in baseMapConfigs) {
-        if(baseMapConfigs[i].arcgis_wmts == true) {
-            var projection = ol.proj.get(baseMapConfigs[i].srs);
-            console.log('projection reads ' + baseMapConfigs[i].srs);
+    var layers = [];
+    CGSWeb_Map.Options.layers.baseMapConfigs.forEach(function(baseMapConfig){
+        if(baseMapConfig.arcgis_wmts == true) {
+            var projection = ol.proj.get(baseMapConfig.srs);
+            // console.log('projection reads ' + baseMapConfig.srs);
             var projectionExtent = projection.getExtent();
-            var size = ol.extent.getWidth(projectionExtent) / baseMapConfigs[i].tilesize;
-            var levels = baseMapConfigs[i].levels;
+            var size = ol.extent.getWidth(projectionExtent) / baseMapConfig.tilesize;
+            var levels = baseMapConfig.levels;
             var resolutions = new Array(levels);   
             var matrixIds = new Array(levels);
             for (var j = 0; j < levels; ++j) {
                 resolutions[j] = size / Math.pow(2, j);
                 matrixIds[j] = j;
             }
-
-            mapLayers[baseMapConfigs[i].title] = new ol.layer.Tile({
+            layers.push(new ol.layer.Tile({
                 visible: true,
                 preload: 2,
                 source: new ol.source.WMTS({
-                    url: baseMapConfigs[i].url,
+                    url: baseMapConfig.url,
                     format: 'image/jpeg',
-                    matrixSet: baseMapConfigs[i].srs,
+                    matrixSet: baseMapConfig.srs,
                     projection: projection,
                     tileGrid: new ol.tilegrid.WMTS({
                         origin: ol.extent.getTopLeft(projectionExtent),
@@ -52,29 +51,40 @@ function populateBaseMapLayers() {
                     style: 'default',
                     wrapX: true,
                     requestEncoding: 'REST',
-                    layer: baseMapConfigs[i].layer
+                    layer: baseMapConfig.layer
                 })
-            })
+            }));
         } else {
-            console.log('projection reads EPSG:4326');
-            mapLayers[baseMapConfigs[i].title] = new ol.layer.Tile({
+            // console.log('projection reads EPSG:4326');
+            layers.push(new ol.layer.Tile({
                 visible: true,
                 preload: 2,
                 source: new ol.source.TileWMS({
-                    url: baseMapConfigs[i].url,
+                    url: baseMapConfig.url,
                     params: {
-                        LAYERS: baseMapConfigs[i].layer,
-                        VERSION: baseMapConfigs[i].version,
+                        LAYERS: baseMapConfig.layer,
+                        VERSION: baseMapConfig.version,
                         FORMAT: 'image/jpeg',
                         SRS: 'EPSG:4326'
                     },
                     projection: 'EPSG:4326'
-                })
-            })
+                }),
+            }));
         }
+    });
+
+    var layerGroup = new ol.layer.Group({
+        layers: layers
+    })
+    layerGroups[0] = layerGroup;   
+
+    for(var j = 0; j < layers.length ; j++ ){
+        layers[j].setVisible(false);
     }
+    layers[0].setVisible(true);      
 }
 
+// TODO: fix
 function normalizeExtent(extent) {
     // Check if total Lon > 360.
     if(extent[0] > 0 && extent[2] > 0 && extent[2] - extent[0] > 360) {
@@ -134,151 +144,138 @@ function normalizeExtent(extent) {
     }
 }
 
-
-function populateWFSLayers(){
-    CGSWeb_Map.Options.wfsMapConfigs.forEach(function(wfsMapConfig){
-        wfsLayers['wfs_' + wfsMapConfig.name + '_layer'] = new ol.layer.Vector({
-            source: new ol.source.Vector({
-                format: (wfsMapConfig.version == '1.1.0') ? new ol.format.GML3() : 
-                        (wfsMapConfig.version == '1.0.0') ? new ol.format.GML2() : 
-                        undefined,
-                url: function(extent,resolution,proj) {
-                    return wfsMapConfig.hostAddress + wfsMapConfig.url 
-                        + '&version=' + wfsMapConfig.version
-                        + '&srs=EPSG:4326'
-                        + '&bbox=' + normalizeExtent(extent).join(',') ;//+ '&srs=EPSG:4326';
-                },
-                strategy: ol.loadingstrategy.bbox,
-                attributions: [new ol.Attribution({
-                    html: '<div style="color:' + wfsMapConfig.color + '" class="wfs_legend">' + wfsMapConfig.title + '</div>' //id="' + wfsMapConfigs[i].name + '_attributions' + '"
-                })],
-            }),
-            visible: false,
-            style: new ol.style.Style({
-                stroke: new ol.style.Stroke({
-                    color: wfsMapConfig.color,
-                    width: 3
-                })
-            }),        
-        });
-        
-        wfsLayersGroup.getLayers().insertAt(wfsLayersGroup.getKeys().length, wfsLayers['wfs_' + wfsMapConfig.name + '_layer']);
-        $('#' + wfsMapConfig.name +'_checkbox').click(function(){
-            wfsLayers['wfs_' +  this.id.replace('_checkbox', '_layer')].setVisible(this.checked);
-        });  
+function populateLayers(){
+    Object.keys(CGSWeb_Map.Options.layers).forEach(function(key){
+        var layerConfigs = CGSWeb_Map.Options.layers[key];
+        var layers = [];
+        var features = [];
+        if(key  != 'baseMapConfigs') {
+            console.log('populating ' + key)
+            var id = 0;
+            layerConfigs.forEach(function(layerConfig){
+                var layer = new ol.layer.Vector({
+                    source: new ol.source.Vector({
+                        format: (layerConfig.version == '1.1.0') ? new ol.format.GML3() : 
+                                (layerConfig.version == '1.0.0') ? new ol.format.GML2() : 
+                                undefined,
+                        features: features,
+                        url: layerConfig.url ? function(extent,resolution,proj) {
+                            return layerConfig.hostAddress + layerConfig.url 
+                                + (layerConfig.version ? '&version=' + layerConfig.version : '')
+                                + '&srs=' + 'EPSG:4326'
+                                + '&bbox=' + normalizeExtent(extent).join(',') ;//+ '&srs=EPSG:4326';
+                        }: undefined,
+                        strategy: ol.loadingstrategy.bbox,
+                        // attributions: [new ol.Attribution({
+                        //     html: '<div style="color:' + config.color + '" class="wfs_legend">' + config.title + '</div>' //id="' + wfsMapConfigs[i].name + '_attributions' + '"
+                        // })],                       
+                    }),
+                    visible: false,
+                    style: layerConfig.style ? 
+                        new ol.style.Style({
+                            stroke: layerConfig.style.stroke ? new ol.style.Stroke({
+                                color: layerConfig.style.stroke.color ? layerConfig.style.stroke.color : 'rgba(0,0,0,1)',
+                                width: layerConfig.style.stroke.width ? layerConfig.style.stroke.width : 3
+                            }) : new ol.style.Stroke(),
+                            fill: layerConfig.style.fill ? new ol.style.Fill({
+                                color: layerConfig.style.fill.color ? layerConfig.style.fill.color : 'rgba(0,0,0,0)'
+                            }) : new ol.style.Fill(),
+                        }): 
+                        new ol.style.Style()      
+                });
+                layer.set('name', layerConfig.name);
+                globals.counts[layerConfig.name] = 0;
+                layer.set('selectable', true);
+                $('#' + layerConfig.name +'_checkbox').click(function(){
+                    layer.setVisible(this.checked);
+                }); 
+                layers.push(layer);
+            });
+        }
+        var layerGroup = new ol.layer.Group({
+            layers: layers
+        })
+        layerGroups.push(layerGroup);        
+        console.log(layerGroups.length);
     });
 }
 
-function populateAdditionalLayers(){
-    //
-}
-
 function populateMap() {
+    populateLayers();
+    populateShape();
     populateBaseMapLayers();
-    populateWFSLayers();    
-    populateAdditionalLayers();
-    var mapLayerOptions = Object.keys(mapLayers);   
-    var currMapLayer = mapLayerOptions[0]; 
+ 
+    var currMapLayer = CGSWeb_Map.Options.layers.baseMapConfigs[0].title; 
+
     var mapLayerSelect = document.getElementsByClassName('layer-select');
     var mapSelect = document.createElement('select');
-    for( var i = 0; i < mapLayerOptions.length; i++) {
+    CGSWeb_Map.Options.layers.baseMapConfigs.forEach(function(baseMapConfig){
         var opt = document.createElement('option');
-        opt.innerHTML=mapLayerOptions[i];
-        opt.value = mapLayerOptions[i];
+        opt.innerHTML = baseMapConfig.title;
+        opt.value = baseMapConfig.title;
         mapSelect.appendChild(opt);
-    }
-    mapSelect.value = currMapLayer;
+    });
 
+                 
+    // currMapLayer = layerGroups[0].getLayers().item(0).title;
+    mapSelect.value = currMapLayer;
+    console.log('currmap layer is ' + currMapLayer);
     for(var i = 0; i < mapLayerSelect.length; i++) {
-        mapLayerSelect[i].innerHTML = ""; // clear contents
+        // mapLayerSelect[i].innerHTML = ""; // clear contents
         var cln = mapSelect.cloneNode(true);
         (<HTMLSelectElement>cln).onchange = function(){
+            for(var j = 0; j < (<HTMLSelectElement>this).length ; j++ ){
+                layerGroups[0].getLayers().item(j).setVisible(false);
+            }
+            layerGroups[0].getLayers().item((<HTMLSelectElement>this).selectedIndex).setVisible(true);                  
             currMapLayer = (<HTMLSelectElement>this).value; 
-            map.getLayerGroup().getLayers().setAt(0, mapLayers[(<HTMLSelectElement>this).value]);
         };
         mapLayerSelect[i].appendChild(cln);
     }
 }
 
 function populateShape(){
-    shapeLayerOptions.push('all');
-    // generate the sources and layers for the shapes
-    for(var i = 0; i < shapeLayerOptions.length; i++) {
-        var source = new ol.source.Vector();
-        var vector = new ol.layer.Vector({
-            source: source, 
-            visible: false, 
-            style:  new ol.style.Style({
-                stroke: new ol.style.Stroke({
-                    color: 'rgba(255,0,0,1)',
-                    width: 3
-                }),
-                fill:new ol.style.Fill({
-                    color: 'rgba(255,255,255,0.4)'
-                })
-            })
-        });
-        vector.set('selectable', true);
-        vector.set('name', shapeLayerOptions[i]);
-        shapeLayersGroup.getLayers().insertAt(i, vector);
-    }
-
-    shapeLayer = shapeLayersGroup.getLayers().item(0);
-    shapeLayer.setVisible(true);
+    globals.shapeLayer = layerGroups[3].getLayers().item(0);
+    globals.shapeLayer.setVisible(true);
     var shapeLayerSelect = document.getElementsByClassName('shape-layer-select');
 
+
+    for (var i = 0; i < shapeLayerSelect.length; i++) {
+        CGSWeb_Map.Options.layers.shapesConfigs.forEach(function(shapeConfig){
+            var opt = document.createElement('option');
+            opt.innerHTML=shapeConfig.name;
+            opt.value = shapeConfig.name;        
+            shapeLayerSelect[i].appendChild(opt.cloneNode(true));
+        });
+   
+        (<HTMLSelectElement>shapeLayerSelect[i]).value = globals.shapeLayer.get('name');
+        (<HTMLSelectElement>shapeLayerSelect[i]).onchange = function(){
+            globals.shapeLayer = layerGroups[3].getLayers().item((<HTMLSelectElement>this).selectedIndex);
+            for(var j = 0; j < (<HTMLSelectElement>this).length ; j++ ){
+                layerGroups[3].getLayers().item(j).setVisible(false);
+            }
+            layerGroups[3].getLayers().item((<HTMLSelectElement>this).selectedIndex).setVisible(true);                
+            setupShapes();     
+        };           
+    }
     // make all options change at the same time
     var $set = $('.shape-layer-select');
     $set.change(function(){
         $set.not(this).val(this.value);
-    });    
-
-    for (var i = 0; i < shapeLayerSelect.length; i++) {
-        for( var j = 0; j < shapeLayerOptions.length; j++) {
-            var opt = document.createElement('option');
-            opt.innerHTML=shapeLayerOptions[j];
-            opt.value = shapeLayerOptions[j];
-
-            // TODO: make this less hacky >__>
-            if(shapeLayerSelect[i].id == 'layerinfolayer' && j == shapeLayerOptions.length -1) 
-                continue;
-
-            shapeLayerSelect[i].appendChild(opt.cloneNode(true));
-        }
-        (<HTMLSelectElement>shapeLayerSelect[i]).value = shapeLayer.get('name');
-        (<HTMLSelectElement>shapeLayerSelect[i]).onchange = function(){
-            // set other layers false and set this layer true, unless option is all, which case all true
-            if((<HTMLSelectElement>this).selectedIndex < (<HTMLSelectElement>this).length -1) {
-                shapeLayer = shapeLayersGroup.getLayers().item((<HTMLSelectElement>this).selectedIndex);
-                for(var j = 0; j < (<HTMLSelectElement>this).length - 1; j++ ){
-                    shapeLayersGroup.getLayers().item(j).setVisible(false);
-                }
-                shapeLayersGroup.getLayers().item((<HTMLSelectElement>this).selectedIndex).setVisible(true);                
-            } else  {
-                shapeLayer = shapeLayersGroup.getLayers().item(0);; // all is set to default value
-                for(var j = 0; j < (<HTMLSelectElement>this).length - 1; j++ ){
-                    shapeLayersGroup.getLayers().item(j).setVisible(true);
-                }
-            }
-            setupShapes();     
-        };        
-    }
+    }); 
 }
 
 export function setupMap() {
-    // map.getView().fit([-117.90295999999988, 35.551014000000066, -117.54647999999992, 35.71793700000006], map.getSize());
+    chinaLake();
     $('#legend').click(function(){
         attribution.setCollapsed(!attribution.getCollapsed());
     });
-
     populateMap();
-    populateShape();
-
     map.setLayerGroup(new ol.layer.Group({
-        layers: [
-            mapLayers[Object.keys(mapLayers)[0]], // basemap 
-            wfsLayersGroup, // wfs layers
-            shapeLayersGroup // shape layers
-        ]
+        layers: layerGroups
     }));
+}
+
+function chinaLake(){
+    map.getView().fit([-117.90295999999988, 35.551014000000066, -117.54647999999992, 35.71793700000006], map.getSize());
 }

@@ -1,4 +1,3 @@
-
 export var Shape = function(feature, layer, properties, objectID=-1){
     this.feature = feature;
     this.layer = layer; 
@@ -28,12 +27,10 @@ export var Shape = function(feature, layer, properties, objectID=-1){
             return null
         return this.properties[property]['val'];
     }
-    
     this.getObjectID = function(){
         return this.objectID;
     }
     this.setObjectID = function(objectID) {
         this.objectID = objectID;
     }
-    
 }

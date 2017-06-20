@@ -46,16 +46,7 @@ export function navSetup() {
 
     navBarNav.appendChild(createNavButton('mapLayerButton', 'Map Layers'));
     navBarNav.appendChild(createNavButton('getmButton', 'GETM'));    
-
-    // special case
-    var wfsEntires = {};
-    for(var w of CGSWeb_Map.Options.wfsMapConfigs) {
-        wfsEntires[w.name+ '_entry'] = 
-            '<input type="checkbox" id="' + w.name + '_checkbox">' +
-            '<label for="' + w.name + '_checkbox">' + w.title + '</label>';
-    }
-    var wfsOption= createNavDropDown('WFS', wfsEntires);
-    navBarNav.appendChild(wfsOption);
+    navBarNav.appendChild(createNavButton('wfsButton', 'WFS'));
 }
 
 function createNavButton(id, innerText) {

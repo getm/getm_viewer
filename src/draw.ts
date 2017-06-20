@@ -1,4 +1,4 @@
-import {shapeLayer, map} from './map';
+import {map} from './map';
 import * as $ from 'jquery';
 import * as ol from 'openlayers';
 import './css/draw.css';
@@ -11,21 +11,14 @@ var draw;
 var deleteInteraction;
 var radioSelection;
 
-var shapeCounts = {
-    'rectangle': 0,
-    'circle': 0,
-    'ellipse': 0,
-    'freeform': 0,
-    'polyline': 0,
-    'polygon': 0
-}
+
 
 function drawShape(shapeType) {
     if(map.getInteractions().getArray().indexOf(draw) != -1) {
         draw.setActive(false);
         map.removeInteraction(draw);
     }
-    var shapeSource = shapeLayer.getSource();
+    var shapeSource = globals.shapeLayer.getSource();
     switch(shapeType) {
         case 'rectangle': 
             draw = new ol.interaction.Draw({
@@ -91,15 +84,15 @@ function drawShape(shapeType) {
     if(draw != undefined) {
         draw.on('drawend', function(e) {
             // avoid duplicate naming
-            while(globals.shapes[shapeType + shapeCounts[shapeType]] != null) {
-                shapeCounts[shapeType]++;
+            while(globals.shapes[shapeType + globals.counts[shapeType]] != null) {
+                globals.counts[shapeType]++;
             }
             e.feature.setProperties({ 
-                'id': shapeType + shapeCounts[shapeType]
+                'id': shapeType + globals.counts[shapeType]
             });
-            var shape = new Shape(e.feature, shapeLayer, null);
-            globals.shapes[shapeType + shapeCounts[shapeType]] = shape;
-            shapeCounts[shapeType]++;
+            var shape = new Shape(e.feature, globals.shapeLayer, null);
+            globals.shapes[shapeType + globals.counts[shapeType]] = shape;
+            globals.counts[shapeType]++;
 
             draw.setActive(false);
             map.removeInteraction(draw);
@@ -132,7 +125,7 @@ function setupDelete(){
 }
 
 function addRemoveFeatures() {
-    shapeLayer.getSource().on('addfeature', function(evt){
+    globals.shapeLayer.getSource().on('addfeature', function(evt){
         setupShapes();
     });
 }

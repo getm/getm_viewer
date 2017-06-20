@@ -83,7 +83,6 @@ function besearch(){
             }
         }
     }
-    
 }
 
 function normalizeExtent(extent) {
@@ -173,6 +172,7 @@ export function setup() {
     catsearchFiltersSetup();
     besearchFiltersSetup();
     getmSetup();
+    wfsSetup();
     mapLayerSetup();
 
     // TODO: dynamically add to nav bar and do the clicky stuff
@@ -193,6 +193,32 @@ function printImg(e) {
         popup.window.print();
         popup.close();
     });
+}
+
+function wfsSetup() {
+    var wfsPopup = windowSetup('wfs', 'WFS');
+    document.getElementById('app').appendChild(wfsPopup);
+    var windowContents = document.getElementById('wfs-contents');
+    CGSWeb_Map.Options.layers.wfsMapConfigs.forEach(function(wfsMapConfig){
+        var div = document.createElement('div');
+        windowContents.appendChild(div);
+
+        var input = document.createElement('input');
+        input.type = 'checkbox';
+        input.id = wfsMapConfig.name.trim() + '_checkbox';
+        div.appendChild(input);
+
+        var label = document.createElement('label');
+        label.setAttribute('for', input.id);
+        label.innerHTML = wfsMapConfig.title;
+        div.appendChild(label);
+    });
+
+    document.getElementById('wfsButton').onclick = function() {
+        if(document.getElementById("wfsPopupText").classList.toggle("show")) {
+            $("#wfsPopup").zIndex(2);
+        }        
+    }    
 }
 
 function catsearchFiltersSetup() {
@@ -422,7 +448,7 @@ function normalizeCoord(coord) {
     }
 
     return coord;
-};
+}
 
 // callback function for database stuffs
 function updateShapesCallback(response, status, xhr) {
