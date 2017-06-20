@@ -146,6 +146,7 @@ function normalizeExtent(extent) {
 
 function populateLayers(){
     Object.keys(CGSWeb_Map.Options.layers).forEach(function(key){
+        console.log('foreach option layer ' + key);
         var layerConfigs = CGSWeb_Map.Options.layers[key];
         var layers = [];
         var features = [];
@@ -153,6 +154,7 @@ function populateLayers(){
             console.log('populating ' + key)
             var id = 0;
             layerConfigs.forEach(function(layerConfig){
+                console.log('foreach layerconfig ' + layerConfig.name);
                 var layer = new ol.layer.Vector({
                     source: new ol.source.Vector({
                         format: (layerConfig.version == '1.1.0') ? new ol.format.GML3() : 

@@ -7,7 +7,7 @@ import {globals, windowSetup} from './globals';
 import {map} from './map';
 import {Shape} from './Shape';
 const WILDCARD = '*';
-
+import '../dist/config.js';
 function loadSession(){
     // clear this session first;
     for (var shapesID in globals.shapes){
