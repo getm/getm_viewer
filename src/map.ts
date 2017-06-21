@@ -149,7 +149,7 @@ function populateLayers(){
         console.log('foreach option layer ' + key);
         var layerConfigs = CGSWeb_Map.Options.layers[key];
         var layers = [];
-        var features = [];
+        // var features = [];
         if(key  != 'baseMapConfigs') {
             console.log('populating ' + key)
             var id = 0;
@@ -160,18 +160,25 @@ function populateLayers(){
                         format: (layerConfig.version == '1.1.0') ? new ol.format.GML3() : 
                                 (layerConfig.version == '1.0.0') ? new ol.format.GML2() : 
                                 undefined,
-                        features: features,
+                        // features: features,
                         url: layerConfig.url ? function(extent,resolution,proj) {
                             return layerConfig.hostAddress + layerConfig.url 
                                 + (layerConfig.version ? '&version=' + layerConfig.version : '')
                                 + '&srs=' + 'EPSG:4326'
-                                + '&bbox=' + normalizeExtent(extent).join(',') ;//+ '&srs=EPSG:4326';
+                                // + '&bbox=' + normalizeExtent(extent).join(',') ;//+ '&srs=EPSG:4326';
                         }: undefined,
                         strategy: ol.loadingstrategy.bbox,
-                        // attributions: [new ol.Attribution({
-                        //     html: '<div style="color:' + config.color + '" class="wfs_legend">' + config.title + '</div>' //id="' + wfsMapConfigs[i].name + '_attributions' + '"
-                        // })],                       
+                        attributions: [new ol.Attribution({
+                            html: '<div style="color:' + 
+                                (layerConfig.style ? 
+                                (layerConfig.style.stroke ? layerConfig.style.stroke.color : 
+                                (layerConfig.style.fill ? layerConfig.style.fill.color : 
+                                'rgba(0,0,0,1)')): 
+                                'rgba(0,0,0,1)') + ';" class="wfs_legend">' + layerConfig.title + '</div>',
+                            
+                        })]  
                     }),
+                    updateWhileInteracting: true,
                     visible: false,
                     style: layerConfig.style ? 
                         new ol.style.Style({

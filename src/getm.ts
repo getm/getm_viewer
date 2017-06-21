@@ -388,13 +388,14 @@ function getmSetup() {
 }
 
 function mapLayerSetup() {
-    var getm = windowSetup('mapLayer', 'Map Layers');
+    var mapLayer = windowSetup('mapLayer', 'Map Layers');
     document.getElementById('mapLayerButton').onclick = function(){
         if(document.getElementById("mapLayerPopupText").classList.toggle("show")) {
             $("#mapLayerPopup").zIndex(2);
         }
     };
 
+    document.getElementById('app').appendChild(mapLayer);
     var div1 = document.createElement('div');
     div1.align = 'center';
     document.getElementById('mapLayer-contents').appendChild(div1);

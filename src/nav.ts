@@ -55,7 +55,7 @@ function createNavButton(id, innerText) {
     var a = document.createElement('a');
     a.href = '#';
     a.id = id;
-    a.innerText = innerText;
+    a.innerHTML = innerText;
     li.appendChild(a);
 
     return li;
