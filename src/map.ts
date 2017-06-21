@@ -283,6 +283,8 @@ export function setupMap() {
     map.setLayerGroup(new ol.layer.Group({
         layers: layerGroups
     }));
+    $('#map').height(window.innerHeight - $('#topBanner').height() - $('#bottomBanner').height() - $('#nav').height() - $('#nav').height());
+    window.onresize = function() {$('#map').height(window.innerHeight - $('#topBanner').height() - $('#bottomBanner').height() - $('#nav').height() - $('#nav').height());  map.updateSize();};    
 }
 
 function chinaLake(){

@@ -182,36 +182,26 @@ export function setup() {
 }
 
 function printImg(e) {
-    // var css = '<link rel="stylesheet" href="map.bundle.css" type="text/css" media="all">';
-    // var js = '    <script src="ol.js"></script>' +
-    // '<script src="config.js"></script>' +
-    // '<script src="map.bundle.js"></script>' +
-    // '<script src="bootstrap.min.js"></script>';
-    //window.print();
-    var canvas = <HTMLCanvasElement>document.getElementById("map").getElementsByClassName("ol-unselectable")[0];
-    // canvas
+
+    var oldIdx = $('#map').zIndex();
+    var oldHeight = $('#map').height();
+    $('#map').height('max-content');
+    $('#map').zIndex(9999);
+    document.getElementById('map').focus();
+    window.print();
+    $('#map').zIndex(oldIdx);
+    $('#map').height(oldHeight);
+
+
+
+    // var canvas = <HTMLCanvasElement>document.getElementById("map").getElementsByClassName("ol-unselectable")[0];
     // canvas.webkitRequestFullScreen();
     // canvas.requestFullscreen();
     // canvas.webkitRequestFullscreen();
-    // document.getElementById("map").webkitRequestFullScreen();
-    // console.log(document.webkitFullscreenElement);
-    
     // document.exitFullscreen()
     // document.webkitExitFullscreen();
     // document.webkitCancelFullScreen();
-
-    // var printContents = document.getElementById("map").innerHTML + js;
-    // var originalContents = document.body.innerHTML;
-    // document.body.innerHTML = printContents;
-    // window.print();
-    // document.body.innerHTML = originalContents;
     
-
-
-    //document.getElementById("map").webkitRequestFullScreen();
-    window.createImageBitmap(canvas).then(result =>drawBitmap(result) );
-    
-
     // e.preventDefault();
     // var canvas = document.getElementById("map").getElementsByClassName("ol-unselectable")[0];
     // var img = (canvas as any).toDataURL('image/png');
@@ -222,36 +212,6 @@ function printImg(e) {
     //     popup.window.print();
     //     popup.close();
     // });
-}
-function drawBitmap(result: ImageBitmap){
-
-    // var i = new Image(2000,2000);
-    // i.
-    var popup = window.open();
-    var canvas2 = popup.document.createElement('canvas');
-    canvas2.width = 2000;
-    canvas2.height = 800;    
-    var ctx = canvas2.getContext('2d');
-    ctx.drawImage(result, 0, 0);
-    // var x = canvas2.toDataURL('image/png');    
-    popup.focus(); //required for IE 
-    $(popup).ready(function(){
-        popup.window.print();
-        popup.close();
-    });
-
-
-    // var canvas2 = document.createElement('canvas');
-    // canvas2.width = 2000;
-    // canvas2.height = 800;
-    // document.getElementById('app').appendChild(canvas2);
-    // var ctx = canvas2.getContext('2d');
-    // ctx.drawImage(result, 0, 0);
-    // var x = canvas2.toDataURL('image/png');
-    // var img = new Image();
-    // img.src = 'data:image/bmp,' + result;
-    // img.
-    // document.getElementById('app').appendChild(img);
 }
 
 function wfsSetup() {
