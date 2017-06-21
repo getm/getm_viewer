@@ -3,17 +3,20 @@ import * as ol from 'openlayers';
 import * as $ from 'jquery';
 import {setupShapes} from './getm';
 import {globals} from './globals';
-var attribution = new ol.control.Attribution();
 
+var attribution = new ol.control.Attribution();
 const layerGroups = [];
 const wfsLayers = {};
 const features = {};
+const defaultProjection = 'EPSG:4326';
+const defaultVersion = '1.1.0';
 
+declare const CGSWeb_Map;
 export const map = new ol.Map({
     target: 'map',
     controls: new ol.Collection([new ol.control.FullScreen(), attribution, new ol.control.Zoom()]),
     view: new ol.View({
-        projection: ol.proj.get('EPSG:4326'),
+        projection: ol.proj.get(defaultProjection),
         center: [20, 0],
         zoom: 2
     }),
@@ -25,7 +28,6 @@ function populateBaseMapLayers() {
     CGSWeb_Map.Options.layers.baseMapConfigs.forEach(function(baseMapConfig){
         if(baseMapConfig.arcgis_wmts == true) {
             var projection = ol.proj.get(baseMapConfig.srs);
-            // console.log('projection reads ' + baseMapConfig.srs);
             var projectionExtent = projection.getExtent();
             var size = ol.extent.getWidth(projectionExtent) / baseMapConfig.tilesize;
             var levels = baseMapConfig.levels;
@@ -55,7 +57,6 @@ function populateBaseMapLayers() {
                 })
             }));
         } else {
-            // console.log('projection reads EPSG:4326');
             layers.push(new ol.layer.Tile({
                 visible: true,
                 preload: 2,
@@ -65,9 +66,9 @@ function populateBaseMapLayers() {
                         LAYERS: baseMapConfig.layer,
                         VERSION: baseMapConfig.version,
                         FORMAT: 'image/jpeg',
-                        SRS: 'EPSG:4326'
+                        SRS: defaultProjection
                     },
-                    projection: 'EPSG:4326'
+                    projection: defaultProjection
                 }),
             }));
         }
@@ -130,42 +131,74 @@ function normalizeExtent(extent) {
     if(extent[2] > 180) {
         // Wrap to the east.
         return [
-            [extent[1], extent[0], extent[3], 180],
-            [extent[1], -180, extent[3], -180 + (extent[2] - 180)],
+            [extent[0], extent[1], 180, extent[3]],
+            [-180, extent[1], -180 + (extent[2] - 180), extent[3]],
         ];
     } else if(extent[0] < -180) {
         // Wrap to the west.
         return [
-            [extent[1], -180,extent[3], extent[2]],
+            [-180, extent[1], extent[2], extent[3]],
             [extent[1], 180 + (extent[0] + 180), extent[3], 180],
         ];
     } else {
-        return [extent[1], extent[0], extent[3], extent[2]];
+        return [extent[0], extent[1], extent[2], extent[3]];
     }
+}
+
+function flipExtent(extent, oldVersion, newVersion){
+    extent = normalizeExtent(extent);
+    var temp;
+    console.log('flip');
+    console.log(extent);
+    console.log(oldVersion);
+    console.log(newVersion);
+    console.log(extent.length);
+    if(oldVersion.trim() != newVersion.trim()){
+        if(extent.length == 4) {
+            temp = extent[0];
+            extent[0] = extent[1];
+            extent[1] = temp;
+            temp = extent[2];
+            extent[2] = extent[3];
+            extent[3] = temp;
+            console.log(extent);
+        } else if (extent.length == 2) {
+            extent.forEach(function (ex){
+                temp = ex[0];
+                ex[0] = ex[1];
+                ex[1] = temp;
+                temp = ex[2];
+                ex[2] = ex[3];
+                ex[3] = temp;
+            });
+            console.log(extent);
+        }
+    }
+    return extent;
 }
 
 function populateLayers(){
     Object.keys(CGSWeb_Map.Options.layers).forEach(function(key){
-        console.log('foreach option layer ' + key);
         var layerConfigs = CGSWeb_Map.Options.layers[key];
         var layers = [];
-        // var features = [];
         if(key  != 'baseMapConfigs') {
-            console.log('populating ' + key)
             var id = 0;
             layerConfigs.forEach(function(layerConfig){
-                console.log('foreach layerconfig ' + layerConfig.name);
                 var layer = new ol.layer.Vector({
                     source: new ol.source.Vector({
                         format: (layerConfig.version == '1.1.0') ? new ol.format.GML3() : 
                                 (layerConfig.version == '1.0.0') ? new ol.format.GML2() : 
                                 undefined,
-                        // features: features,
                         url: layerConfig.url ? function(extent,resolution,proj) {
                             return layerConfig.hostAddress + layerConfig.url 
-                                + (layerConfig.version ? '&version=' + layerConfig.version : '')
-                                + '&srs=' + 'EPSG:4326'
-                                // + '&bbox=' + normalizeExtent(extent).join(',') ;//+ '&srs=EPSG:4326';
+                                + '&version=' + (layerConfig.version ? layerConfig.version : defaultVersion)
+                                + '&srs=' + (layerConfig.srs ? layerConfig.srs : defaultProjection)
+                                + '&bbox=' + flipExtent(
+                                    extent, 
+                                    // (<ol.source.TileWMS>globals.basemapLayer.getSource()).getParams() ?
+                                    // (<ol.source.TileWMS>globals.basemapLayer.getSource()).getParams()['VERSION'] :
+                                    '1.3.0', // WHYYYYY?????
+                                    (layerConfig.version ? layerConfig.version : defaultVersion)).join(',') ;
                         }: undefined,
                         strategy: ol.loadingstrategy.bbox,
                         attributions: [new ol.Attribution({
@@ -192,22 +225,24 @@ function populateLayers(){
                         }): 
                         new ol.style.Style()      
                 });
+                
                 layer.set('name', layerConfig.name);
-                globals.counts[layerConfig.name] = 0;
                 layer.set('selectable', true);
+                layers.push(layer);
+
+                globals.counts[layerConfig.name] = 0;
                 $('#' + layerConfig.name.replace(/\W/g, '') +'_checkbox').click(function(){
                     layer.setVisible(this.checked);
                 }); 
-                layers.push(layer);
             });
         }
         var layerGroup = new ol.layer.Group({
             layers: layers
         })
         layerGroups.push(layerGroup);        
-        console.log(layerGroups.length);
     });
 }
+console.log(map);
 
 function populateMap() {
     populateLayers();
@@ -215,31 +250,25 @@ function populateMap() {
     populateBaseMapLayers();
  
     var currMapLayer = CGSWeb_Map.Options.layers.baseMapConfigs[0].title; 
-
-    var mapLayerSelect = document.getElementsByClassName('layer-select');
-    var mapSelect = document.createElement('select');
-    CGSWeb_Map.Options.layers.baseMapConfigs.forEach(function(baseMapConfig){
-        var opt = document.createElement('option');
-        opt.innerHTML = baseMapConfig.title;
-        opt.value = baseMapConfig.title;
-        mapSelect.appendChild(opt);
-    });
-
-                 
-    // currMapLayer = layerGroups[0].getLayers().item(0).title;
-    mapSelect.value = currMapLayer;
-    console.log('currmap layer is ' + currMapLayer);
-    for(var i = 0; i < mapLayerSelect.length; i++) {
-        // mapLayerSelect[i].innerHTML = ""; // clear contents
-        var cln = mapSelect.cloneNode(true);
-        (<HTMLSelectElement>cln).onchange = function(){
+    var mapLayerSelect = document.getElementsByClassName('basemap-layer-select');
+    //var mapSelect = document.createElement('select');
+    for (var i = 0; i < mapLayerSelect.length; i++) {
+        CGSWeb_Map.Options.layers.baseMapConfigs.forEach(function(baseMapConfig){
+            var opt = document.createElement('option');
+            opt.innerHTML = baseMapConfig.title;
+            opt.value = baseMapConfig.title;
+            mapLayerSelect[i].appendChild(opt.cloneNode(true));
+        });
+        globals.basemapLayer = layerGroups[0].getLayers().item(0);
+        (<HTMLSelectElement>mapLayerSelect[i]).value = currMapLayer;
+        (<HTMLSelectElement>mapLayerSelect[i]).onchange = function(){
             for(var j = 0; j < (<HTMLSelectElement>this).length ; j++ ){
                 layerGroups[0].getLayers().item(j).setVisible(false);
             }
-            layerGroups[0].getLayers().item((<HTMLSelectElement>this).selectedIndex).setVisible(true);                  
+            layerGroups[0].getLayers().item((<HTMLSelectElement>this).selectedIndex).setVisible(true);    
+            globals.basemapLayer = layerGroups[0].getLayers().item((<HTMLSelectElement>this).selectedIndex);         
             currMapLayer = (<HTMLSelectElement>this).value; 
-        };
-        mapLayerSelect[i].appendChild(cln);
+        };        
     }
 }
 
@@ -247,8 +276,6 @@ function populateShape(){
     globals.shapeLayer = layerGroups[3].getLayers().item(0);
     globals.shapeLayer.setVisible(true);
     var shapeLayerSelect = document.getElementsByClassName('shape-layer-select');
-
-
     for (var i = 0; i < shapeLayerSelect.length; i++) {
         CGSWeb_Map.Options.layers.shapesConfigs.forEach(function(shapeConfig){
             var opt = document.createElement('option');
@@ -275,16 +302,17 @@ function populateShape(){
 }
 
 export function setupMap() {
-    chinaLake();
-    $('#legend').click(function(){
-        attribution.setCollapsed(!attribution.getCollapsed());
-    });
+    // chinaLake();
     populateMap();
     map.setLayerGroup(new ol.layer.Group({
         layers: layerGroups
     }));
+    $('#legend').click(function(){
+        attribution.setCollapsed(!attribution.getCollapsed());
+    });    
     $('#map').height(window.innerHeight - $('#topBanner').height() - $('#bottomBanner').height() - $('#nav').height() - $('#nav').height());
-    window.onresize = function() {$('#map').height(window.innerHeight - $('#topBanner').height() - $('#bottomBanner').height() - $('#nav').height() - $('#nav').height());  map.updateSize();};    
+    map.updateSize();
+    window.onresize = function(){$('#map').height(window.innerHeight - $('#topBanner').height() - $('#bottomBanner').height() - $('#nav').height() - $('#nav').height());  map.updateSize();};    
 }
 
 function chinaLake(){

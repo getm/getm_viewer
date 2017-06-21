@@ -7,6 +7,7 @@ export var globals = {
     wfsFeatures: [],
     featuresArray: [],
     shapeLayer: undefined,
+    basemapLayer: undefined,
     counts: {
         'rectangle': 0,
         'circle': 0,

@@ -5,7 +5,8 @@ import {navSetup} from './nav';
 import {drawSetup} from './draw';
 import {layerInfoSetup} from './layerinfo';
 import './css/index.css';
-import '../dist/config.js';
+// import '../dist/config.js';
+declare const CGSWeb_Map; 
 // Expose jQuery so Bootstrap can use it.
 (window as any).$ = $;
 (window as any).jQuery = $;

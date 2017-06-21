@@ -5,7 +5,7 @@ import {map} from './map';
 import {globals, windowSetup} from './globals';
 import {setupShapes} from './getm';
 import {Shape} from './Shape'
-
+declare const GeoServerRestInterface;
 var required;
 
 var layerInfoRequirements = [
@@ -298,29 +298,34 @@ function assignValues() {
         }
     });
 
-    // setting variable name
+    // CASE: shape
     if(id != globals.selectedFeatureID && globals.shapes[globals.selectedFeatureID] != undefined) {
-        if(globals.shapes[id] == undefined) {
-            globals.shapes[globals.selectedFeatureID].getFeature().set('id', id);
-            var temp = globals.shapes[globals.selectedFeatureID];
-            delete globals.shapes[globals.selectedFeatureID];
-            globals.shapes[id] = temp;
-            globals.selectedFeatureID = id;
-        } else {
-            // don't write over what currently exists
-            (<HTMLInputElement>document.getElementById('tgt_name')).value = globals.selectedFeatureID;
+        // setting variable name
+        if(id != globals.selectedFeatureID) {
+            if(globals.shapes[id] == undefined) {
+                globals.shapes[globals.selectedFeatureID].getFeature().set('id', id);
+                globals.shapes[id] = globals.shapes[globals.selectedFeatureID];
+                delete globals.shapes[globals.selectedFeatureID];
+                globals.selectedFeatureID = id;
+            } else {
+                // don't write over what currently exists
+                (<HTMLInputElement>document.getElementById('tgt_name')).value = globals.selectedFeatureID;
+            }
         }
-    }
 
-    var feature = globals.shapes[id].getFeature();
-    // setting shape layer
-    if(globals.shapes[id].getLayer() != globals.shapeLayer) {
-        globals.shapes[id].getLayer().getSource().removeFeature(globals.shapes[id].getFeature());
-        globals.shapes[id].setLayer(globals.shapeLayer);
-        globals.shapes[id].getLayer().getSource().addFeature(globals.shapes[id].getFeature());
+        var feature = globals.shapes[id].getFeature();
+        // setting shape layer
+        if(globals.shapes[id].getLayer() != globals.shapeLayer) {
+            globals.shapes[id].getLayer().getSource().removeFeature(globals.shapes[id].getFeature());
+            globals.shapes[id].setLayer(globals.shapeLayer);
+            globals.shapes[id].getLayer().getSource().addFeature(globals.shapes[id].getFeature());
+        }
+        globals.shapes[id].setProperties(fields);
+        setupShapes();
+    // CASE: wfs
+    } else {
+        //
     }
-    globals.shapes[id].setProperties(fields);
-    setupShapes();
 }
 
 function clearLayerInfoContents() {
@@ -331,8 +336,10 @@ function clearLayerInfoContents() {
 
 function retrieveValidProperties() {
     layerInfoRequirements.forEach(function(layerInfoReq){
-        if(globals.shapes[globals.selectedFeatureID].getFeature().getProperties()[layerInfoReq.val] != undefined) {
-            (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value =globals.shapes[globals.selectedFeatureID].getFeature().getProperties()[layerInfoReq.val];
+        if(globals.shapes[globals.selectedFeatureID] != undefined && (globals.shapes[globals.selectedFeatureID].getFeature().getProperties()[layerInfoReq.val] != undefined)) {
+            (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = globals.shapes[globals.selectedFeatureID].getFeature().getProperties()[layerInfoReq.val];
+        } else if (globals.selectedFeature != undefined && globals.selectedFeature.get('id') == globals.selectedFeatureID) {
+            (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = globals.selectedFeature.getProperties()[layerInfoReq.val];
         } else {
             (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = "";
         }        
@@ -440,13 +447,32 @@ export function layerInfoSetup(){
         assignValues();
     });
 
+    map.on('click', function (e) {
+        e.preventDefault();
+        console.info(e.pixel);
+        console.info(map.getPixelFromCoordinate(e.coordinate));
+        // console.log(map.getView().calculateExtent(globals.basemapLayer.getView().getSize()));
+        //console.log((<ol.source.Vector>globals.basemapLayer.getSource()).getExtent());
+    });
     map.getViewport().addEventListener('contextmenu', function (e) {
         e.preventDefault();
+        console.log(map.getEventPixel(e));
+        // window.event.preventDefault();
+        console.log('contextmenu');
+        // var featureLayer = map.forEachLayerAtPixel(map.getEventPixel(e), 
+        //     function(layer){
+        //         if(layer.get('selectable'))
+        //         return((<ol.source.Vector>layer.getSource()).getClosestFeatureToCoordinate(map.getEventCoordinate(e)), layer);
+        // })
         var featureLayer = map.forEachFeatureAtPixel(map.getEventPixel(e),
             function (feature, layer) {
+                console.log(feature);
+                console.log(layer);
                 if(layer.get('selectable'))
                     return [feature, layer];
         });
+        console.log(featureLayer);
+
         if (featureLayer != undefined && featureLayer[0] != undefined) {
             globals.selectedFeatureID = featureLayer[0].get('id');
             if(globals.selectedFeatureID == undefined){
@@ -457,7 +483,7 @@ export function layerInfoSetup(){
                 console.log(featureLayer[0]);
                 globals.selectedFeatureID =  layerName + globals.counts[layerName]++;
                 (<ol.Feature>featureLayer[0]).set('id', globals.selectedFeatureID);
-                globals.shapes[globals.selectedFeatureID] = new Shape(featureLayer[0], featureLayer[1], undefined);
+                // globals.shapes[globals.selectedFeatureID] = new Shape(featureLayer[0], featureLayer[1], undefined);
             }
             layerInfoPopup();
         }

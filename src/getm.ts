@@ -7,7 +7,10 @@ import {globals, windowSetup} from './globals';
 import {map} from './map';
 import {Shape} from './Shape';
 const WILDCARD = '*';
-import '../dist/config.js';
+// import '../dist/config.js';
+declare const CGSWeb_Map;
+declare const GeoServerRestInterface;
+
 function loadSession(){
     // clear this session first;
     for (var shapesID in globals.shapes){
@@ -185,14 +188,28 @@ function printImg(e) {
 
     var oldIdx = $('#map').zIndex();
     var oldHeight = $('#map').height();
+
     $('#map').height('max-content');
     $('#map').zIndex(9999);
+    $('#map').addClass('whitebg');
     document.getElementById('map').focus();
+
+    var popupCollection = document.getElementsByClassName('popup');
+    for( var popup in popupCollection) { 
+        console.log(popupCollection[popup]);       
+        if(popupCollection[popup] != undefined && popupCollection[popup].classList!= undefined)
+        popupCollection[popup].classList.add('hide');
+    }
     window.print();
+
     $('#map').zIndex(oldIdx);
     $('#map').height(oldHeight);
+    $('#map').removeClass('whitebg');
 
-
+    for( var popup in popupCollection) {       
+        if(popupCollection[popup] != undefined && popupCollection[popup].classList!= undefined) 
+            popupCollection[popup].classList.remove('hide');
+    }
 
     // var canvas = <HTMLCanvasElement>document.getElementById("map").getElementsByClassName("ol-unselectable")[0];
     // canvas.webkitRequestFullScreen();
@@ -368,21 +385,21 @@ function mapLayerSetup() {
     span1.innerHTML = 'WMS Layer: ';
     div2.appendChild(span1);
 
-    var span2 = document.createElement('span');
-    span2.className = 'layer-select';
-    div2.appendChild(span2);
+    var select1 = document.createElement('select');
+    select1.className = 'basemap-layer-select';
+    div2.appendChild(select1);
 
     var div3 = document.createElement('div'); 
     div3.id = 'shapeLayer';
     div1.appendChild(div3);
 
-    var span3 = document.createElement('span');
-    span3.innerHTML = 'Shape Layer: ';
-    div3.appendChild(span3);
+    var span2 = document.createElement('span');
+    span2.innerHTML = 'Shape Layer: ';
+    div3.appendChild(span2);
 
-    var span4 = document.createElement('select');
-    span4.className = 'shape-layer-select';
-    div3.appendChild(span4);
+    var select2 = document.createElement('select');
+    select2.className = 'shape-layer-select';
+    div3.appendChild(select2);
 }
 
 // setup shapes 

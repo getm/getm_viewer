@@ -11,14 +11,14 @@ CGSWeb_Map.Options = {
 				title: "OSM",
 				url: "http://129.206.228.72/cached/osm/service",
 				layer: "osm_auto:all",
-				version: "1.1.1",
+				version: "1.1.0",
 				arcgis_wmts: false
 			},
 			{
 				title: "USGSTopo",
 				url: "http://basemap.nationalmap.gov/arcgis/services/USGSTopo/MapServer/WMSServer",
 				layer: "0",
-				version: "1.1.1",
+				version: "1.1.0",
 				arcgis_wmts: false
 			},
 			{

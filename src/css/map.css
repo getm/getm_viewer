@@ -2,13 +2,18 @@ h5 {
     color: blue;
 }
 
-#getmpage{
-	position: relative;
+.hide {
+	visibility: hidden;
 }
 
 #map {
+	/*position: relative;*/
 	width: 100%;
     z-index: 0;
+}
+
+.whitebg{
+	background-color: white;
 }
 
 #map:-moz-full-screen {

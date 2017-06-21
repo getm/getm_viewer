@@ -11,8 +11,6 @@ var draw;
 var deleteInteraction;
 var radioSelection;
 
-
-
 function drawShape(shapeType) {
     if(map.getInteractions().getArray().indexOf(draw) != -1) {
         draw.setActive(false);
