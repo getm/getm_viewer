@@ -657,6 +657,7 @@ select{
 
 .drawButtonOptionLabel {
     -webkit-appearance: button;
+    -moz-appearance: button;
     padding: 2px 8px;
     border-radius: 4px;
     color: black;
