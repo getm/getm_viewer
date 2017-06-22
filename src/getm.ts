@@ -154,10 +154,10 @@ function catsearch() {
         (<ol.layer.Vector>layer).getSource().getFeaturesInExtent(extent).forEach(function(feature){
             if($('#catsearch').val()){
                 if($('#catsearch').val() == WILDCARD ||
-                    (globals.shapes[feature.get('id')].getProperty('catcode') == $('#catsearch').val())) {
+                    (globals.shapes[feature.getProperties()['id']].getProperty('catcode') == $('#catsearch').val())) {
                         //results.push(feature.get('id'));
                         var result = document.createElement('div');
-                        result.innerHTML = feature.get('id');
+                        result.innerHTML = feature.getProperties()['id'];
                         result.onclick = function(){
                             globals.selectedFeatureID = this.innerHTML;
                             layerInfoPopup();
@@ -195,10 +195,9 @@ function printImg(e) {
     document.getElementById('map').focus();
 
     var popupCollection = document.getElementsByClassName('popup');
-    for( var popup in popupCollection) { 
-        console.log(popupCollection[popup]);       
+    for( var popup in popupCollection) {       
         if(popupCollection[popup] != undefined && popupCollection[popup].classList!= undefined)
-        popupCollection[popup].classList.add('hide');
+            popupCollection[popup].classList.add('hide');
     }
     window.print();
 

@@ -110,9 +110,9 @@ function setupDelete(){
     });
 
     deleteInteraction.getFeatures().on('add', function (e){
-        globals.shapes[e.element.get('id')].getLayer().getSource().removeFeature(e.element);
+        globals.shapes[e.element.getProperties()['id']].getLayer().getSource().removeFeature(e.element);
         deleteInteraction.getFeatures().remove(e.element);
-        delete globals.shapes[e.element.get('id')];
+        delete globals.shapes[e.element.getProperties()['id']];
         radioSelection = null;
         (<HTMLInputElement>document.querySelector('input[name = "draw-select"]:checked')).checked = false;
                 deleteInteraction.setActive(false);  

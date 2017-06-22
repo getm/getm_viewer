@@ -148,11 +148,6 @@ function normalizeExtent(extent) {
 function flipExtent(extent, oldVersion, newVersion){
     extent = normalizeExtent(extent);
     var temp;
-    console.log('flip');
-    console.log(extent);
-    console.log(oldVersion);
-    console.log(newVersion);
-    console.log(extent.length);
     if(oldVersion.trim() != newVersion.trim()){
         if(extent.length == 4) {
             temp = extent[0];
@@ -161,7 +156,6 @@ function flipExtent(extent, oldVersion, newVersion){
             temp = extent[2];
             extent[2] = extent[3];
             extent[3] = temp;
-            console.log(extent);
         } else if (extent.length == 2) {
             extent.forEach(function (ex){
                 temp = ex[0];
@@ -171,7 +165,6 @@ function flipExtent(extent, oldVersion, newVersion){
                 ex[2] = ex[3];
                 ex[3] = temp;
             });
-            console.log(extent);
         }
     }
     return extent;
@@ -242,7 +235,6 @@ function populateLayers(){
         layerGroups.push(layerGroup);        
     });
 }
-console.log(map);
 
 function populateMap() {
     populateLayers();

@@ -1,4 +1,4 @@
-export var Shape = function(feature, layer, properties, objectID=-1){
+export var Shape = function(feature, layer, properties={}, objectID=-1){
     this.feature = feature;
     this.layer = layer; 
     this.properties = properties;
