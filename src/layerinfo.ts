@@ -241,10 +241,33 @@ function matchRegex(r, s) {
    return match != null && s == match[0];
 }
 
-function setRequired(response) {
+function retrieveRequiredFields(){
+    $.ajax({
+        type: 'GET',
+        url: GeoServerRestInterface.getLayersUrl(),
+        success: function(response, status, xhr){setRequiredFields(response);},
+    });
+}
+
+function setRequiredFields(response) {
     response = JSON.parse(response);
-    response.required.push('benumber'); // TODO: remove
     required = response.required;
+}
+
+function retrieveLayer() {
+    if(globals.shapes[globals.selectedFeatureID] != undefined) {
+        document.getElementById('layerinfolayerwfs').classList.add('hide');
+        document.getElementById('layerinfolayer').classList.remove('hide');
+        (<HTMLSelectElement>document.getElementById('layerinfolayer')).value = globals.shapes[globals.selectedFeatureID].getLayer().get('name');  
+    } else {
+        document.getElementById('layerinfolayer').classList.add('hide');
+        document.getElementById('layerinfolayerwfs').classList.remove('hide');
+        (<HTMLInputElement>document.getElementById('layerinfolayerwfs')).value = globals.selectedFeature.getProperties()['layer'];
+    }
+}
+
+function retrieveTgtName(){
+    (<HTMLInputElement>document.getElementById('tgt_name')).value =  globals.selectedFeatureID; 
 }
 
 export function layerInfoPopup(){
@@ -252,7 +275,7 @@ export function layerInfoPopup(){
          //fillLayerInfoDefaults();
         clearLayerInfoContents();
         retrieveValidProperties();
-        (<HTMLInputElement>document.getElementById('tgt_name')).value = globals.selectedFeatureID;  
+        retrieveTgtName();  
     } else
         retrieveValues();
 
@@ -271,15 +294,14 @@ function typeCheck(layerInfoReq) {
 }
 
 function retrieveValues() {
-    var id = globals.selectedFeatureID;
     layerInfoRequirements.forEach(function(layerInfoReq){
-        if(globals.shapes[id].getProperties()[layerInfoReq.val] != undefined) {
-            (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = globals.shapes[id].getProperties()[layerInfoReq.val]['val'];
+        if(globals.shapes[globals.selectedFeatureID].getProperties()[layerInfoReq.val] != undefined) {
+            (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = globals.shapes[globals.selectedFeatureID].getProperties()[layerInfoReq.val]['val'];
         } else {
             (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = "";
         }
     });
-    (<HTMLSelectElement>document.getElementById('layerinfolayer')).value = globals.shapes[id].getLayer().get('name');
+    retrieveLayer();
 }
 
 function assignValues() {
@@ -310,7 +332,7 @@ function assignValues() {
                 globals.selectedFeatureID = id;
             } else {
                 // don't write over what currently exists
-                (<HTMLInputElement>document.getElementById('tgt_name')).value = globals.selectedFeatureID;
+                retrieveTgtName();  
             }
         }
         var feature = globals.shapes[id].getFeature();
@@ -330,7 +352,7 @@ function assignValues() {
                 globals.selectedFeatureID = id;
             } else {
                 // don't write over what currently exists
-                (<HTMLInputElement>document.getElementById('tgt_name')).value = globals.selectedFeatureID;
+                retrieveTgtName();  
             }
         }        
         var properties = {};
@@ -351,23 +373,28 @@ function clearLayerInfoContents() {
 
 function retrieveValidProperties() {
     layerInfoRequirements.forEach(function(layerInfoReq){
-        if(globals.shapes[globals.selectedFeatureID] != undefined && (globals.shapes[globals.selectedFeatureID].getFeature().getProperties()[layerInfoReq.val] != undefined)) {
+        // this is a shape
+        if(globals.shapes[globals.selectedFeatureID] != undefined 
+        && (globals.shapes[globals.selectedFeatureID].getFeature().getProperties()[layerInfoReq.val] != undefined)) {
             (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = globals.shapes[globals.selectedFeatureID].getFeature().getProperties()[layerInfoReq.val];
-        } else if (globals.selectedFeature != undefined && globals.selectedFeature.getProperties()['id'] == globals.selectedFeatureID &&  globals.selectedFeature.get(layerInfoReq.val)!= undefined) {
+        } else if (globals.selectedFeature != undefined 
+        // this is wfs
+        && globals.selectedFeature.getProperties()['id'] == globals.selectedFeatureID 
+        &&  globals.selectedFeature.get(layerInfoReq.val)!= undefined) {
             (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = globals.selectedFeature.getProperties()[layerInfoReq.val];
         } else {
             (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = "";
         }        
     });    
+    retrieveLayer();
 }
 
 function fillLayerInfoDefaults() {
     layerInfoRequirements.forEach(function(layerInfoReq){
         (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = layerInfoReq.example;
     });
-    (<HTMLInputElement>document.getElementById('layerinfolayer')).value = globals.shapeLayer.get('name');
-    (<HTMLInputElement>document.getElementById('tgt_name')).value = globals.selectedFeatureID;
-
+    retrieveLayer();
+    retrieveTgtName();  
     assignValues();
 }
 
@@ -378,12 +405,8 @@ function hideLayerInfoPopup() {
 }
 
 export function layerInfoSetup(){
-    $.ajax({
-        type: 'GET',
-        url: GeoServerRestInterface.getLayersUrl(),
-        success: function(response, status, xhr){setRequired(response);},
-    });
-
+    retrieveRequiredFields();
+    featureInfoSetup();
     var app = document.getElementById('app');
     var layerInfoDiv = windowSetup('layerInfo', 'Layer Information');
     app.appendChild(layerInfoDiv);
@@ -400,6 +423,12 @@ export function layerInfoSetup(){
     shapeLayerSelect.className = "shape-layer-select";
     shapeLayerSelect.id = "layerinfolayer";
     div.appendChild(shapeLayerSelect);
+
+    var wfsLayerInput = document.createElement('input');
+    wfsLayerInput.type = "text";
+    wfsLayerInput.disabled = true;
+    wfsLayerInput.id = "layerinfolayerwfs";
+    div.appendChild(wfsLayerInput);
 
     layerInfoRequirements.forEach(function(layerInfoReq){
         var div = document.createElement('div');
@@ -472,19 +501,19 @@ export function layerInfoSetup(){
         if (featureLayer != undefined && featureLayer[0] != undefined) {
             globals.selectedFeature = featureLayer[0];
             globals.selectedFeatureID = featureLayer[0].getProperties()['id'];
-            if(globals.selectedFeatureID == undefined){
+            if(globals.selectedFeatureID == undefined || globals.shapes[globals.selectedFeatureID] == undefined){
                 var layerName = featureLayer[1].get('name');
+                (<ol.Feature>featureLayer[0]).setProperties({'layer': layerName});
                 while(globals.shapes[layerName + globals.counts[layerName]] != null) {
                     globals.counts[layerName]++;
                 }                
                 globals.selectedFeatureID =  layerName + globals.counts[layerName]++;
                 (<ol.Feature>featureLayer[0]).setProperties({'id': globals.selectedFeatureID});
-                globals.wfsFeatures[globals.selectedFeatureID] = new Shape(featureLayer[0], featureLayer[1], undefined);
-            }
-            layerInfoPopup();
+                featureInfoPopup();
+            } else
+                layerInfoPopup();
         }
     });
-
 }
 
 function validateLayerInfo(layerInfoReq) {
@@ -500,4 +529,43 @@ function validateLayerInfo(layerInfoReq) {
                 + '<b>Regex:</b> ' + layerInfoReq.regex + '<br/>' 
                 + '<b>Example:</b> ' + layerInfoReq.example;        
     } 
+}
+
+function featureInfoSetup() {
+    var app = document.getElementById('app');
+    var featureInfoDiv = windowSetup('featureInfo', 'Feature Information');
+    app.appendChild(featureInfoDiv);
+
+    var featureInfoContents = document.getElementById('featureInfo-contents');
+    var fields = document.createElement('div');
+    fields.id = 'featureInfoFields';
+    featureInfoContents.appendChild(fields);
+
+    var editButton = document.createElement('button');
+    editButton.innerHTML = "EDIT";
+    editButton.onclick = layerInfoPopup;
+    featureInfoContents.appendChild(editButton);
+}
+
+function featureInfoPopup() {
+    $('#featureInfoPopupText').addClass('show');
+    $('#featureInfoPopup').zIndex(2);    
+    document.getElementById('featureInfoFields').innerHTML = ''; // clear off inside
+
+    var properties = globals.selectedFeature.getProperties();
+    for(var p in properties) {
+        var featurediv = document.createElement('div');
+        document.getElementById('featureInfoFields').appendChild(featurediv);
+
+        var featurelabel = document.createElement('div');
+        featurelabel.className = 'label';
+        featurelabel.innerHTML = p + ':';
+        featurediv.appendChild(featurelabel);
+
+        var featureval = document.createElement('input');
+        featureval.type = 'text';
+        featureval.disabled = true;
+        featureval.value = properties[p];
+        featurediv.appendChild(featureval);
+    }    
 }

@@ -22,6 +22,7 @@ function setupTopAndBottomBanners() {
     bottomBanner.className = 'securityBanner';
     bottomBanner.innerHTML = CGSWeb_Map.Options.banner_text;
     document.getElementById('app').appendChild(bottomBanner);
+    $('.securityBanner').css('background-color', CGSWeb_Map.Options.banner_color)
 }
 navSetup();
 setupTopAndBottomBanners();

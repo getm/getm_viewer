@@ -63,7 +63,6 @@ h5 {
 	top: 0; 
 	left: 0; 
 	right: 0; 
-	background-color: green; 
 	text-align: center; 
 	margin: 0;
 }
@@ -73,7 +72,6 @@ h5 {
 	bottom: 0; 
 	left: 0; 
 	right: 0; 
-	background-color: green; 
 	text-align: center; 
 	margin: 0;
 }
@@ -177,7 +175,18 @@ select{
     width: 100%;
     left: 0px;
 }
-#drawPopup.popup {
+
+#featureInfo-contents {
+    height: 400px;
+}
+
+#featureInfo-contents .label {
+    /*align-content: unset;*/
+    text-align: left;
+    /*left: 0px;*/
+    bottom: 0px;
+    display: block;
+}#drawPopup.popup {
     width: max-content;
     height: max-content;
     display:unset;

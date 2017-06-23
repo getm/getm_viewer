@@ -45,3 +45,15 @@
     width: 100%;
     left: 0px;
 }
+
+#featureInfo-contents {
+    height: 400px;
+}
+
+#featureInfo-contents .label {
+    /*align-content: unset;*/
+    text-align: left;
+    /*left: 0px;*/
+    bottom: 0px;
+    display: block;
+}

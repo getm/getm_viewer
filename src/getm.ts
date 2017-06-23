@@ -21,20 +21,20 @@ function loadSession(){
     if(localStorage.shapes){
         var storageShapes = JSON.parse(localStorage.shapes);
         for(var shapesID in storageShapes) {
-            var layer = null;
             var feature = new ol.format.KML().readFeature(storageShapes[shapesID]['feature']);
-            for(var l of (<ol.layer.Group>map.getLayerGroup().getLayers().getArray()[2]).getLayers().getArray()){         
-                if( (<ol.layer.Vector>l).get('name') == storageShapes[shapesID]['layer']){
-                    layer = l;
+            for(var layer of (<ol.layer.Group>map.getLayerGroup().getLayers().getArray()[3]).getLayers().getArray()){         
+                if( (<ol.layer.Vector>layer).get('name') == storageShapes[shapesID]['layer']){
+                    (<ol.layer.Vector>layer).getSource().addFeature(feature);    
+                    globals.shapes[shapesID] = new Shape(
+                        feature,
+                        layer,
+                        storageShapes[shapesID]['properties'],
+                        storageShapes[shapesID]['objectID']
+                    );                      
+                    break;
                 }
             }
-            (<ol.layer.Vector>layer).getSource().addFeature(feature);    
-            globals.shapes[shapesID] = new Shape(
-                feature,
-                layer,
-                storageShapes[shapesID]['properties'],
-                storageShapes[shapesID]['objectID']
-            );     
+   
         }
     }
     setupShapes();
@@ -155,15 +155,13 @@ function catsearch() {
             if($('#catsearch').val()){
                 if($('#catsearch').val() == WILDCARD ||
                     (globals.shapes[feature.getProperties()['id']].getProperty('catcode') == $('#catsearch').val())) {
-                        //results.push(feature.get('id'));
-                        var result = document.createElement('div');
-                        result.innerHTML = feature.getProperties()['id'];
-                        result.onclick = function(){
-                            globals.selectedFeatureID = this.innerHTML;
-                            layerInfoPopup();
-                        }
-                        document.getElementById('catsearchResults').appendChild(result);
-
+                    var result = document.createElement('div');
+                    result.innerHTML = feature.getProperties()['id'];
+                    result.onclick = function(){
+                        globals.selectedFeatureID = this.innerHTML;
+                        layerInfoPopup();
+                    }
+                    document.getElementById('catsearchResults').appendChild(result);
                 }
             }            
         })
@@ -209,15 +207,6 @@ function printImg(e) {
         if(popupCollection[popup] != undefined && popupCollection[popup].classList!= undefined) 
             popupCollection[popup].classList.remove('hide');
     }
-
-    // var canvas = <HTMLCanvasElement>document.getElementById("map").getElementsByClassName("ol-unselectable")[0];
-    // canvas.webkitRequestFullScreen();
-    // canvas.requestFullscreen();
-    // canvas.webkitRequestFullscreen();
-    // document.exitFullscreen()
-    // document.webkitExitFullscreen();
-    // document.webkitCancelFullScreen();
-    
     // e.preventDefault();
     // var canvas = document.getElementById("map").getElementsByClassName("ol-unselectable")[0];
     // var img = (canvas as any).toDataURL('image/png');
@@ -572,7 +561,7 @@ function deleteShapes() {
 function updateShapes() {
     $.ajax({
         type: 'POST',
-        url: GeoServerRestInterface.getPostInsertUrl(),
+        url: GeoServerRestInterface.getPostInsertAndUpdateUrl(),
         data: JSON.stringify(buildUpdate()),
         contentType: 'application/json',
         success: updateShapesCallback,
@@ -582,7 +571,7 @@ function updateShapes() {
 function insertShapes() {
     $.ajax({
         type: 'POST',
-        url: GeoServerRestInterface.getPostInsertUrl(),
+        url: GeoServerRestInterface.getPostInsertAndUpdateUrl(),
         data: JSON.stringify(buildInsert()),
         contentType: 'application/json',
          success: updateShapesCallback,

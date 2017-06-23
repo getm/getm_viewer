@@ -5,16 +5,16 @@ import {setupShapes} from './getm';
 import {globals} from './globals';
 
 var attribution = new ol.control.Attribution();
+var zoom = new ol.control.Zoom();
+
 const layerGroups = [];
-const wfsLayers = {};
-const features = {};
 const defaultProjection = 'EPSG:4326';
 const defaultVersion = '1.1.0';
 
 declare const CGSWeb_Map;
 export const map = new ol.Map({
     target: 'map',
-    controls: new ol.Collection([new ol.control.FullScreen(), attribution, new ol.control.Zoom()]),
+    controls: new ol.Collection([new ol.control.FullScreen(), attribution, zoom]),
     view: new ol.View({
         projection: ol.proj.get(defaultProjection),
         center: [20, 0],
@@ -226,6 +226,11 @@ function populateLayers(){
                 globals.counts[layerConfig.name] = 0;
                 $('#' + layerConfig.name.replace(/\W/g, '') +'_checkbox').click(function(){
                     layer.setVisible(this.checked);
+                    console.log(layers.indexOf(layer));
+                    console.log(
+                    (<ol.layer.Group>map.getLayerGroup().getLayers().getArray()[4]).getLayers()
+                    );
+                    (<ol.layer.Group>map.getLayerGroup().getLayers().getArray()[4]).getLayers().getArray()[layers.indexOf(layer)].setVisible(this.checked);
                 }); 
             });
         }
@@ -240,7 +245,7 @@ function populateMap() {
     populateLayers();
     populateShape();
     populateBaseMapLayers();
- 
+    wfsImage();
     var currMapLayer = CGSWeb_Map.Options.layers.baseMapConfigs[0].title; 
     var mapLayerSelect = document.getElementsByClassName('basemap-layer-select');
     //var mapSelect = document.createElement('select');
@@ -262,6 +267,49 @@ function populateMap() {
             currMapLayer = (<HTMLSelectElement>this).value; 
         };        
     }
+}
+
+function wfsImage() {
+    var layers = [];
+    CGSWeb_Map.Options.layers.wfsMapConfigs.forEach(function(wfsConfig){
+        var layer = new ol.layer.Image({
+            source: new ol.source.ImageVector({
+                projection: defaultProjection,
+                source: new ol.source.Vector({
+                    format: (wfsConfig.version == '1.1.0') ? new ol.format.GML3() : 
+                        (wfsConfig.version == '1.0.0') ? new ol.format.GML2() : 
+                        wfsConfig,
+                    url: wfsConfig.hostAddress + wfsConfig.url 
+                        + '&version=' + (wfsConfig.version ? wfsConfig.version : defaultVersion)
+                        + '&srs=' + (wfsConfig.srs ? wfsConfig.srs : defaultProjection),
+                    attributions: [new ol.Attribution({
+                        html: '<div style="color:' + 
+                            (wfsConfig.style ? 
+                            (wfsConfig.style.stroke ? wfsConfig.style.stroke.color : 
+                            (wfsConfig.style.fill ? wfsConfig.style.fill.color : 
+                            'rgba(0,0,0,1)')): 
+                            'rgba(0,0,0,1)') + ';" class="wfs_legend">' + wfsConfig.title + '</div>',
+                    })],       
+                }),
+                style: wfsConfig.style ? 
+                    new ol.style.Style({
+                        stroke: wfsConfig.style.stroke ? new ol.style.Stroke({
+                            color: wfsConfig.style.stroke.color ? wfsConfig.style.stroke.color : 'rgba(0,0,0,1)',
+                            width: wfsConfig.style.stroke.width ? wfsConfig.style.stroke.width : 3
+                        }) : new ol.style.Stroke(),
+                        fill: wfsConfig.style.fill ? new ol.style.Fill({
+                            color: wfsConfig.style.fill.color ? wfsConfig.style.fill.color : 'rgba(0,0,0,0)'
+                        }) : new ol.style.Fill(),
+                    }): 
+                    new ol.style.Style()  
+            }),
+            visible: false,
+        });
+        layers.push(layer);
+    });
+    layerGroups.push(new ol.layer.Group({
+        layers: layers
+    }));
 }
 
 function populateShape(){
@@ -294,19 +342,34 @@ function populateShape(){
 }
 
 export function setupMap() {
-    // chinaLake();
+    chinaLake();
     populateMap();
+    
     map.setLayerGroup(new ol.layer.Group({
         layers: layerGroups
     }));
     $('#legend').click(function(){
         attribution.setCollapsed(!attribution.getCollapsed());
     });    
+    
+    map.getView().on('change:resolution', toggleWFS);
+    toggleWFS();
     $('#map').height(window.innerHeight - $('#topBanner').height() - $('#bottomBanner').height() - $('#nav').height() - $('#nav').height());
     map.updateSize();
     window.onresize = function(){$('#map').height(window.innerHeight - $('#topBanner').height() - $('#bottomBanner').height() - $('#nav').height() - $('#nav').height());  map.updateSize();};    
 }
-
+function toggleWFS(){
+    console.log('zoom is ' + map.getView().getZoom());
+    if(map.getView().getZoom() > 5) {
+        console.log('use wfs layers');
+        map.getLayerGroup().getLayers().getArray()[2].setVisible(true);
+        map.getLayerGroup().getLayers().getArray()[4].setVisible(false);
+    } else {
+        console.log('use wmslayers');
+        map.getLayerGroup().getLayers().getArray()[2].setVisible(false);
+        map.getLayerGroup().getLayers().getArray()[4].setVisible(true);
+    }
+}
 function chinaLake(){
     map.getView().fit([-117.90295999999988, 35.551014000000066, -117.54647999999992, 35.71793700000006], map.getSize());
 }

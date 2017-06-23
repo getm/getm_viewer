@@ -126,11 +126,11 @@ CGSWeb_Map.Options = {
 var GeoServerRestInterface = {
 	hostAddress: "http://localhost:9002/",
 	gsRestUrl: 'GeoServerRest/api/rest/',
-    INSERT: 'getm/getm_wms_insert_and_update',
+    INSERT_AND_UPDATE: 'getm/getm_wms_insert_and_update',
     DELETE: 'getm/getm_wms_delete',
     LAYERS: 'layers',
-    getPostInsertUrl: function () {
-        return this.hostAddress + this.gsRestUrl + this.INSERT; 
+    getPostInsertAndUpdateUrl: function () {
+        return this.hostAddress + this.gsRestUrl + this.INSERT_AND_UPDATE; 
     },
     getPostDeleteUrl: function () {
         return this.hostAddress + this.gsRestUrl + this.DELETE;
