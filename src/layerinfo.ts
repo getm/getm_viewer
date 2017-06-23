@@ -489,8 +489,15 @@ export function layerInfoSetup(){
     $('#submitlayerinfo').click(function(){
         assignValues();
     });
-
+    $('#layerInfo-close').click(function(){
+        $('#featureInfoPopupText').removeClass('show');
+        $('#featureInfoPopup').zIndex(-1);  
+    }); 
     map.getViewport().addEventListener('contextmenu', function (e) {
+        $('#featureInfoPopupText').removeClass('show');
+        $('#featureInfoPopup').zIndex(-1);  
+        $('#layerInfoPopupText').removeClass('show');
+        $('#layerInfoPopup').zIndex(-1);  
         e.preventDefault();
         var featureLayer = map.forEachFeatureAtPixel(map.getEventPixel(e),
             function (feature, layer) {
@@ -510,8 +517,9 @@ export function layerInfoSetup(){
                 globals.selectedFeatureID =  layerName + globals.counts[layerName]++;
                 (<ol.Feature>featureLayer[0]).setProperties({'id': globals.selectedFeatureID});
                 featureInfoPopup();
-            } else
+            } else {
                 layerInfoPopup();
+            }
         }
     });
 }

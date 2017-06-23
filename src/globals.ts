@@ -39,6 +39,7 @@ export function windowSetup(id, headerTitle=id){
 
     var windowHeadersCloseBtn = document.createElement('button');
     windowHeadersCloseBtn.className = "close";
+    windowHeadersCloseBtn.id = id + "-close";
     windowHeadersCloseBtn.innerHTML = "&times;";
     windowHeadersCloseBtn.onclick = function () {
         popupText.classList.toggle("show");
