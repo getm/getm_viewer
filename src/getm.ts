@@ -7,7 +7,6 @@ import {globals, windowSetup} from './globals';
 import {map} from './map';
 import {Shape} from './Shape';
 const WILDCARD = '*';
-// import '../dist/config.js';
 declare const CGSWeb_Map;
 declare const GeoServerRestInterface;
 
@@ -150,7 +149,7 @@ function normalizeExtent(extent) {
 function catsearch() {
     var extent = map.getView().calculateExtent(map.getSize());
     document.getElementById('catsearchResults').innerHTML = "";
-    (<ol.layer.Group>(map.getLayerGroup().getLayers().getArray()[2])).getLayers().getArray().forEach(function(layer){
+    (<ol.layer.Group>(map.getLayerGroup().getLayers().getArray()[3])).getLayers().getArray().forEach(function(layer){
         (<ol.layer.Vector>layer).getSource().getFeaturesInExtent(extent).forEach(function(feature){
             if($('#catsearch').val()){
                 if($('#catsearch').val() == WILDCARD ||
@@ -172,7 +171,6 @@ export function setup() {
     catsearchFiltersSetup();
     besearchFiltersSetup();
     getmSetup();
-    wfsSetup();
     mapLayerSetup();
 
     // TODO: dynamically add to nav bar and do the clicky stuff
@@ -207,79 +205,19 @@ function printImg(e) {
         if(popupCollection[popup] != undefined && popupCollection[popup].classList!= undefined) 
             popupCollection[popup].classList.remove('hide');
     }
-    // e.preventDefault();
-    // var canvas = document.getElementById("map").getElementsByClassName("ol-unselectable")[0];
-    // var img = (canvas as any).toDataURL('image/png');
-    // var popup = window.open();
-    // popup.document.write('<img src="'+img+'"/>');
-    // popup.focus(); //required for IE 
-    // $(popup).ready(function(){
-    //     popup.window.print();
-    //     popup.close();
-    // });
-}
-
-function wfsSetup() {
-    var wfsPopup = windowSetup('wfs', 'WFS');
-    document.getElementById('app').appendChild(wfsPopup);
-    var windowContents = document.getElementById('wfs-contents');
-    CGSWeb_Map.Options.layers.wfsMapConfigs.forEach(function(wfsMapConfig){
-        var div = document.createElement('div');
-        windowContents.appendChild(div);
-
-        var input = document.createElement('input');
-        input.type = 'checkbox';
-        input.id = wfsMapConfig.name.replace(/\W/g, '') + '_checkbox';
-        div.appendChild(input);
-
-        var label = document.createElement('label');
-        label.setAttribute('for', input.id);
-        label.innerHTML = wfsMapConfig.title;
-        div.appendChild(label);
-    });
-
-    document.getElementById('wfsButton').onclick = function() {
-        if(document.getElementById("wfsPopupText").classList.toggle("show")) {
-            $("#wfsPopup").zIndex(2);
-        }        
-    }    
 }
 
 function catsearchFiltersSetup() {
     var catsearchFilterPopup = windowSetup('catsearchFilter', 'Cat Search');
     document.getElementById('app').appendChild(catsearchFilterPopup);
 
-    var windowContents = document.getElementById('catsearchFilter-contents');
-    var catSearchfilter = document.createElement('div');
-    windowContents.appendChild(catSearchfilter);
-
-    var catSearchLabel = document.createElement('span'); 
-    catSearchLabel.innerHTML = 'Catcode Search: ';
-    catSearchfilter.appendChild(catSearchLabel);
-
-    var catSearchInput = document.createElement('input');
-    catSearchInput.type = 'search';
-    catSearchInput.id = 'catsearch';
-    catSearchfilter.appendChild(catSearchInput);
-
-    var catsearchfilter = document.createElement('div');
-    windowContents.appendChild(catsearchfilter);
-
-    var catfilterSearchBtn = document.createElement('input');
-    catfilterSearchBtn.type = 'button';
-    catfilterSearchBtn.value = 'Search';
-    catfilterSearchBtn.id = 'catfilterSearchBtn';
-    catfilterSearchBtn.onclick = catsearch;
-    catsearchfilter.appendChild(catfilterSearchBtn);
-
     var catsearchResults = document.createElement('div');
-    catsearchResults.className = 'window-contents';
     catsearchResults.id = 'catsearchResults';
-    document.getElementById('catsearchFilterPopupText').appendChild(catsearchResults);
+    document.getElementById('catsearchFilter-contents').appendChild(catsearchResults);
     document.getElementById('catsearchBtn').onclick = function() {
-        if(document.getElementById("catsearchFilterPopupText").classList.toggle("show")) {
-            $("#catsearchFilterPopup").zIndex(2);
-        }        
+        $('#catsearchFilterPopupText').addClass('show');
+        $('#catsearchFilterPopup').zIndex(2);     
+        catsearch();    
     }
 }
 
@@ -287,37 +225,13 @@ function besearchFiltersSetup() {
     var besearchFilterPopup = windowSetup('besearchFilter', 'BE Search');
     document.getElementById('app').appendChild(besearchFilterPopup);
 
-    var windowContents = document.getElementById('besearchFilter-contents');
-    var beSearchfilter = document.createElement('div');
-    windowContents.appendChild(beSearchfilter);
-
-    var beSearchLabel = document.createElement('span'); 
-    beSearchLabel.innerHTML = 'BE Search: ';
-    beSearchfilter.appendChild(beSearchLabel);
-
-    var beSearchInput = document.createElement('input');
-    beSearchInput.type = 'search';
-    beSearchInput.id = 'besearch';
-    beSearchfilter.appendChild(beSearchInput);
-
-    var besearchfilter = document.createElement('div');
-    windowContents.appendChild(besearchfilter);
-
-    var befilterSearchBtn = document.createElement('input');
-    befilterSearchBtn.type = 'button';
-    befilterSearchBtn.value = 'Search';
-    befilterSearchBtn.id = 'befilterSearchBtn';
-    befilterSearchBtn.onclick = besearch;
-    besearchfilter.appendChild(befilterSearchBtn);
-
-    var searchResults = document.createElement('div');
-    searchResults.className = 'window-contents';
-    searchResults.id = 'besearchResults';
-    document.getElementById('besearchFilterPopupText').appendChild(searchResults);
+    var besearchResults = document.createElement('div');
+    besearchResults.id = 'besearchResults';
+    document.getElementById('besearchFilter-contents').appendChild(besearchResults);
     document.getElementById('besearchBtn').onclick = function(){
-        if(document.getElementById("besearchFilterPopupText").classList.toggle("show")) {
-            $("#besearchFilterPopup").zIndex(2);
-        }
+        $('#besearchFilterPopupText').addClass('show');
+        $('#besearchFilterPopup').zIndex(2);     
+        besearch();      
     }
 }
 

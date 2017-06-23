@@ -1,3 +1,4 @@
+declare const CGSWeb_Map;
 export function navSetup() {
     var nav = document.createElement('nav');
     nav.className = "navbar navbar-inverse";
@@ -37,18 +38,11 @@ export function navSetup() {
     });
     navBarNav.appendChild(toolsOption);
 
-    var searchOption = createNavDropDown('Search',
-    {
-        'besearchBtn': 'BE Search',
-        'catsearchBtn': 'Catcode Search'
-    });
-    navBarNav.appendChild(searchOption);
-
     navBarNav.appendChild(createNavButton('mapLayerButton', 'Map Layers'));
     navBarNav.appendChild(createNavButton('getmButton', 'GETM'));    
-    navBarNav.appendChild(createNavButton('wfsButton', 'WFS'));
 
-    // navBarNav.appendChild(createNavDropDownTwice('asdf', {'asd': 'fds'}));
+    navBarNav.appendChild(createNavDropDownForm());
+    navBarNav.appendChild(createNavDropDownWFS());
 }
 
 function createNavButton(id, innerText) {
@@ -98,65 +92,131 @@ function createNavDropDown(title, options) {
     return li;
 }
 
-// function createNavDropDownTwice(title, options) {
-//     var li = document.createElement('li');
+function createNavDropDownForm() {
+    var li = document.createElement('li');
+    li.className = 'dropdown';
 
-//     var a = document.createElement('a');
-//     // a.className = 'dropdown-toggle';
-//     a.id='menu1';
-//     a.setAttribute('data-toggle', 'dropdown');
-//     a.href = '#';
-//     li.appendChild(a);
+    var a = document.createElement('a');
+    a.className = 'dropdown-toggle';
+    a.setAttribute('data-toggle', 'dropdown');
+    a.href = '#';
+    a.innerHTML = 'Search';
+    li.appendChild(a);
+    
+    var caret = document.createElement('span');
+    caret.className = 'caret';
+    a.appendChild(caret);
 
-//     var label = document.createElement('span');
-//     label.innerHTML = title;
-//     a.appendChild(label);
+    var div = document.createElement('div');
+    div.className = 'dropdown-menu';
+    li.appendChild(div);
 
-//     var caret = document.createElement('span');
-//     caret.className = 'caret';
-//     a.appendChild(caret);
+    var form = document.createElement('form');
+    form.id = 'formSeach';
+    form.className = 'form container-fluid';
+    div.appendChild(form);
 
-//     var dropdownMenu = document.createElement('ul');
-//     dropdownMenu.className = 'dropdown-menu';
-//     dropdownMenu.setAttribute('aria-labelledby', 'menu1')
-//     li.appendChild(dropdownMenu);
+    var besearchGroup = document.createElement('div');
+    besearchGroup.className = 'form-group';
+    form.appendChild(besearchGroup);
 
-//     for(var o in options) {
-//         console.log(options[o]);
+    var besearchLabel = document.createElement('label');
+    besearchLabel.htmlFor = 'besearch';
+    besearchLabel.innerHTML = 'BE Search:';
+    besearchGroup.appendChild(besearchLabel);
 
-//         var optioncontent = document.createElement('li');
-//         dropdownMenu.appendChild(optioncontent);
+    var besearchInput = document.createElement('input');
+    besearchInput.type = 'text';
+    besearchInput.className = 'form-control';
+    besearchInput.id = 'besearch';
+    besearchGroup.appendChild(besearchInput);
 
-//         var a2 = document.createElement('a');
-//         // a2.className = 'dropdown-toggle';
-//         a2.setAttribute('data-toggle', 'dropdown');
-//         a2.id = 'menu2'
-//         a2.href = '#';
-//         optioncontent.appendChild(a2);
+    var besearchButton = document.createElement('button');
+    besearchButton.type = 'button';
+    besearchButton.id = 'besearchBtn';
+    besearchButton.className = "btn btn-block";
+    besearchButton.innerHTML = 'Search';
+    form.appendChild(besearchButton);
 
-//         var label2 = document.createElement('span');
-//         label2.innerHTML = title;
-//         a2.appendChild(label2);
+    var divider = document.createElement('div');
+    divider.className = 'divider';
+    form.appendChild(divider);
 
-//         var caret2 = document.createElement('span');
-//         caret2.className = 'caret';
-//         a2.appendChild(caret2);
+    var catsearchGroup = document.createElement('div');
+    catsearchGroup.className = 'form-group';
+    form.appendChild(catsearchGroup);
 
-//         var dropdownMenu2 = document.createElement('ul');
-//         dropdownMenu2.className = 'dropdown-menu dropdown-menu-right';
-//         dropdownMenu.setAttribute('aria-labelledby', 'menu2')
-//         optioncontent.appendChild(dropdownMenu2);
-//         var options2 = {'a': 'b', 'c': 'd'};
-//         for(var o in options2) {
-//             var optionItem = document.createElement('li');
-//             dropdownMenu2.appendChild(optionItem);
+    var catsearchLabel = document.createElement('label');
+    catsearchLabel.htmlFor = 'catsearch';
+    catsearchLabel.innerHTML = 'Cat Search:';
+    catsearchGroup.appendChild(catsearchLabel);
 
-//             var optionContent2 = document.createElement('a');
-//             optionContent2.href = '#';
-//             optionContent2.id = o;
-//             optionContent2.innerHTML = options2[o];
-//             optionItem.appendChild(optionContent2);
-//         }
-//     }
-//     return li;
-// }
+    var catsearchInput = document.createElement('input');
+    catsearchInput.type = 'text';
+    catsearchInput.className = 'form-control';
+    catsearchInput.id = 'catsearch';
+    catsearchGroup.appendChild(catsearchInput);
+
+    var catsearchButton = document.createElement('button');
+    catsearchButton.type = 'button';
+    catsearchButton.id = 'catsearchBtn';
+    catsearchButton.className = "btn btn-block";
+    catsearchButton.innerHTML = 'Search';
+    form.appendChild(catsearchButton);
+
+    return li;
+    // <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Login <span class="glyphicon glyphicon-log-in"></span></a>
+    //     <div class="dropdown-menu">
+    //         <form id="formLogin" class="form container-fluid">
+    //             <div class="form-group">
+    //                 <label for="usr">Name:</label>
+    //                 <input type="text" class="form-control" id="usr">
+    //             </div>
+    //             <div class="form-group">
+    //                 <label for="pwd">Password:</label>
+    //                 <input type="password" class="form-control" id="pwd">
+    //             </div>
+    //             <button type="button" id="btnLogin" class="btn btn-block">Login</button>
+    //         </form>
+}
+
+function createNavDropDownWFS() {
+    var li = document.createElement('li');
+    li.className = 'dropdown';
+
+    var a = document.createElement('a');
+    a.className = 'dropdown-toggle';
+    a.setAttribute('data-toggle', 'dropdown');
+    a.href = '#';
+    a.innerHTML = 'WFS';
+    li.appendChild(a);
+    
+    var caret = document.createElement('span');
+    caret.className = 'caret';
+    a.appendChild(caret);
+
+    var div = document.createElement('div');
+    div.className = 'dropdown-menu';
+    li.appendChild(div);
+
+    var form = document.createElement('form');
+    form.id = 'formWFS';
+    form.className = 'form container-fluid';
+    div.appendChild(form);
+
+    CGSWeb_Map.Options.layers.wfsMapConfigs.forEach(function(wfsMapConfig){
+        var div = document.createElement('div');
+        form.appendChild(div);
+
+        var input = document.createElement('input');
+        input.type = 'checkbox';
+        input.id = wfsMapConfig.name.replace(/\W/g, '') + '_checkbox';
+        div.appendChild(input);
+
+        var label = document.createElement('label');
+        label.setAttribute('for', input.id);
+        label.innerHTML = wfsMapConfig.title;
+        div.appendChild(label);
+    });
+    return li;
+}
