@@ -25,7 +25,7 @@ CGSWeb_Map.Options = {
 				title: "ArcGIS Topo",
 				url: "https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/WMTS/tile/1.0.0/USGSTopo/{Style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}",
 				layer: "0",
-				version: "1.1.1",
+				version: "1.1.0",
 				arcgis_wmts: true,
 				tilesize: 256,
 				levels: 20,
@@ -137,5 +137,14 @@ var GeoServerRestInterface = {
     },
     getLayersUrl: function() {
         return this.hostAddress + this.gsRestUrl + this.LAYERS;
+    }
+};
+
+var ProductRestInterface = {
+	hostAddress: "http://localhost:9002/",
+	productRestUrl: 'product/api/rest/',
+	SAVE_SHAPES: 'save_shapes/',
+    getSaveShapesUrl: function () {
+        return this.hostAddress + this.productRestUrl + this.SAVE_SHAPES; 
     }
 };

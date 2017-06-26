@@ -6,7 +6,6 @@ import {globals} from './globals';
 
 var attribution = new ol.control.Attribution();
 var zoom = new ol.control.Zoom();
-
 const layerGroups = [];
 const defaultProjection = 'EPSG:4326';
 const defaultVersion = '1.1.0';
@@ -29,17 +28,19 @@ function populateBaseMapLayers() {
         if(baseMapConfig.arcgis_wmts == true) {
             var projection = ol.proj.get(baseMapConfig.srs);
             var projectionExtent = projection.getExtent();
-            var size = ol.extent.getWidth(projectionExtent) / baseMapConfig.tilesize;
+            //projectionExtent = [-180, -90,  180,90];
+            var size = (ol.extent.getWidth(projectionExtent) / baseMapConfig.tilesize);
             var levels = baseMapConfig.levels;
             var resolutions = new Array(levels);   
             var matrixIds = new Array(levels);
             for (var j = 0; j < levels; ++j) {
                 resolutions[j] = size / Math.pow(2, j);
+                console.log('resolution[' + j + '] is ' + resolutions[j]);
                 matrixIds[j] = j;
             }
             layers.push(new ol.layer.Tile({
                 visible: true,
-                preload: 2,
+                preload:2,
                 source: new ol.source.WMTS({
                     url: baseMapConfig.url,
                     format: 'image/jpeg',
@@ -250,7 +251,7 @@ function populateMap() {
     wfsImage();
     var currMapLayer = CGSWeb_Map.Options.layers.baseMapConfigs[0].title; 
     var mapLayerSelect = document.getElementsByClassName('basemap-layer-select');
-    //var mapSelect = document.createElement('select');
+
     for (var i = 0; i < mapLayerSelect.length; i++) {
         CGSWeb_Map.Options.layers.baseMapConfigs.forEach(function(baseMapConfig){
             var opt = document.createElement('option');
@@ -344,7 +345,7 @@ function populateShape(){
 }
 
 export function setupMap() {
-    chinaLake();
+    //chinaLake();
     populateMap();
     
     map.setLayerGroup(new ol.layer.Group({

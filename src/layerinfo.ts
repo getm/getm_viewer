@@ -493,7 +493,7 @@ export function layerInfoSetup(){
         $('#featureInfoPopupText').removeClass('show');
         $('#featureInfoPopup').zIndex(-1);  
     }); 
-    map.getViewport().addEventListener('contextmenu', function (e) {
+    map.on('singleclick', function (e) {
         $('#featureInfoPopupText').removeClass('show');
         $('#featureInfoPopup').zIndex(-1);  
         $('#layerInfoPopupText').removeClass('show');
@@ -565,8 +565,7 @@ function featureInfoPopup() {
         var featurediv = document.createElement('div');
         document.getElementById('featureInfoFields').appendChild(featurediv);
 
-        var featurelabel = document.createElement('div');
-        featurelabel.className = 'label';
+        var featurelabel = document.createElement('span');
         featurelabel.innerHTML = p + ':';
         featurediv.appendChild(featurelabel);
 

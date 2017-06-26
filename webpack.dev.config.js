@@ -29,6 +29,10 @@ const config = {
                 target: 'http://localhost:8080/',
                 changeOrigin: true
             },
+            '/product/**/*': {
+                target: 'http://localhost:8080/',
+                changeOrigin: true
+            },
             '/geoserver/**/*': {
                 target: 'http://localhost:8080/',
                 changeOrigin: true

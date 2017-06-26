@@ -9,6 +9,7 @@ import {Shape} from './Shape';
 const WILDCARD = '*';
 declare const CGSWeb_Map;
 declare const GeoServerRestInterface;
+declare const ProductRestInterface;
 
 function loadSession(){
     // clear this session first;
@@ -54,7 +55,7 @@ function saveSession(){
 }
 
 function saveShapes(){
-    var featureArray = [];
+   /* var featureArray = [];
     for(var shapesID in globals.shapes) {
         if(globals.shapes[shapesID].getLayer().getVisible()) {
             featureArray.push(globals.shapes[shapesID].getFeature());
@@ -64,7 +65,17 @@ function saveShapes(){
     a.download = 'shapes.shp';            
     var shp = new ol.format.GeoJSON().writeFeatures(featureArray);
     a.href = window.URL.createObjectURL(new Blob([shp], {'type': 'application/octet-stream'}));
-    a.click();         
+    ProductRestInterface.getSaveShapesUrl();
+
+    $.ajax({
+        type: 'POST',
+        url: ProductRestInterface.getSaveShapesUrl(),
+        data: JSON.stringify({'imageName': 'asdf', 'sensor': 'sensor', 'geoJsons':JSON.stringify(shp), 'generationType': 'ACCURACY', 'saveFormat': 'SHAPEFILE'}),
+        contentType: 'application/json',
+        success: function(){ a.click()},
+     });
+
+   ;  */       
 }
 
 function besearch(){
@@ -171,7 +182,6 @@ export function setup() {
     catsearchFiltersSetup();
     besearchFiltersSetup();
     getmSetup();
-    mapLayerSetup();
 
     // TODO: dynamically add to nav bar and do the clicky stuff
     $('#saveBtn').click(saveShapes);
@@ -181,7 +191,6 @@ export function setup() {
 }
 
 function printImg(e) {
-
     e.preventDefault();
     var canvas = document.getElementById("map").getElementsByClassName("ol-unselectable")[0];
     var img = (canvas as any).toDataURL('image/png');
@@ -251,44 +260,6 @@ function getmSetup() {
     document.getElementById('getm-contents').appendChild(div2);
     setupShapes();
 
-}
-
-function mapLayerSetup() {
-    var mapLayer = windowSetup('mapLayer', 'Map Layers');
-    document.getElementById('mapLayerButton').onclick = function(){
-        if(document.getElementById("mapLayerPopupText").classList.toggle("show")) {
-            $("#mapLayerPopup").zIndex(2);
-        }
-    };
-
-    document.getElementById('app').appendChild(mapLayer);
-    var div1 = document.createElement('div');
-    div1.align = 'center';
-    document.getElementById('mapLayer-contents').appendChild(div1);
-
-    var div2 = document.createElement('div'); 
-    div2.id = 'wmslayer';
-    div1.appendChild(div2);
-
-    var span1 = document.createElement('span');
-    span1.innerHTML = 'WMS Layer: ';
-    div2.appendChild(span1);
-
-    var select1 = document.createElement('select');
-    select1.className = 'basemap-layer-select';
-    div2.appendChild(select1);
-
-    var div3 = document.createElement('div'); 
-    div3.id = 'shapeLayer';
-    div1.appendChild(div3);
-
-    var span2 = document.createElement('span');
-    span2.innerHTML = 'Shape Layer: ';
-    div3.appendChild(span2);
-
-    var select2 = document.createElement('select');
-    select2.className = 'shape-layer-select';
-    div3.appendChild(select2);
 }
 
 // setup shapes 

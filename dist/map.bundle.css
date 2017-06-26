@@ -75,7 +75,18 @@ h5 {
 	text-align: center; 
 	margin: 0;
 }
-#insertShapes {
+
+.dropdown-menu {
+	width: 200px;
+}
+
+/*.dropdown-menu div{
+	width: 100%;
+}*/
+
+.dropdown-menu label{
+	width: 90%;
+}#insertShapes {
     float: left;
     width: 33%;
 }
@@ -154,7 +165,6 @@ select{
 }
 
 #layerInfoForm input {
-    /*left: 0px;*/
     position: relative;
     width: 100%;
     left: 0%;
@@ -180,12 +190,22 @@ select{
     height: 400px;
 }
 
-#featureInfo-contents .label {
-    /*align-content: unset;*/
+#featureInfo-contents span {
     text-align: left;
-    /*left: 0px;*/
-    bottom: 0px;
-    display: block;
+    display: table-cell;
+}
+
+#featureInfo-contents div {
+    position: relative;
+    width: 500px;
+    display: table-row;
+}
+
+#featureInfo-contents input {
+    text-align: left;
+    display: table-cell;
+    float: right;
+    height: inherit;
 }#drawPopup.popup {
     width: max-content;
     height: max-content;

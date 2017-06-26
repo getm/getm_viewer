@@ -24,7 +24,6 @@
 }
 
 #layerInfoForm input {
-    /*left: 0px;*/
     position: relative;
     width: 100%;
     left: 0%;
@@ -50,10 +49,20 @@
     height: 400px;
 }
 
-#featureInfo-contents .label {
-    /*align-content: unset;*/
+#featureInfo-contents span {
     text-align: left;
-    /*left: 0px;*/
-    bottom: 0px;
-    display: block;
+    display: table-cell;
+}
+
+#featureInfo-contents div {
+    position: relative;
+    width: 500px;
+    display: table-row;
+}
+
+#featureInfo-contents input {
+    text-align: left;
+    display: table-cell;
+    float: right;
+    height: inherit;
 }

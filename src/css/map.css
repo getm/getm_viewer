@@ -75,3 +75,15 @@ h5 {
 	text-align: center; 
 	margin: 0;
 }
+
+.dropdown-menu {
+	width: 200px;
+}
+
+/*.dropdown-menu div{
+	width: 100%;
+}*/
+
+.dropdown-menu label{
+	width: 90%;
+}

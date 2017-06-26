@@ -22,27 +22,23 @@ export function navSetup() {
     navBarNav.className = 'nav navbar-nav';
     navContainer.appendChild(navBarNav);
 
-    var fileOption = createNavDropDown('File', 
+    navBarNav.appendChild(createNavDropDown('File', 
     {
         'saveSessBtn': 'Save Session',
         'loadSessBtn': 'Load Session',
         'saveBtn': 'Save Shape',
         'printBtn': 'Print',
-    });
-    navBarNav.appendChild(fileOption);
+    }));
 
-    var toolsOption = createNavDropDown('Tools', 
+    navBarNav.appendChild(createNavDropDownMapLayers());
+    navBarNav.appendChild(createNavDropDownWFS());
+    navBarNav.appendChild(createNavButton('getmButton', 'GETM'));  
+    navBarNav.appendChild(createNavDropDownSearch());
+    navBarNav.appendChild(createNavDropDown('Tools', 
     {
         'drawButton': 'Draw',
         'legend': 'Legend'
-    });
-    navBarNav.appendChild(toolsOption);
-
-    navBarNav.appendChild(createNavButton('mapLayerButton', 'Map Layers'));
-    navBarNav.appendChild(createNavButton('getmButton', 'GETM'));    
-
-    navBarNav.appendChild(createNavDropDownForm());
-    navBarNav.appendChild(createNavDropDownWFS());
+    }));
 }
 
 function createNavButton(id, innerText) {
@@ -92,7 +88,7 @@ function createNavDropDown(title, options) {
     return li;
 }
 
-function createNavDropDownForm() {
+function createNavDropDownSearch() {
     var li = document.createElement('li');
     li.className = 'dropdown';
 
@@ -165,19 +161,6 @@ function createNavDropDownForm() {
     form.appendChild(catsearchButton);
 
     return li;
-    // <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown" href="#">Login <span class="glyphicon glyphicon-log-in"></span></a>
-    //     <div class="dropdown-menu">
-    //         <form id="formLogin" class="form container-fluid">
-    //             <div class="form-group">
-    //                 <label for="usr">Name:</label>
-    //                 <input type="text" class="form-control" id="usr">
-    //             </div>
-    //             <div class="form-group">
-    //                 <label for="pwd">Password:</label>
-    //                 <input type="password" class="form-control" id="pwd">
-    //             </div>
-    //             <button type="button" id="btnLogin" class="btn btn-block">Login</button>
-    //         </form>
 }
 
 function createNavDropDownWFS() {
@@ -218,5 +201,64 @@ function createNavDropDownWFS() {
         label.innerHTML = wfsMapConfig.title;
         div.appendChild(label);
     });
+    return li;
+}
+
+function createNavDropDownMapLayers() {
+    var li = document.createElement('li');
+    li.className = 'dropdown';
+
+    var a = document.createElement('a');
+    a.className = 'dropdown-toggle';
+    a.setAttribute('data-toggle', 'dropdown');
+    a.href = '#';
+    a.innerHTML = 'Map Layers';
+    li.appendChild(a);
+    
+    var caret = document.createElement('span');
+    caret.className = 'caret';
+    a.appendChild(caret);
+
+    var div = document.createElement('div');
+    div.className = 'dropdown-menu';
+    li.appendChild(div);
+
+    var form = document.createElement('form');
+    form.id = 'formMapLayer';
+    form.className = 'form container-fluid';
+    div.appendChild(form);
+
+    var wmsLayerGroup = document.createElement('div');
+    wmsLayerGroup.className = 'form-group';
+    form.appendChild(wmsLayerGroup);
+
+    var wmsLayerLabel = document.createElement('label');
+    wmsLayerLabel.htmlFor = 'wmsLayer';
+    wmsLayerLabel.innerHTML = 'WMS Layer:';
+    wmsLayerGroup.appendChild(wmsLayerLabel);
+
+    var wmsLayerSelect = document.createElement('select');
+    wmsLayerSelect.className = 'form-control basemap-layer-select';
+    wmsLayerSelect.id = 'wmsLayer';
+    wmsLayerGroup.appendChild(wmsLayerSelect);
+
+    var divider = document.createElement('div');
+    divider.className = 'divider';
+    form.appendChild(divider);
+
+    var shapeLayerGroup = document.createElement('div');
+    shapeLayerGroup.className = 'form-group';
+    form.appendChild(shapeLayerGroup);
+
+    var shapeLayerLabel = document.createElement('label');
+    shapeLayerLabel.htmlFor = 'shapeLayer';
+    shapeLayerLabel.innerHTML = 'Shape Layer:';
+    shapeLayerGroup.appendChild(shapeLayerLabel);
+
+    var shapeLayerSelect = document.createElement('select');
+    shapeLayerSelect.className = 'form-control shape-layer-select';
+    shapeLayerSelect.id = 'shapeLayer';
+    shapeLayerGroup.appendChild(shapeLayerSelect);
+
     return li;
 }
