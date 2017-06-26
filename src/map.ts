@@ -53,7 +53,8 @@ function populateBaseMapLayers() {
                     style: 'default',
                     wrapX: true,
                     requestEncoding: 'REST',
-                    layer: baseMapConfig.layer
+                    layer: baseMapConfig.layer,
+                    crossOrigin: 'anonymous'
                 })
             }));
         } else {
@@ -68,7 +69,8 @@ function populateBaseMapLayers() {
                         FORMAT: 'image/jpeg',
                         SRS: defaultProjection
                     },
-                    projection: defaultProjection
+                    projection: defaultProjection,
+                    crossOrigin: 'anonymous'
                 }),
             }));
         }
