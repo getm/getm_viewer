@@ -86,7 +86,8 @@ h5 {
 
 .dropdown-menu label{
 	width: 90%;
-}#insertShapes {
+}
+#insertShapes {
     float: left;
     width: 33%;
 }
@@ -206,6 +207,26 @@ select{
     display: table-cell;
     float: right;
     height: inherit;
+}
+.dropdown-submenu {
+    position: relative;
+}
+.dropdown-submenu .dropdown-menu {
+    top: 0;
+    left: 100%;
+    margin-top: -1px;
+}
+
+input[type="radio"]+label {
+    font-weight: normal;
+}
+
+input[type="radio"]:checked+label {
+    font-weight:bold;
+}
+
+.basemapoption{
+    display: none;
 }#drawPopup.popup {
     width: max-content;
     height: max-content;

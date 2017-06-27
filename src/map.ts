@@ -35,7 +35,6 @@ function populateBaseMapLayers() {
             var matrixIds = new Array(levels);
             for (var j = 0; j < levels; ++j) {
                 resolutions[j] = size / Math.pow(2, j);
-                console.log('resolution[' + j + '] is ' + resolutions[j]);
                 matrixIds[j] = j;
             }
             layers.push(new ol.layer.Tile({
@@ -357,13 +356,15 @@ export function setupMap() {
     
     map.getView().on('change:resolution', toggleWFS);
     toggleWFS();
+    window.onresize = function(){$('#map').height(window.innerHeight - $('#topBanner').height() - $('#bottomBanner').height() - $('#nav').height() - $('#nav').height());  map.updateSize();}; 
     $('#map').height(window.innerHeight - $('#topBanner').height() - $('#bottomBanner').height() - $('#nav').height() - $('#nav').height());
     map.updateSize();
-    window.onresize = function(){$('#map').height(window.innerHeight - $('#topBanner').height() - $('#bottomBanner').height() - $('#nav').height() - $('#nav').height());  map.updateSize();};    
+       
 }
+
 function toggleWFS(){
     console.log('zoom is ' + map.getView().getZoom());
-    if(map.getView().getZoom() > 5) {
+    if(map.getView().getZoom() > CGSWeb_Map.Options.zoomThreshold) {
         console.log('use wfs layers');
         map.getLayerGroup().getLayers().getArray()[2].setVisible(true);
         map.getLayerGroup().getLayers().getArray()[4].setVisible(false);

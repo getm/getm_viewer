@@ -5,6 +5,8 @@ CGSWeb_Map.Options = {
 	banner_text: "UNCLASSIFIED",
 	baseUrl: "http://localhost:9002/",
 	wfsUrl: "http://localhost:8080/",
+	zoomThreshold: 8,
+	saveFormat: 'SHAPEFILE',
 	layers: {
 		baseMapConfigs: [
 			{
@@ -143,8 +145,12 @@ var GeoServerRestInterface = {
 var ProductRestInterface = {
 	hostAddress: "http://localhost:9002/",
 	productRestUrl: 'product/api/rest/',
-	SAVE_SHAPES: 'save_shapes/',
+	productResultUrl: 'product',
+	SAVE_SHAPES: 'save_shapes',
     getSaveShapesUrl: function () {
         return this.hostAddress + this.productRestUrl + this.SAVE_SHAPES; 
-    }
+    },
+	getResultUrl: function() {
+		return this.hostAddress + this.productResultUrl;
+	}
 };

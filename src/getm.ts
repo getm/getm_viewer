@@ -54,28 +54,40 @@ function saveSession(){
     localStorage.shapes = JSON.stringify(storageShapes);
 }
 
+// TODO
 function saveShapes(){
-   /* var featureArray = [];
+    var featureArray = [];
     for(var shapesID in globals.shapes) {
         if(globals.shapes[shapesID].getLayer().getVisible()) {
             featureArray.push(globals.shapes[shapesID].getFeature());
         }
     }                
     var a = document.createElement('a');
-    a.download = 'shapes.shp';            
-    var shp = new ol.format.GeoJSON().writeFeatures(featureArray);
-    a.href = window.URL.createObjectURL(new Blob([shp], {'type': 'application/octet-stream'}));
-    ProductRestInterface.getSaveShapesUrl();
+    //a.download = 'shapes.shp';            
 
+    var geoJsons = [];
+    for(var feature of featureArray) {
+        var geoJson = new ol.format.GeoJSON().writeFeature(feature);
+        console.log(geoJson);
+        geoJson = JSON.parse(geoJson);
+        geoJson['properties']['type'] = geoJson['geometry']['type'];
+        geoJsons.push(JSON.stringify(geoJson));
+    }
+    //a.href = window.URL.createObjectURL(new Blob([shp], {'type': 'application/octet-stream'}));
+    console.log(JSON.stringify(geoJsons));
+    console.log(geoJsons);
     $.ajax({
         type: 'POST',
         url: ProductRestInterface.getSaveShapesUrl(),
-        data: JSON.stringify({'imageName': 'asdf', 'sensor': 'sensor', 'geoJsons':JSON.stringify(shp), 'generationType': 'ACCURACY', 'saveFormat': 'SHAPEFILE'}),
+        data: JSON.stringify({'geoJsons': geoJsons, 'saveFormat': CGSWeb_Map.Options.saveFormat}),
         contentType: 'application/json',
-        success: function(){ a.click()},
-     });
+        success: function(response, status, xhr) {successSave(response, a)},
+     });       
+}
 
-   ;  */       
+function successSave(response, a) {
+    a.href = ProductRestInterface.getResultUrl() + response['result'];//window.URL.createObjectURL(new Blob([JSON.stringify(response)], {'type': 'application/octet-stream'}));
+    a.click();
 }
 
 function besearch(){

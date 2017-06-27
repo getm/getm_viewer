@@ -256,12 +256,12 @@ function setRequiredFields(response) {
 
 function retrieveLayer() {
     if(globals.shapes[globals.selectedFeatureID] != undefined) {
-        document.getElementById('layerinfolayerwfs').classList.add('hide');
-        document.getElementById('layerinfolayer').classList.remove('hide');
+        $('#layerinfolayerwfs').addClass('hide');
+        $('#layerinfolayer').removeClass('hide');
         (<HTMLSelectElement>document.getElementById('layerinfolayer')).value = globals.shapes[globals.selectedFeatureID].getLayer().get('name');  
     } else {
-        document.getElementById('layerinfolayer').classList.add('hide');
-        document.getElementById('layerinfolayerwfs').classList.remove('hide');
+        $('#layerinfolayer').addClass('hide');
+        $('#layerinfolayerwfs').removeClass('hide');
         (<HTMLInputElement>document.getElementById('layerinfolayerwfs')).value = globals.selectedFeature.getProperties()['layer'];
     }
 }
@@ -283,6 +283,7 @@ export function layerInfoPopup(){
     $('#layerInfo-contents').scrollTop(0);
     $('#layerInfoPopupText').addClass('show');
     $('#layerInfoPopup').zIndex(2);     
+    console.log('show layer info popup');
 }
 
 function typeCheck(layerInfoReq) {
@@ -398,11 +399,11 @@ function fillLayerInfoDefaults() {
     assignValues();
 }
 
-function hideLayerInfoPopup() {
-    var layerInfoPopupText = document.getElementById("layerInfoPopupText");
-    $(layerInfoPopupText).removeClass('show');
-    $(layerInfoPopupText.parentElement).zIndex(-1);
-}
+// function hideLayerInfoPopup() {
+//     var layerInfoPopupText = document.getElementById("layerInfoPopupText");
+//     $(layerInfoPopupText).removeClass('show');
+//     $(layerInfoPopupText.parentElement).zIndex(-1);
+// }
 
 export function layerInfoSetup(){
     retrieveRequiredFields();
@@ -489,20 +490,30 @@ export function layerInfoSetup(){
     $('#submitlayerinfo').click(function(){
         assignValues();
     });
+
     $('#layerInfo-close').click(function(){
-        $('#featureInfoPopupText').removeClass('show');
+        $('#featureInfoPopupText').addClass('show');
         $('#featureInfoPopup').zIndex(-1);  
     }); 
-    map.on('singleclick', function (e) {
+
+    // on chrome, map.on(click, fn...)
+    // on firefox, map.getViewport().addEventListener('click')
+    map.getViewport().addEventListener('click', function (e) {
+        e.preventDefault();
         $('#featureInfoPopupText').removeClass('show');
         $('#featureInfoPopup').zIndex(-1);  
         $('#layerInfoPopupText').removeClass('show');
         $('#layerInfoPopup').zIndex(-1);  
-        e.preventDefault();
+        
+
         var featureLayer = map.forEachFeatureAtPixel(map.getEventPixel(e),
             function (feature, layer) {
-                if(layer.get('selectable'))
+                if(layer.get('selectable')) 
+                {
+                    console.log('layer is selectable');
                     return [feature, layer];
+                }
+                console.log('layer is not selectable');
         });
 
         if (featureLayer != undefined && featureLayer[0] != undefined) {
@@ -516,10 +527,16 @@ export function layerInfoSetup(){
                 }                
                 globals.selectedFeatureID =  layerName + globals.counts[layerName]++;
                 (<ol.Feature>featureLayer[0]).setProperties({'id': globals.selectedFeatureID});
+                console.log('featureInfo')
                 featureInfoPopup();
             } else {
+                console.log('layerinfo')
                 layerInfoPopup();
             }
+        }
+        else {
+            console.log('idk');
+            console.log(featureLayer);
         }
     });
 }
