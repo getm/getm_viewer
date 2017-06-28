@@ -42,7 +42,7 @@ export function windowSetup(id, headerTitle=id){
     windowHeadersCloseBtn.id = id + "-close";
     windowHeadersCloseBtn.innerHTML = "&times;";
     windowHeadersCloseBtn.onclick = function () {
-        popupText.classList.toggle("show");
+        $(popupText).removeClass('show');
         $(popupText).zIndex(-1);
     };
     windowHeaders.appendChild(windowHeadersCloseBtn);

@@ -86,8 +86,7 @@ h5 {
 
 .dropdown-menu label{
 	width: 90%;
-}
-#insertShapes {
+}#insertShapes {
     float: left;
     width: 33%;
 }
@@ -217,16 +216,29 @@ select{
     margin-top: -1px;
 }
 
-input[type="radio"]+label {
+/*a.test input[type="radio"]+label {
     font-weight: normal;
-}
+}*/
 
-input[type="radio"]:checked+label {
+div.test input[type="radio"]:checked+label {
     font-weight:bold;
 }
 
 .basemapoption{
     display: none;
+}
+
+.shapelayeroption{
+    display: none;
+}
+
+.caret-right {
+    border-bottom: 4px solid transparent;
+    border-top: 4px solid transparent;
+    border-left: 4px solid;
+    display: inline-block;
+    height: 0;
+    width: 0;
 }#drawPopup.popup {
     width: max-content;
     height: max-content;

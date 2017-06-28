@@ -492,7 +492,7 @@ export function layerInfoSetup(){
     });
 
     $('#layerInfo-close').click(function(){
-        $('#featureInfoPopupText').addClass('show');
+        $('#featureInfoPopupText').removeClass('show');
         $('#featureInfoPopup').zIndex(-1);  
     }); 
 
@@ -504,11 +504,10 @@ export function layerInfoSetup(){
         $('#featureInfoPopup').zIndex(-1);  
         $('#layerInfoPopupText').removeClass('show');
         $('#layerInfoPopup').zIndex(-1);  
-        
 
         var featureLayer = map.forEachFeatureAtPixel(map.getEventPixel(e),
             function (feature, layer) {
-                if(layer.get('selectable')) 
+                if(layer && feature && layer.get('selectable')) 
                 {
                     console.log('layer is selectable');
                     return [feature, layer];

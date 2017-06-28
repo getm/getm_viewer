@@ -25,6 +25,7 @@ export const map = new ol.Map({
 function populateBaseMapLayers() {
     var layers = [];
     CGSWeb_Map.Options.layers.baseMapConfigs.forEach(function(baseMapConfig){
+        var layer; 
         if(baseMapConfig.arcgis_wmts == true) {
             var projection = ol.proj.get(baseMapConfig.srs);
             var projectionExtent = projection.getExtent();
@@ -37,7 +38,7 @@ function populateBaseMapLayers() {
                 resolutions[j] = size / Math.pow(2, j);
                 matrixIds[j] = j;
             }
-            layers.push(new ol.layer.Tile({
+            layer = new ol.layer.Tile({
                 visible: true,
                 preload:2,
                 source: new ol.source.WMTS({
@@ -56,9 +57,9 @@ function populateBaseMapLayers() {
                     layer: baseMapConfig.layer,
                     crossOrigin: 'anonymous'
                 })
-            }));
+            });
         } else {
-            layers.push(new ol.layer.Tile({
+            layer = new ol.layer.Tile({
                 visible: true,
                 preload: 2,
                 source: new ol.source.TileWMS({
@@ -72,19 +73,19 @@ function populateBaseMapLayers() {
                     projection: defaultProjection,
                     crossOrigin: 'anonymous'
                 }),
-            }));
+            });
         }
+        layers.push(layer);
+
+        $('#' + baseMapConfig.title.replace(/\W/g, '') +'_checkbox').change(function(){
+            console.log('#' + baseMapConfig.title.replace(/\W/g, '') +'_checkbox is clicked' );
+            map.getLayerGroup().getLayers().getArray()[0] = layer;
+            map.updateSize();
+        });         
     });
-
-    var layerGroup = new ol.layer.Group({
-        layers: layers
-    })
-    layerGroups[0] = layerGroup;   
-
-    for(var j = 0; j < layers.length ; j++ ){
-        layers[j].setVisible(false);
-    }
-    layers[0].setVisible(true);      
+    layerGroups.push(layers[0]); 
+    $('#' + CGSWeb_Map.Options.layers.baseMapConfigs[0].title.replace(/\W/g, '') +'_checkbox').click();
+    console.log('pushed basemap layer'); 
 }
 
 // TODO: fix
@@ -176,7 +177,8 @@ function populateLayers(){
     Object.keys(CGSWeb_Map.Options.layers).forEach(function(key){
         var layerConfigs = CGSWeb_Map.Options.layers[key];
         var layers = [];
-        if(key  != 'baseMapConfigs') {
+        if(key == 'shapesConfigs') {
+        //if(key  != 'baseMapConfigs' && key != 'wfsMapConfigs') {
             var id = 0;
             layerConfigs.forEach(function(layerConfig){
                 var layer = new ol.layer.Vector({
@@ -230,112 +232,178 @@ function populateLayers(){
                     layer.setVisible(this.checked);
                     console.log(layers.indexOf(layer));
                     console.log(
-                    (<ol.layer.Group>map.getLayerGroup().getLayers().getArray()[4]).getLayers()
+                        (<ol.layer.Group>map.getLayerGroup().getLayers().getArray()[2]).getLayers()
                     );
-                    (<ol.layer.Group>map.getLayerGroup().getLayers().getArray()[4]).getLayers().getArray()[layers.indexOf(layer)].setVisible(this.checked);
+                    (<ol.layer.Group>map.getLayerGroup().getLayers().getArray()[2]).getLayers().getArray()[layers.indexOf(layer)].setVisible(this.checked);
                 }); 
             });
+            var layerGroup = new ol.layer.Group({
+                layers: layers
+            })
+            layerGroups.push(layerGroup);     
+            console.log('pushed ' + key + ' layer');               
         }
-        var layerGroup = new ol.layer.Group({
-            layers: layers
-        })
-        layerGroups.push(layerGroup);        
+
     });
 }
 
 function populateMap() {
-    populateLayers();
-    populateShape();
-    populateBaseMapLayers();
-    wfsImage();
-    var currMapLayer = CGSWeb_Map.Options.layers.baseMapConfigs[0].title; 
-    var mapLayerSelect = document.getElementsByClassName('basemap-layer-select');
 
-    for (var i = 0; i < mapLayerSelect.length; i++) {
-        CGSWeb_Map.Options.layers.baseMapConfigs.forEach(function(baseMapConfig){
-            var opt = document.createElement('option');
-            opt.innerHTML = baseMapConfig.title;
-            opt.value = baseMapConfig.title;
-            mapLayerSelect[i].appendChild(opt.cloneNode(true));
-        });
-        globals.basemapLayer = layerGroups[0].getLayers().item(0);
-        (<HTMLSelectElement>mapLayerSelect[i]).value = currMapLayer;
-        (<HTMLSelectElement>mapLayerSelect[i]).onchange = function(){
-            for(var j = 0; j < (<HTMLSelectElement>this).length ; j++ ){
-                layerGroups[0].getLayers().item(j).setVisible(false);
-            }
-            layerGroups[0].getLayers().item((<HTMLSelectElement>this).selectedIndex).setVisible(true);    
-            globals.basemapLayer = layerGroups[0].getLayers().item((<HTMLSelectElement>this).selectedIndex);         
-            currMapLayer = (<HTMLSelectElement>this).value; 
-        };        
-    }
+    populateBaseMapLayers();
+    populateWFS();
+    populateLayers();
+    populateShape(); 
 }
 
-function wfsImage() {
-    var layers = [];
-    CGSWeb_Map.Options.layers.wfsMapConfigs.forEach(function(wfsConfig){
-        var layer = new ol.layer.Image({
-            source: new ol.source.ImageVector({
-                projection: defaultProjection,
-                source: new ol.source.Vector({
-                    format: (wfsConfig.version == '1.1.0') ? new ol.format.GML3() : 
-                        (wfsConfig.version == '1.0.0') ? new ol.format.GML2() : 
-                        wfsConfig,
-                    url: wfsConfig.hostAddress + wfsConfig.url 
-                        + '&version=' + (wfsConfig.version ? wfsConfig.version : defaultVersion)
-                        + '&srs=' + (wfsConfig.srs ? wfsConfig.srs : defaultProjection),
-                    attributions: [new ol.Attribution({
-                        html: '<div style="color:' + 
-                            (wfsConfig.style ? 
-                            (wfsConfig.style.stroke ? wfsConfig.style.stroke.color : 
-                            (wfsConfig.style.fill ? wfsConfig.style.fill.color : 
-                            'rgba(0,0,0,1)')): 
-                            'rgba(0,0,0,1)') + ';" class="wfs_legend">' + wfsConfig.title + '</div>',
-                    })],       
-                }),
-                style: wfsConfig.style ? 
-                    new ol.style.Style({
-                        stroke: wfsConfig.style.stroke ? new ol.style.Stroke({
-                            color: wfsConfig.style.stroke.color ? wfsConfig.style.stroke.color : 'rgba(0,0,0,1)',
-                            width: wfsConfig.style.stroke.width ? wfsConfig.style.stroke.width : 3
-                        }) : new ol.style.Stroke(),
-                        fill: wfsConfig.style.fill ? new ol.style.Fill({
-                            color: wfsConfig.style.fill.color ? wfsConfig.style.fill.color : 'rgba(0,0,0,0)'
-                        }) : new ol.style.Fill(),
-                    }): 
-                    new ol.style.Style()  
+function populateWFS() {
+    var wfslayers = [];
+    var wmslayers = [];
+    CGSWeb_Map.Options.layers.wfsMapConfigs.forEach(function(wfsMapConfig){
+        // wfs required
+        if(wfsMapConfig.wfs == undefined)
+            return;
+    
+        var wfslayer = new ol.layer.Vector({
+            source: new ol.source.Vector({
+                format: (wfsMapConfig.wfs.version == '1.1.0') ? new ol.format.GML3() : 
+                        (wfsMapConfig.wfs.version == '1.0.0') ? new ol.format.GML2() : 
+                        undefined,
+                url: wfsMapConfig.wfs.url ? function(extent,resolution,proj) {
+                    return wfsMapConfig.wfs.hostAddress + wfsMapConfig.wfs.url 
+                        + '&version=' + (wfsMapConfig.wfs.version ? wfsMapConfig.wfs.version : defaultVersion)
+                        + '&srs=' + (wfsMapConfig.wfs.srs ? wfsMapConfig.wfs.srs : defaultProjection)
+                        + '&bbox=' + flipExtent(
+                            extent, 
+                            // (<ol.source.TileWMS>globals.basemapLayer.getSource()).getParams() ?
+                            // (<ol.source.TileWMS>globals.basemapLayer.getSource()).getParams()['VERSION'] :
+                            '1.3.0', // WHYYYYY?????
+                            (wfsMapConfig.wfs.version ? wfsMapConfig.wfs.version : defaultVersion)).join(',') ;
+                }: undefined,
+                strategy: ol.loadingstrategy.bbox,
+                attributions: [new ol.Attribution({
+                    html: '<div style="color:' + 
+                        (wfsMapConfig.wfs.style ? 
+                        (wfsMapConfig.wfs.style.stroke ? wfsMapConfig.wfs.style.stroke.color : 
+                        (wfsMapConfig.wfs.style.fill ? wfsMapConfig.wfs.style.fill.color : 
+                        'rgba(0,0,0,1)')): 
+                        'rgba(0,0,0,1)') + ';" class="wfs_legend">' + wfsMapConfig.wfs.title + '</div>',
+                    
+                })]  
             }),
+            updateWhileInteracting: true,
             visible: false,
+            style: wfsMapConfig.wfs.style ? 
+                new ol.style.Style({
+                    stroke: wfsMapConfig.wfs.style.stroke ? new ol.style.Stroke({
+                        color: wfsMapConfig.wfs.style.stroke.color ? wfsMapConfig.wfs.style.stroke.color : 'rgba(0,0,0,1)',
+                        width: wfsMapConfig.wfs.style.stroke.width ? wfsMapConfig.wfs.style.stroke.width : 3
+                    }) : new ol.style.Stroke(),
+                    fill: wfsMapConfig.wfs.style.fill ? new ol.style.Fill({
+                        color: wfsMapConfig.wfs.style.fill.color ? wfsMapConfig.wfs.style.fill.color : 'rgba(0,0,0,0)'
+                    }) : new ol.style.Fill(),
+                }): 
+                new ol.style.Style()      
         });
-        layers.push(layer);
+
+        if(wfsMapConfig.wms != undefined && wfsMapConfig.wms != {}) {
+            var wmslayer = new ol.layer.Image({
+                visible: false,
+                source: new ol.source.ImageWMS({
+                    url: wfsMapConfig.wms.hostAddress + wfsMapConfig.wms.url,
+                    params: {
+                        LAYERS: wfsMapConfig.wms.layers,
+                        VERSION: wfsMapConfig.wms.version,
+                        FORMAT: 'image/png',
+                        SRS: defaultProjection,
+                        TRANSPARENT: 'true',
+                        BBOX: '-180.0,-90.0,180.0,90.0'
+                    },
+                    projection: defaultProjection,
+                    crossOrigin: 'anonymous'
+                }),
+            });
+            wmslayers.push(wmslayer);
+        } else {
+            wmslayers.push(new ol.layer.Vector());
+        }
+
+        wfslayer.set('name', wfsMapConfig.wfs.name);
+        wfslayer.set('selectable', true);
+        wfslayers.push(wfslayer);
+        globals.counts[wfsMapConfig.wfs.name] = 0;
+
+        // checkbox will trigger visibility change
+        $('#' + wfsMapConfig.wfs.name.replace(/\W/g, '') +'_checkbox').click(function(){
+            console.log('#' + wfsMapConfig.wfs.name.replace(/\W/g, '') +'_checkbox is clicked' );
+            wfslayer.setVisible(this.checked);
+            if(wmslayer) {
+                wmslayer.setVisible(this.checked);
+            }
+        }); 
     });
-    layerGroups.push(new ol.layer.Group({
-        layers: layers
-    }));
+    var wfslayerGroup = new ol.layer.Group({
+        layers: wfslayers
+    });
+    var wmslayerGroup = new ol.layer.Group({
+        layers: wmslayers
+    })
+    layerGroups.push(wmslayerGroup);  
+    console.log('pushed wms layer');
+    // WMS/WFS change when zoom level passes threshold
+    map.getView().on('change:resolution', function(){
+        console.log(map.getView().getZoom());
+        if(map.getView().getZoom() > CGSWeb_Map.Options.zoomThreshold) {
+            console.log('wfs')
+            map.getLayerGroup().getLayers().getArray()[1] = wfslayerGroup;
+        } else {
+            console.log('wms');
+            map.getLayerGroup().getLayers().getArray()[1] = wmslayerGroup;
+        }
+    });
 }
 
 function populateShape(){
-    globals.shapeLayer = layerGroups[3].getLayers().item(0);
+    console.log(layerGroups);
+    globals.shapeLayer = layerGroups[2].getLayers().item(0);
     globals.shapeLayer.setVisible(true);
     var shapeLayerSelect = document.getElementsByClassName('shape-layer-select');
-    for (var i = 0; i < shapeLayerSelect.length; i++) {
+    Array.apply(null, {length: shapeLayerSelect.length}).map(Number.call, Number).forEach(function(i){
+    //for (var i = 0; i < shapeLayerSelect.length; i++) {
         CGSWeb_Map.Options.layers.shapesConfigs.forEach(function(shapeConfig){
             var opt = document.createElement('option');
-            opt.innerHTML=shapeConfig.name;
-            opt.value = shapeConfig.name;        
-            shapeLayerSelect[i].appendChild(opt.cloneNode(true));
+            opt.innerHTML = shapeConfig.title;
+            opt.value = shapeConfig.name;
+            shapeLayerSelect[i].appendChild(opt);
+
+            //checkbox will trigger visibility change
+            $('#' + shapeConfig.name.replace(/\W/g, '') +'_checkbox').click(function(){
+                console.log(shapeConfig.name.replace(/\W/g, '') +'_checkbox is clicked' );
+                (<HTMLSelectElement>shapeLayerSelect[i]).value = shapeConfig.name;
+                globals.shapeLayer = layerGroups[2].getLayers().item(CGSWeb_Map.Options.layers.shapesConfigs.indexOf(shapeConfig));
+                for(var j = 0; j < shapeLayerSelect.length ; j++ ){
+                    layerGroups[2].getLayers().item(j).setVisible(false);
+                }
+                $('#' + (<HTMLSelectElement>this).value.replace(/\W/g, '') +'_checkbox').click();
+                layerGroups[2].getLayers().item(CGSWeb_Map.Options.layers.shapesConfigs.indexOf(shapeConfig)).setVisible(true);         
+                setupShapes();  
+            });
         });
-   
+
+        console.log(CGSWeb_Map.Options.layers.shapesConfigs[0].name.replace(/\W/g, '') +'_checkbox');
+        // might have to set attribute for older jquery versions
+        $('#' + CGSWeb_Map.Options.layers.shapesConfigs[0].name.replace(/\W/g, '') +'_checkbox').prop('checked', true);
+
         (<HTMLSelectElement>shapeLayerSelect[i]).value = globals.shapeLayer.get('name');
         (<HTMLSelectElement>shapeLayerSelect[i]).onchange = function(){
-            globals.shapeLayer = layerGroups[3].getLayers().item((<HTMLSelectElement>this).selectedIndex);
+            globals.shapeLayer = layerGroups[2].getLayers().item((<HTMLSelectElement>this).selectedIndex);
             for(var j = 0; j < (<HTMLSelectElement>this).length ; j++ ){
-                layerGroups[3].getLayers().item(j).setVisible(false);
+                layerGroups[2].getLayers().item(j).setVisible(false);
             }
-            layerGroups[3].getLayers().item((<HTMLSelectElement>this).selectedIndex).setVisible(true);                
+            $('#' + (<HTMLSelectElement>this).value.replace(/\W/g, '') +'_checkbox').click();
+            layerGroups[2].getLayers().item((<HTMLSelectElement>this).selectedIndex).setVisible(true);         
             setupShapes();     
         };           
-    }
+    });
     // make all options change at the same time
     var $set = $('.shape-layer-select');
     $set.change(function(){
@@ -350,30 +418,16 @@ export function setupMap() {
     map.setLayerGroup(new ol.layer.Group({
         layers: layerGroups
     }));
+
     $('#legend').click(function(){
         attribution.setCollapsed(!attribution.getCollapsed());
     });    
     
-    map.getView().on('change:resolution', toggleWFS);
-    toggleWFS();
     window.onresize = function(){$('#map').height(window.innerHeight - $('#topBanner').height() - $('#bottomBanner').height() - $('#nav').height() - $('#nav').height());  map.updateSize();}; 
     $('#map').height(window.innerHeight - $('#topBanner').height() - $('#bottomBanner').height() - $('#nav').height() - $('#nav').height());
     map.updateSize();
-       
 }
 
-function toggleWFS(){
-    console.log('zoom is ' + map.getView().getZoom());
-    if(map.getView().getZoom() > CGSWeb_Map.Options.zoomThreshold) {
-        console.log('use wfs layers');
-        map.getLayerGroup().getLayers().getArray()[2].setVisible(true);
-        map.getLayerGroup().getLayers().getArray()[4].setVisible(false);
-    } else {
-        console.log('use wmslayers');
-        map.getLayerGroup().getLayers().getArray()[2].setVisible(false);
-        map.getLayerGroup().getLayers().getArray()[4].setVisible(true);
-    }
-}
 function chinaLake(){
     map.getView().fit([-117.90295999999988, 35.551014000000066, -117.54647999999992, 35.71793700000006], map.getSize());
 }

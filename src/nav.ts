@@ -188,163 +188,18 @@ function createNavDropDownWFS() {
 
         var input = document.createElement('input');
         input.type = 'checkbox';
-        input.id = wfsMapConfig.name.replace(/\W/g, '') + '_checkbox';
+        input.id = wfsMapConfig.wfs.name.replace(/\W/g, '') + '_checkbox';
         div.appendChild(input);
 
         var label = document.createElement('label');
         label.setAttribute('for', input.id);
-        label.innerHTML = wfsMapConfig.title;
+        label.innerHTML = wfsMapConfig.wfs.title;
         div.appendChild(label);
     });
     return li;
 }
 
 function createNavDropDownMapLayers() {
-//     var li = document.createElement('li');
-//     li.className = 'dropdown';
-
-//     var a = document.createElement('a');
-//     a.className = 'dropdown-toggle';
-//     a.setAttribute('data-toggle', 'dropdown');
-//     a.href = '#';
-//     a.innerHTML = 'Map Layers';
-//     li.appendChild(a);
-    
-//     var caret = document.createElement('span');
-//     caret.className = 'caret';
-//     a.appendChild(caret);
-
-//     var ul = document.createElement('ul');
-//     ul.className = 'dropdown-menu';
-//     li.appendChild(ul);
-
-//     var wmsLayerGroup = document.createElement('li');
-//     wmsLayerGroup.className = 'dropdown-submenu';
-//     ul.appendChild(wmsLayerGroup);
-
-//     var wmsLayerLabel = document.createElement('a');
-//     wmsLayerLabel.className = 'test';
-//     wmsLayerLabel.tabIndex = -1;
-//     wmsLayerLabel.href = '#';
-//     wmsLayerGroup.appendChild(wmsLayerLabel);
-
-//     var wmsLayerTitle = document.createElement('span');
-//     wmsLayerTitle.innerHTML = 'WMS Layer ';
-//     wmsLayerLabel.appendChild(wmsLayerTitle);
-
-//     var caret = document.createElement('span');
-//     caret.className = 'caret';
-//     wmsLayerLabel.appendChild(caret);
-
-//     var wmsLayerDropdown = document.createElement('ul');
-//     wmsLayerDropdown.className = 'dropdown-menu';
-//     wmsLayerGroup.appendChild(wmsLayerDropdown);
-
-//     CGSWeb_Map.Options.layers.baseMapConfigs.forEach(function(baseMapConfig){
-//         var li = document.createElement('li');
-//         wmsLayerDropdown.appendChild(li);
-//         li.className = 'dropdown-submenu';
-
-// //        var div = document.createElement('div');
-
-//         var input = document.createElement('input');
-//         input.type = 'radio';
-//         input.name = 'basemapoption';
-//         input.id = baseMapConfig.title.replace(/\W/g, '') + '_checkbox';
-//         input.className = 'basemapoption';
-//         //input.id = baseMapConfig.name.replace(/\W/g, '') + '_checkbox';
-//         li.appendChild(input);
-
-//         var label = document.createElement('label');
-//         label.setAttribute('for', input.id);
-//         label.innerHTML = baseMapConfig.title;
-//         li.appendChild(label);
-//         //
-// /*
-//         var a = document.createElement('a');
-//         a.tabIndex = -1;
-//         a.href = '#';
-//         a.innerHTML = baseMapConfig.title;
-//         li.appendChild(a);*/
-//     });
-
-//     var shapeLayerGroup = document.createElement('li');
-//     shapeLayerGroup.className = 'dropdown-submenu';
-//     ul.appendChild(shapeLayerGroup);
-
-//     var shapeLayerLabel = document.createElement('a');
-//     shapeLayerLabel.className = 'test';
-//     shapeLayerLabel.tabIndex = -1;
-//     shapeLayerLabel.href = '#';
-//     shapeLayerGroup.appendChild(shapeLayerLabel);
-
-//     var shapeLayerTitle = document.createElement('span');
-//     shapeLayerTitle.innerHTML = 'Shape Layer ';
-//     shapeLayerLabel.appendChild(shapeLayerTitle);
-
-//     var caret = document.createElement('span');
-//     caret.className = 'caret';
-//     shapeLayerLabel.appendChild(caret);
-
-//     var shapeLayerDropdown = document.createElement('ul');
-//     shapeLayerDropdown.className = 'dropdown-menu';
-//     shapeLayerGroup.appendChild(shapeLayerDropdown);
-
-//     CGSWeb_Map.Options.layers.shapesConfigs.forEach(function(shapesConfig){
-//         var li = document.createElement('li');
-//         shapeLayerDropdown.appendChild(li);
-
-//         var a = document.createElement('a');
-//         a.tabIndex = -1;
-//         a.href = '#';
-//         a.innerHTML = shapesConfig.title;
-//         li.appendChild(a);
-//     });
-
-
-
-
-
-//     // var form = document.createElement('form');
-//     // form.id = 'formMapLayer';
-//     // form.className = 'form container-fluid';
-//     // div.appendChild(form);
-
-    
-//     // var wmsLayerGroup = document.createElement('div');
-//     // wmsLayerGroup.className = 'form-group';
-//     // form.appendChild(wmsLayerGroup);
-
-//     // var wmsLayerLabel = document.createElement('label');
-//     // wmsLayerLabel.htmlFor = 'wmsLayer';
-//     // wmsLayerLabel.innerHTML = 'WMS Layer:';
-//     // wmsLayerGroup.appendChild(wmsLayerLabel);
-
-//     // var wmsLayerSelect = document.createElement('select');
-//     // wmsLayerSelect.className = 'form-control basemap-layer-select';
-//     // wmsLayerSelect.id = 'wmsLayer';
-//     // wmsLayerGroup.appendChild(wmsLayerSelect);
-
-//     // var divider = document.createElement('div');
-//     // divider.className = 'divider';
-//     // form.appendChild(divider);
-
-//     // var shapeLayerGroup = document.createElement('div');
-//     // shapeLayerGroup.className = 'form-group';
-//     // form.appendChild(shapeLayerGroup);
-
-//     // var shapeLayerLabel = document.createElement('label');
-//     // shapeLayerLabel.htmlFor = 'shapeLayer';
-//     // shapeLayerLabel.innerHTML = 'Shape Layer:';
-//     // shapeLayerGroup.appendChild(shapeLayerLabel);
-
-//     // var shapeLayerSelect = document.createElement('select');
-//     // shapeLayerSelect.className = 'form-control shape-layer-select';
-//     // shapeLayerSelect.id = 'shapeLayer';
-//     // shapeLayerGroup.appendChild(shapeLayerSelect);
-
-//     return li;
-
     var li = document.createElement('li');
     li.className = 'dropdown';
 
@@ -359,71 +214,182 @@ function createNavDropDownMapLayers() {
     caret.className = 'caret';
     a.appendChild(caret);
 
-    var div = document.createElement('div');
-    div.className = 'dropdown-menu';
-    li.appendChild(div);
+    var ul = document.createElement('ul');
+    ul.className = 'dropdown-menu';
+    li.appendChild(ul);
 
-    var form = document.createElement('form');
-    form.id = 'formMapLayer';
-    form.className = 'form container-fluid';
-    div.appendChild(form);
+    var wmsLayerGroup = document.createElement('li');
+    wmsLayerGroup.className = 'dropdown-submenu';
+    ul.appendChild(wmsLayerGroup);
 
-    var wmsLayerGroup = document.createElement('div');
-    wmsLayerGroup.className = 'form-group';
-    form.appendChild(wmsLayerGroup);
-
-    var wmsLayerLabel = document.createElement('label');
-    wmsLayerLabel.htmlFor = 'wmsLayer';
-    wmsLayerLabel.innerHTML = 'WMS Layer:';
+    var wmsLayerLabel = document.createElement('a');
+    wmsLayerLabel.className = 'test';
+    wmsLayerLabel.tabIndex = -1;
+    wmsLayerLabel.href = '#';
     wmsLayerGroup.appendChild(wmsLayerLabel);
 
-    var wmsLayerSelect = document.createElement('select');
-    wmsLayerSelect.className = 'form-control basemap-layer-select';
-    wmsLayerSelect.id = 'wmsLayer';
-    wmsLayerGroup.appendChild(wmsLayerSelect);
+    var wmsLayerTitle = document.createElement('span');
+    wmsLayerTitle.innerHTML = 'WMS Layer ';
+    wmsLayerLabel.appendChild(wmsLayerTitle);
 
-    var divider = document.createElement('div');
-    divider.className = 'divider';
-    form.appendChild(divider);
+    var caret = document.createElement('span');
+    caret.className = 'caret-right';
+    wmsLayerLabel.appendChild(caret);
 
-    var shapeLayerGroup = document.createElement('div');
-    shapeLayerGroup.className = 'form-group';
-    form.appendChild(shapeLayerGroup);
+    var wmsLayerDropdown = document.createElement('ul');
+    wmsLayerDropdown.className = 'dropdown-menu';
+    wmsLayerGroup.appendChild(wmsLayerDropdown);
 
-    var shapeLayerLabel = document.createElement('label');
-    shapeLayerLabel.htmlFor = 'shapeLayer';
-    shapeLayerLabel.innerHTML = 'Shape Layer:';
+    CGSWeb_Map.Options.layers.baseMapConfigs.forEach(function(baseMapConfig){
+        var basemapOption = document.createElement('li');
+        basemapOption.className = 'dropdown-submenu';
+        wmsLayerDropdown.appendChild(basemapOption);
+
+        var a = document.createElement('a');
+        a.tabIndex = -1;
+        a.href = '#';
+        a.className = 'test';
+        basemapOption.appendChild(a);
+
+        var input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'basemapoption';
+        input.id = baseMapConfig.title.replace(/\W/g, '') + '_checkbox';
+        input.className = 'basemapoption';
+        a.appendChild(input);
+
+        var label = document.createElement('label');
+        label.setAttribute('for', input.id);
+        label.innerHTML = baseMapConfig.title;
+        a.appendChild(label);
+    });
+
+    var shapeLayerGroup = document.createElement('li');
+    shapeLayerGroup.className = 'dropdown-submenu';
+    ul.appendChild(shapeLayerGroup);
+
+    var shapeLayerLabel = document.createElement('a');
+    shapeLayerLabel.className = 'test';
+    shapeLayerLabel.tabIndex = -1;
+    shapeLayerLabel.href = '#';
     shapeLayerGroup.appendChild(shapeLayerLabel);
 
-    var shapeLayerSelect = document.createElement('select');
-    shapeLayerSelect.className = 'form-control shape-layer-select';
-    shapeLayerSelect.id = 'shapeLayer';
-    shapeLayerGroup.appendChild(shapeLayerSelect);
+    var shapeLayerTitle = document.createElement('span');
+    shapeLayerTitle.innerHTML = 'Shape Layer ';
+    shapeLayerLabel.appendChild(shapeLayerTitle);
+
+    var caret = document.createElement('span');
+    caret.className = 'caret-right';
+    shapeLayerLabel.appendChild(caret);
+
+    var shapeLayerDropdown = document.createElement('ul');
+    shapeLayerDropdown.className = 'dropdown-menu';
+    shapeLayerGroup.appendChild(shapeLayerDropdown);
+
+    CGSWeb_Map.Options.layers.shapesConfigs.forEach(function(shapesConfig){
+        var li = document.createElement('li');
+        li.className = 'dropdown-submenu'
+        shapeLayerDropdown.appendChild(li);
+        
+        var a = document.createElement('a');
+        a.tabIndex = -1;
+        a.href = '#';
+        a.className = 'test';
+        li.appendChild(a);
+
+        var input = document.createElement('input');
+        input.type = 'radio';
+        input.name = 'shapelayeroption';
+        input.id = shapesConfig.title.replace(/\W/g, '') + '_checkbox';
+        input.className = 'shapelayeroption';
+        a.appendChild(input);
+
+        var label = document.createElement('label');
+        label.setAttribute('for', input.id);
+        label.innerHTML = shapesConfig.title;
+        a.appendChild(label);
+    });
 
     return li;
 
 
+/****************************************************************************************************************** */
+    // var li = document.createElement('li');
+    // li.className = 'dropdown';
 
+    // var a = document.createElement('a');
+    // a.className = 'dropdown-toggle';
+    // a.setAttribute('data-toggle', 'dropdown');
+    // a.href = '#';
+    // a.innerHTML = 'Map Layers';
+    // li.appendChild(a);
+    
+    // var caret = document.createElement('span');
+    // caret.className = 'caret';
+    // a.appendChild(caret);
+
+    // var div = document.createElement('div');
+    // div.className = 'dropdown-menu';
+    // li.appendChild(div);
+
+    // var form = document.createElement('form');
+    // form.id = 'formMapLayer';
+    // form.className = 'form container-fluid';
+    // div.appendChild(form);
+
+    // var wmsLayerGroup = document.createElement('div');
+    // wmsLayerGroup.className = 'form-group';
+    // form.appendChild(wmsLayerGroup);
+
+    // var wmsLayerLabel = document.createElement('label');
+    // wmsLayerLabel.htmlFor = 'wmsLayer';
+    // wmsLayerLabel.innerHTML = 'WMS Layer:';
+    // wmsLayerGroup.appendChild(wmsLayerLabel);
+
+    // var wmsLayerSelect = document.createElement('select');
+    // wmsLayerSelect.className = 'form-control basemap-layer-select';
+    // wmsLayerSelect.id = 'wmsLayer';
+    // wmsLayerGroup.appendChild(wmsLayerSelect);
+
+    // var divider = document.createElement('div');
+    // divider.className = 'divider';
+    // form.appendChild(divider);
+
+    // var shapeLayerGroup = document.createElement('div');
+    // shapeLayerGroup.className = 'form-group';
+    // form.appendChild(shapeLayerGroup);
+
+    // var shapeLayerLabel = document.createElement('label');
+    // shapeLayerLabel.htmlFor = 'shapeLayer';
+    // shapeLayerLabel.innerHTML = 'Shape Layer:';
+    // shapeLayerGroup.appendChild(shapeLayerLabel);
+
+    // var shapeLayerSelect = document.createElement('select');
+    // shapeLayerSelect.className = 'form-control shape-layer-select';
+    // shapeLayerSelect.id = 'shapeLayer';
+    // shapeLayerGroup.appendChild(shapeLayerSelect);
+
+    // return li;
 }
 
 $(document).ready(function(){
-  $('.dropdown-submenu a.test').on("click", function(e){
-    $(this).next('ul').toggle();
-    e.stopPropagation();
-    e.preventDefault();
-  });
+    $('.dropdown-submenu a.test').on("click", function(e){
+        $(this).next('ul').toggle();
+        e.stopPropagation();
+        // e.preventDefault();
+    });
+    $('.dropdown-menu').on('click', function (event) {
+        $(this).parent().toggleClass('open');
+    });
+
+    $('body').on('click', function (e) {
+        if (!$('.dropdown-menu').is(e.target) 
+            && $('.dropdown-menu').has(e.target).length === 0 
+            && $('.open').has(e.target).length === 0
+        ) {
+            $('.dropdown-menu').removeClass('open');
+        }
+    });
 });
 
 
-$('.dropdown-menu').on('click', function (event) {
-    $(this).parent().toggleClass('open');
-});
-
-$('body').on('click', function (e) {
-    if (!$('.dropdown-menu').is(e.target) 
-        && $('.dropdown-menu').has(e.target).length === 0 
-        && $('.open').has(e.target).length === 0
-    ) {
-        $('.dropdown-menu').removeClass('open');
-    }
-});

@@ -45,47 +45,91 @@ CGSWeb_Map.Options = {
 		],
 		wfsMapConfigs: [
 			{
-				title: 'Airports',
-				name: 'airports',
-				hostAddress: 'http://localhost:9002/',
-				layerWorkspace: 'wfs',
-				layerName: 'wfs_airports_layer',
-				url: 'geoserver/wfs/ows?service=WFS&request=GetFeature&typeName=wfs:cl_airports',
-				version: '1.1.0',
-				style: {
-					stroke: {
-						color: 'rgba(255,0,0,1)',
-						width: 3
+				wfs: {
+					title: 'Airports',
+					name: 'airports',
+					hostAddress: 'http://localhost:9002/',
+					url: 'geoserver/wfs/ows?service=WFS&request=GetFeature&typeName=wfs:cl_airports',
+					version: '1.1.0',
+					style: {
+						stroke: {
+							color: 'rgba(255,0,0,1)',
+							width: 3
+						}
+					}
+				},
+				wms: {
+					title: 'Airports',
+					name: 'airports',
+					hostAddress: 'http://localhost:9002/',
+					layers: 'wfs:cl_airports',
+					url: 'geoserver/wfs/wms?service=WMS&request=GetMap',
+					version: '1.1.0',
+					style: {
+						stroke: {
+							color: 'rgba(255,0,0,1)',
+							width: 3
+						}
 					}
 				}
 			},
 			{
-				title: 'Roads',
-				name: 'roads',
-				hostAddress: 'http://localhost:9002/',
-				layerName: 'wfs_roads_layer',
-				url: 'geoserver/wfs/ows?service=WFS&request=GetFeature&typeName=wfs:cl_roads',
-				version: '1.1.0',
-				style: {
-					stroke: {
-						color: 'rgba(0,0,255,1)',
-						width: 3
+				wfs: {
+					title: 'Roads',
+					name: 'roads',
+					hostAddress: 'http://localhost:9002/',
+					url: 'geoserver/wfs/ows?service=WFS&request=GetFeature&typeName=wfs:cl_roads',
+					version: '1.1.0',
+					style: {
+						stroke: {
+							color: 'rgba(0,0,255,1)',
+							width: 3
+						}
+					}		
+				},
+				wms: {
+					title: 'Roads',
+					name: 'roads',
+					hostAddress: 'http://localhost:9002/',
+					layers: 'wfs:cl_roads',
+					url: 'geoserver/wfs/wms?service=WMS&request=GetMap',
+					version: '1.1.0',
+					style: {
+						stroke: {
+							color: 'rgba(0,255,0,1)',
+							width: 3
+						}
 					}
-				}			
+				}
 			},
 			{
-				title: 'State Routes',
-				name: 'state_routes',
-				layerName: 'wfs_state_routes_layer',
-				hostAddress: 'http://localhost:9002/',
-				url: 'geoserver/wfs/ows?service=WFS&request=GetFeature&typeName=wfs:cl_state_routes',
-				version: '1.1.0',
-				style: {
-					stroke: {
-						color: 'rgba(0,255,0,1)',
-						width: 3
+				wfs: {
+					title: 'State Routes',
+					name: 'state_routes',
+					hostAddress: 'http://localhost:9002/',
+					url: 'geoserver/wfs/ows?service=WFS&request=GetFeature&typeName=wfs:cl_state_routes',
+					version: '1.1.0',
+					style: {
+						stroke: {
+							color: 'rgba(0,255,0,1)',
+							width: 3
+						}
+					}				
+				},
+				wms: {
+					title: 'State Routes',
+					name: 'state_routes',
+					hostAddress: 'http://localhost:9002/',
+					layers: 'wfs:cl_state_routes',
+					url: 'geoserver/wfs/wms?service=WMS&request=GetMap',
+					version: '1.1.0',
+					style: {
+						stroke: {
+							color: 'rgba(0,255,0,1)',
+							width: 3
+						}
 					}
-				}				
+				}
 			}     
 		],
 		shapesConfigs: [
@@ -104,21 +148,21 @@ CGSWeb_Map.Options = {
 					}					
 				}	
 			},
-			// {
-			// 	title: 'tm_prod',
-			// 	name: 'tm_prod',
-			// 	layerName: 'tm_prod',
-			// 	style: {
-			// 		stroke: {
-			// 			color: 'rgba(0,255,255,1)',
-			// 			width: 3
-			// 		},
-			// 		fill: {
-			// 			color: 'rgba(255,255,255,0)',
-			// 			width: 3
-			// 		}
-			// 	}	
-			// }
+			{
+				title: 'tm_prod',
+				name: 'tm_prod',
+				layerName: 'tm_prod',
+				style: {
+					stroke: {
+						color: 'rgba(0,255,255,1)',
+						width: 3
+					},
+					fill: {
+						color: 'rgba(255,255,255,0)',
+						width: 3
+					}
+				}	
+			}
 		]
 	},
 	resources: [
