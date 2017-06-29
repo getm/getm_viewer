@@ -11,10 +11,14 @@ var draw;
 var deleteInteraction;
 var radioSelection;
 
+function removeDraw(){
+    draw.setActive(false);
+    map.removeInteraction(draw);
+}
+
 function drawShape(shapeType) {
     if(map.getInteractions().getArray().indexOf(draw) != -1) {
-        draw.setActive(false);
-        map.removeInteraction(draw);
+        removeDraw();
     }
     var shapeSource = globals.shapeLayer.getSource();
     switch(shapeType) {
@@ -92,8 +96,7 @@ function drawShape(shapeType) {
             globals.shapes[shapeType + globals.counts[shapeType]] = shape;
             globals.counts[shapeType]++;
 
-            draw.setActive(false);
-            map.removeInteraction(draw);
+            removeDraw();
             radioSelection = null;
             (<HTMLInputElement>document.querySelector('input[name = "draw-select"]:checked')).checked = false;
         });        
@@ -183,6 +186,4 @@ function drawButtons() {
         };
         radioInput.name = 'draw-select';
     }
-
-
 }

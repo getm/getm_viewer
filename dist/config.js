@@ -4,7 +4,7 @@ CGSWeb_Map.Options = {
 	banner_color: "green",
 	banner_text: "UNCLASSIFIED",
 	baseUrl: "http://localhost:9002/",
-	wfsUrl: "http://localhost:8080/",
+	//wfsUrl: "http://localhost:8080/",
 	zoomThreshold: 8,
 	saveFormat: 'SHAPEFILE',
 	layers: {
@@ -40,8 +40,6 @@ CGSWeb_Map.Options = {
 				version: "1.1.0",
 				arcgis_wmts: false
 			}
-		],
-		additionalLayersConfigs: [
 		],
 		wfsMapConfigs: [
 			{
@@ -163,7 +161,9 @@ CGSWeb_Map.Options = {
 					}
 				}	
 			}
-		]
+		],
+		additionalLayersConfigs: [
+		],		
 	},
 	resources: [
 	]

@@ -399,12 +399,6 @@ function fillLayerInfoDefaults() {
     assignValues();
 }
 
-// function hideLayerInfoPopup() {
-//     var layerInfoPopupText = document.getElementById("layerInfoPopupText");
-//     $(layerInfoPopupText).removeClass('show');
-//     $(layerInfoPopupText.parentElement).zIndex(-1);
-// }
-
 export function layerInfoSetup(){
     retrieveRequiredFields();
     featureInfoSetup();

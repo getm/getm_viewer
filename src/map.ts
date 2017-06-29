@@ -177,8 +177,8 @@ function populateLayers(){
     Object.keys(CGSWeb_Map.Options.layers).forEach(function(key){
         var layerConfigs = CGSWeb_Map.Options.layers[key];
         var layers = [];
-        if(key == 'shapesConfigs') {
-        //if(key  != 'baseMapConfigs' && key != 'wfsMapConfigs') {
+        //if(key == 'shapesConfigs') {
+        if(key  != 'baseMapConfigs' && key != 'wfsMapConfigs') {
             var id = 0;
             layerConfigs.forEach(function(layerConfig){
                 var layer = new ol.layer.Vector({
@@ -234,7 +234,8 @@ function populateLayers(){
                     console.log(
                         (<ol.layer.Group>map.getLayerGroup().getLayers().getArray()[2]).getLayers()
                     );
-                    (<ol.layer.Group>map.getLayerGroup().getLayers().getArray()[2]).getLayers().getArray()[layers.indexOf(layer)].setVisible(this.checked);
+                    (<ol.layer.Group>map.getLayerGroup().getLayers().getArray()[2]).
+                        getLayers().getArray()[layers.indexOf(layer)].setVisible(this.checked);
                 }); 
             });
             var layerGroup = new ol.layer.Group({
@@ -274,9 +275,7 @@ function populateWFS() {
                         + '&srs=' + (wfsMapConfig.wfs.srs ? wfsMapConfig.wfs.srs : defaultProjection)
                         + '&bbox=' + flipExtent(
                             extent, 
-                            // (<ol.source.TileWMS>globals.basemapLayer.getSource()).getParams() ?
-                            // (<ol.source.TileWMS>globals.basemapLayer.getSource()).getParams()['VERSION'] :
-                            '1.3.0', // WHYYYYY?????
+                            '1.3.0',
                             (wfsMapConfig.wfs.version ? wfsMapConfig.wfs.version : defaultVersion)).join(',') ;
                 }: undefined,
                 strategy: ol.loadingstrategy.bbox,
@@ -348,15 +347,13 @@ function populateWFS() {
         layers: wmslayers
     })
     layerGroups.push(wmslayerGroup);  
-    console.log('pushed wms layer');
+
     // WMS/WFS change when zoom level passes threshold
     map.getView().on('change:resolution', function(){
         console.log(map.getView().getZoom());
         if(map.getView().getZoom() > CGSWeb_Map.Options.zoomThreshold) {
-            console.log('wfs')
             map.getLayerGroup().getLayers().getArray()[1] = wfslayerGroup;
         } else {
-            console.log('wms');
             map.getLayerGroup().getLayers().getArray()[1] = wmslayerGroup;
         }
     });
@@ -379,7 +376,8 @@ function populateShape(){
             $('#' + shapeConfig.name.replace(/\W/g, '') +'_checkbox').click(function(){
                 console.log(shapeConfig.name.replace(/\W/g, '') +'_checkbox is clicked' );
                 (<HTMLSelectElement>shapeLayerSelect[i]).value = shapeConfig.name;
-                globals.shapeLayer = layerGroups[2].getLayers().item(CGSWeb_Map.Options.layers.shapesConfigs.indexOf(shapeConfig));
+                globals.shapeLayer = layerGroups[2].getLayers().item(
+                    CGSWeb_Map.Options.layers.shapesConfigs.indexOf(shapeConfig));
                 for(var j = 0; j < shapeLayerSelect.length ; j++ ){
                     layerGroups[2].getLayers().item(j).setVisible(false);
                 }
@@ -423,8 +421,10 @@ export function setupMap() {
         attribution.setCollapsed(!attribution.getCollapsed());
     });    
     
-    window.onresize = function(){$('#map').height(window.innerHeight - $('#topBanner').height() - $('#bottomBanner').height() - $('#nav').height() - $('#nav').height());  map.updateSize();}; 
-    $('#map').height(window.innerHeight - $('#topBanner').height() - $('#bottomBanner').height() - $('#nav').height() - $('#nav').height());
+    window.onresize = function(){$('#map').height(window.innerHeight - $('#topBanner').height()
+        - $('#bottomBanner').height() - $('#nav').height() - $('#nav').height());  map.updateSize();}; 
+    $('#map').height(window.innerHeight - $('#topBanner').height() - $('#bottomBanner').height() 
+        - $('#nav').height() - $('#nav').height());
     map.updateSize();
 }
 

@@ -311,65 +311,6 @@ function createNavDropDownMapLayers() {
     });
 
     return li;
-
-
-/****************************************************************************************************************** */
-    // var li = document.createElement('li');
-    // li.className = 'dropdown';
-
-    // var a = document.createElement('a');
-    // a.className = 'dropdown-toggle';
-    // a.setAttribute('data-toggle', 'dropdown');
-    // a.href = '#';
-    // a.innerHTML = 'Map Layers';
-    // li.appendChild(a);
-    
-    // var caret = document.createElement('span');
-    // caret.className = 'caret';
-    // a.appendChild(caret);
-
-    // var div = document.createElement('div');
-    // div.className = 'dropdown-menu';
-    // li.appendChild(div);
-
-    // var form = document.createElement('form');
-    // form.id = 'formMapLayer';
-    // form.className = 'form container-fluid';
-    // div.appendChild(form);
-
-    // var wmsLayerGroup = document.createElement('div');
-    // wmsLayerGroup.className = 'form-group';
-    // form.appendChild(wmsLayerGroup);
-
-    // var wmsLayerLabel = document.createElement('label');
-    // wmsLayerLabel.htmlFor = 'wmsLayer';
-    // wmsLayerLabel.innerHTML = 'WMS Layer:';
-    // wmsLayerGroup.appendChild(wmsLayerLabel);
-
-    // var wmsLayerSelect = document.createElement('select');
-    // wmsLayerSelect.className = 'form-control basemap-layer-select';
-    // wmsLayerSelect.id = 'wmsLayer';
-    // wmsLayerGroup.appendChild(wmsLayerSelect);
-
-    // var divider = document.createElement('div');
-    // divider.className = 'divider';
-    // form.appendChild(divider);
-
-    // var shapeLayerGroup = document.createElement('div');
-    // shapeLayerGroup.className = 'form-group';
-    // form.appendChild(shapeLayerGroup);
-
-    // var shapeLayerLabel = document.createElement('label');
-    // shapeLayerLabel.htmlFor = 'shapeLayer';
-    // shapeLayerLabel.innerHTML = 'Shape Layer:';
-    // shapeLayerGroup.appendChild(shapeLayerLabel);
-
-    // var shapeLayerSelect = document.createElement('select');
-    // shapeLayerSelect.className = 'form-control shape-layer-select';
-    // shapeLayerSelect.id = 'shapeLayer';
-    // shapeLayerGroup.appendChild(shapeLayerSelect);
-
-    // return li;
 }
 
 $(document).ready(function(){
@@ -391,5 +332,3 @@ $(document).ready(function(){
         }
     });
 });
-
-
