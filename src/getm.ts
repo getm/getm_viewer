@@ -86,8 +86,10 @@ function saveShapes(){
 }
 
 function successSave(response, a) {
-    if(response.length > 0)
-        a.href = ProductRestInterface.getResultUrl() + response['result'];//window.URL.createObjectURL(new Blob([JSON.stringify(response)], {'type': 'application/octet-stream'}));
+    if(response['result']) {
+        a.href = ProductRestInterface.getResultUrl() + response['result'];
+        a.download='';  
+    }
     a.click();
 }
 
@@ -290,7 +292,7 @@ export function setupShapes() {
             if(globals.shapes[shapesID].objectID == -1)
                 insertEntries.push(shapesID);
             else {
-                updateEntries.push(shapesID); // TODO: indicate update stuff
+                updateEntries.push(shapesID); 
                 deleteEntries.push(shapesID);
             }
         }
