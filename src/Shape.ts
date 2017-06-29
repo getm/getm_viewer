@@ -1,3 +1,5 @@
+// create shape object with links to specified feature, the layer the feature exists on, 
+// properties, and objectID in the database
 export var Shape = function(feature, layer, properties={}, objectID=-1){
     this.feature = feature;
     this.layer = layer; 

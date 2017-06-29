@@ -8,6 +8,7 @@ import {Shape} from './Shape'
 declare const GeoServerRestInterface;
 var required;
 
+// list of each of the layer info fields
 var layerInfoRequirements = [
     { // benumber
         val: 'benumber',
@@ -236,11 +237,13 @@ var layerInfoRequirements = [
     }            
 ];
 
+// returns whether string s follows regex r's pattern
 function matchRegex(r, s) {
    var match = s.match(r);
    return match != null && s == match[0];
 }
 
+// retrieve required fields to fill out for 
 function retrieveRequiredFields(){
     $.ajax({
         type: 'GET',
@@ -249,27 +252,31 @@ function retrieveRequiredFields(){
     });
 }
 
+// set required fields
 function setRequiredFields(response) {
     response = JSON.parse(response);
     required = response.required;
 }
 
+// set layerinfo popup's layer value
 function retrieveLayer() {
-    if(globals.shapes[globals.selectedFeatureID] != undefined) {
+    if(globals.shapes[globals.selectedFeatureID] != undefined) { // shapes layer
         $('#layerinfolayerwfs').addClass('hide');
         $('#layerinfolayer').removeClass('hide');
         (<HTMLSelectElement>document.getElementById('layerinfolayer')).value = globals.shapes[globals.selectedFeatureID].getLayer().get('name');  
-    } else {
+    } else { // wfs layer
         $('#layerinfolayer').addClass('hide');
         $('#layerinfolayerwfs').removeClass('hide');
         (<HTMLInputElement>document.getElementById('layerinfolayerwfs')).value = globals.selectedFeature.getProperties()['layer'];
     }
 }
 
+// retrieves target name
 function retrieveTgtName(){
     (<HTMLInputElement>document.getElementById('tgt_name')).value =  globals.selectedFeatureID; 
 }
 
+// displays and fills out layerInfo popup
 export function layerInfoPopup(){
     if(globals.shapes[globals.selectedFeatureID] == undefined || globals.shapes[globals.selectedFeatureID].getProperties() == undefined) {
          //fillLayerInfoDefaults();
@@ -279,21 +286,14 @@ export function layerInfoPopup(){
     } else
         retrieveValues();
 
+    // validate information, scroll to top, and display
     layerInfoRequirements.forEach(validateLayerInfo);
     $('#layerInfo-contents').scrollTop(0);
     $('#layerInfoPopupText').addClass('show');
     $('#layerInfoPopup').zIndex(2);     
-    console.log('show layer info popup');
 }
 
-function typeCheck(layerInfoReq) {
-    var value = (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value;
-    if(value != undefined) {
-        return matchRegex(new RegExp(layerInfoReq.regex), value.trim());
-    }
-    return false;
-}
-
+// retrieves values from globals.shapes to fill out layerInfo popup
 function retrieveValues() {
     layerInfoRequirements.forEach(function(layerInfoReq){
         if(globals.shapes[globals.selectedFeatureID].getProperties()[layerInfoReq.val] != undefined) {
@@ -305,6 +305,7 @@ function retrieveValues() {
     retrieveLayer();
 }
 
+// assigns values from feature and layerInfo popup to globals.shapes(shape) or features(wfs/others)
 function assignValues() {
     var id = (<HTMLInputElement>document.getElementById('tgt_name')).value;
     var fields = {};
@@ -366,12 +367,14 @@ function assignValues() {
     }
 }
 
+// blank slate with layerInfo popup
 function clearLayerInfoContents() {
     layerInfoRequirements.forEach(function(layerInfoReq){
         (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value ="";
     });
 }
 
+// retrieves valid property from feature to layerInfo popup
 function retrieveValidProperties() {
     layerInfoRequirements.forEach(function(layerInfoReq){
         // this is a shape
@@ -390,6 +393,7 @@ function retrieveValidProperties() {
     retrieveLayer();
 }
 
+// fill in default values for layerInfo popup
 function fillLayerInfoDefaults() {
     layerInfoRequirements.forEach(function(layerInfoReq){
         (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = layerInfoReq.example;
@@ -399,6 +403,7 @@ function fillLayerInfoDefaults() {
     assignValues();
 }
 
+// sets up layerInfo popup and feature info popup and assigns functionality to buttons
 export function layerInfoSetup(){
     retrieveRequiredFields();
     featureInfoSetup();
@@ -512,6 +517,7 @@ export function layerInfoSetup(){
         if (featureLayer != undefined && featureLayer[0] != undefined) {
             globals.selectedFeature = featureLayer[0];
             globals.selectedFeatureID = featureLayer[0].getProperties()['id'];
+            // wfs/wms/other layers
             if(globals.selectedFeatureID == undefined || globals.shapes[globals.selectedFeatureID] == undefined){
                 var layerName = featureLayer[1].get('name');
                 (<ol.Feature>featureLayer[0]).setProperties({'layer': layerName});
@@ -520,23 +526,25 @@ export function layerInfoSetup(){
                 }                
                 globals.selectedFeatureID =  layerName + globals.counts[layerName]++;
                 (<ol.Feature>featureLayer[0]).setProperties({'id': globals.selectedFeatureID});
-                console.log('featureInfo')
                 featureInfoPopup();
+            // shape layer
             } else {
-                console.log('layerinfo')
                 layerInfoPopup();
             }
-        }
-        else {
-            console.log('idk');
-            console.log(featureLayer);
         }
     });
 }
 
+// validate input values for layerInfoReq
 function validateLayerInfo(layerInfoReq) {
+    // check for regex matches
+    var check = false;
+    var value = (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value;
+    if(value != undefined) 
+        check =  matchRegex(new RegExp(layerInfoReq.regex), value.trim());
+
     // correct 
-    if(typeCheck(layerInfoReq)) {
+    if(check) {
         (<HTMLInputElement>document.getElementById(layerInfoReq.val)).classList.remove('wrong')
         document.getElementById(layerInfoReq.val + '-msg').innerHTML='';
     // incorrect and not marked as wrong
@@ -549,6 +557,7 @@ function validateLayerInfo(layerInfoReq) {
     } 
 }
 
+// sets up featureInfo popup
 function featureInfoSetup() {
     var app = document.getElementById('app');
     var featureInfoDiv = windowSetup('featureInfo', 'Feature Information');
@@ -559,12 +568,14 @@ function featureInfoSetup() {
     fields.id = 'featureInfoFields';
     featureInfoContents.appendChild(fields);
 
+    // click on edit button to bring up layerinfo popup
     var editButton = document.createElement('button');
     editButton.innerHTML = "EDIT";
     editButton.onclick = layerInfoPopup;
     featureInfoContents.appendChild(editButton);
 }
 
+// displays and fills out featureInfo popup
 function featureInfoPopup() {
     $('#featureInfoPopupText').addClass('show');
     $('#featureInfoPopup').zIndex(2);    

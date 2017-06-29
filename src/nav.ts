@@ -319,9 +319,9 @@ $(document).ready(function(){
         e.stopPropagation();
         // e.preventDefault();
     });
-    $('.dropdown-menu').on('click', function (event) {
-        $(this).parent().toggleClass('open');
-    });
+    // $('.dropdown-menu').on('click', function (event) {
+    //     $(this).parent().toggleClass('open');
+    // });
 
     $('body').on('click', function (e) {
         if (!$('.dropdown-menu').is(e.target) 

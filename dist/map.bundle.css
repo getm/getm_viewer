@@ -128,13 +128,13 @@ select{
     left: 25%;
 }
 
-#searchFilterPopup.popup{
+/*#searchFilterPopup.popup{
     position: fixed;
     display: unset;
     top:25%;
     width: 33%;
     left: 33%
-}
+}*/
 #layerInfoPopup.popup {
     width: max-content;
     top: 100px;
@@ -202,8 +202,7 @@ select{
     display: table-cell;
     float: right;
     height: inherit;
-}
-.dropdown-submenu {
+}.dropdown-submenu {
     position: relative;
 }
 .dropdown-submenu .dropdown-menu {

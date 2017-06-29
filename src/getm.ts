@@ -10,19 +10,21 @@ const WILDCARD = '*';
 declare const CGSWeb_Map;
 declare const GeoServerRestInterface;
 declare const ProductRestInterface;
+var SHAPES_LAYER = 2;
 
+// clears map of shapes and retrieves stored shapes
 function loadSession(){
     // clear this session first;
     for (var shapesID in globals.shapes){
         (globals.shapes[shapesID]).getLayer().getSource().removeFeature(globals.shapes[shapesID].getFeature());
         delete globals.shapes[shapesID];
     }
-
+    // for each stored shape, place feature on specified layer
     if(localStorage.shapes){
         var storageShapes = JSON.parse(localStorage.shapes);
         for(var shapesID in storageShapes) {
             var feature = new ol.format.KML().readFeature(storageShapes[shapesID]['feature']);
-            for(var layer of (<ol.layer.Group>map.getLayerGroup().getLayers().getArray()[3]).getLayers().getArray()){         
+            for(var layer of (<ol.layer.Group>map.getLayerGroup().getLayers().getArray()[SHAPES_LAYER]).getLayers().getArray()){         
                 if( (<ol.layer.Vector>layer).get('name') == storageShapes[shapesID]['layer']){
                     (<ol.layer.Vector>layer).getSource().addFeature(feature);    
                     globals.shapes[shapesID] = new Shape(
@@ -37,9 +39,11 @@ function loadSession(){
    
         }
     }
+    // reflect changes in getm tables
     setupShapes();
 }
 
+// saves all shapes on map to local storage
 function saveSession(){
     var storageShapes = {};
     for(var shapesID in globals.shapes) {
@@ -54,7 +58,7 @@ function saveSession(){
     localStorage.shapes = JSON.stringify(storageShapes);
 }
 
-// TODO
+// TODO saves shapes as a shapefile or kml
 function saveShapes(){
     var featureArray = [];
     for(var shapesID in globals.shapes) {
@@ -87,6 +91,7 @@ function successSave(response, a) {
     a.click();
 }
 
+// perform be search
 function besearch(){
     var results = [];
     document.getElementById('besearchResults').innerHTML = "";
@@ -165,7 +170,7 @@ function normalizeExtent(extent) {
     }
 }
 
-// catcode searches within range
+// TODO: catcode searches within range broke this somehow....
 function catsearch() {
     var extent = map.getView().calculateExtent(map.getSize());
     document.getElementById('catsearchResults').innerHTML = "";
@@ -187,9 +192,10 @@ function catsearch() {
     });
 }
 
+// sets up butons and popups
 export function setup() {
-    catsearchFiltersSetup();
-    besearchFiltersSetup();
+    catsearchResultsSetup();
+    besearchResultsSetup();
     getmSetup();
 
     // TODO: dynamically add to nav bar and do the clicky stuff
@@ -199,6 +205,7 @@ export function setup() {
     $('#printBtn').click(printImg);
 }
 
+// prints map
 function printImg(e) {
     e.preventDefault();
     var canvas = document.getElementById("map").getElementsByClassName("ol-unselectable")[0];
@@ -212,34 +219,37 @@ function printImg(e) {
     });
 }
 
-function catsearchFiltersSetup() {
-    var catsearchFilterPopup = windowSetup('catsearchFilter', 'Cat Search');
-    document.getElementById('app').appendChild(catsearchFilterPopup);
+// sets up catsearch result window
+function catsearchResultsSetup() {
+    var catsearchResultsPopup = windowSetup('catsearchResults', 'Cat Search');
+    document.getElementById('app').appendChild(catsearchResultsPopup);
 
     var catsearchResults = document.createElement('div');
     catsearchResults.id = 'catsearchResults';
-    document.getElementById('catsearchFilter-contents').appendChild(catsearchResults);
+    document.getElementById('catsearchResults-contents').appendChild(catsearchResults);
     document.getElementById('catsearchBtn').onclick = function() {
-        $('#catsearchFilterPopupText').addClass('show');
-        $('#catsearchFilterPopup').zIndex(2);     
+        $('#catsearchResultsPopupText').addClass('show');
+        $('#catsearchResultsPopup').zIndex(2);     
         catsearch();    
     }
 }
 
-function besearchFiltersSetup() {
-    var besearchFilterPopup = windowSetup('besearchFilter', 'BE Search');
-    document.getElementById('app').appendChild(besearchFilterPopup);
+// sets up besearch result window
+function besearchResultsSetup() {
+    var besearchResultsPopup = windowSetup('besearchResults', 'BE Search');
+    document.getElementById('app').appendChild(besearchResultsPopup);
 
     var besearchResults = document.createElement('div');
     besearchResults.id = 'besearchResults';
-    document.getElementById('besearchFilter-contents').appendChild(besearchResults);
+    document.getElementById('besearchResults-contents').appendChild(besearchResults);
     document.getElementById('besearchBtn').onclick = function(){
-        $('#besearchFilterPopupText').addClass('show');
-        $('#besearchFilterPopup').zIndex(2);     
+        $('#besearchResultsPopupText').addClass('show');
+        $('#besearchResultsPopup').zIndex(2);     
         besearch();      
     }
 }
 
+// sets up getm popup
 function getmSetup() {
     var getm = windowSetup('getm');
     document.getElementById('getmButton').onclick = function(){    
@@ -268,7 +278,6 @@ function getmSetup() {
     div2.id = 'shapes';
     document.getElementById('getm-contents').appendChild(div2);
     setupShapes();
-
 }
 
 // setup shapes 
@@ -366,6 +375,7 @@ function updateShapesCallback(response, status, xhr) {
     }
 }
 
+// retrieves selected shapes and formats for ajax insert call
 function buildInsert() {
     var records = [];
     var insertSelect = document.getElementById('insertShapesSelect');
@@ -390,6 +400,7 @@ function buildInsert() {
     return {'records':records};
 }
 
+// retrieves selected shapes and formats for ajax update call
 function buildUpdate() {
     var records = [];
     var updateSelect = document.getElementById('updateShapesSelect');
@@ -414,6 +425,7 @@ function buildUpdate() {
     return {'records':records};
 }
 
+// retrieves selected shapes and formats for ajax delete call
 function buildDelete() {
     var records = [];
     var deleteSelect = document.getElementById('deleteShapesSelect');
@@ -429,6 +441,7 @@ function buildDelete() {
     return {'records':records};
 }
 
+// ajax call to delete into the db
 function deleteShapes() {
      $.ajax({
          type: 'POST',
@@ -439,6 +452,7 @@ function deleteShapes() {
      });
 }
 
+// ajax call to update into the db
 function updateShapes() {
     $.ajax({
         type: 'POST',
@@ -449,6 +463,7 @@ function updateShapes() {
     });
 }
 
+// ajax call to insert into the db
 function insertShapes() {
     $.ajax({
         type: 'POST',

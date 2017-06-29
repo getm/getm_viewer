@@ -44,10 +44,10 @@ select{
     left: 25%;
 }
 
-#searchFilterPopup.popup{
+/*#searchFilterPopup.popup{
     position: fixed;
     display: unset;
     top:25%;
     width: 33%;
     left: 33%
-}
+}*/
