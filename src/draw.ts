@@ -16,6 +16,11 @@ function removeDraw(){
     map.removeInteraction(draw);
 }
 
+function unselectDrawOption() {
+    radioSelection = null;
+    (<HTMLInputElement>document.querySelector('input[name = "draw-select"]:checked')).checked = false;
+}
+
 function drawShape(shapeType) {
     if(map.getInteractions().getArray().indexOf(draw) != -1) {
         removeDraw();
@@ -97,8 +102,7 @@ function drawShape(shapeType) {
             globals.counts[shapeType]++;
 
             removeDraw();
-            radioSelection = null;
-            (<HTMLInputElement>document.querySelector('input[name = "draw-select"]:checked')).checked = false;
+            unselectDrawOption();
         });        
         map.addInteraction(draw);
     }
@@ -116,9 +120,8 @@ function setupDelete(){
         globals.shapes[e.element.getProperties()['id']].getLayer().getSource().removeFeature(e.element);
         deleteInteraction.getFeatures().remove(e.element);
         delete globals.shapes[e.element.getProperties()['id']];
-        radioSelection = null;
-        (<HTMLInputElement>document.querySelector('input[name = "draw-select"]:checked')).checked = false;
-                deleteInteraction.setActive(false);  
+        unselectDrawOption();
+        deleteInteraction.setActive(false);  
         setupShapes();
     });
     deleteInteraction.setActive(false);

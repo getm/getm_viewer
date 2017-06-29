@@ -212,11 +212,11 @@ select{
     margin-top: -1px;
 }
 
-/*a.test input[type="radio"]+label {
+a.test input[type="radio"]+label {
     font-weight: normal;
-}*/
+}
 
-div.test input[type="radio"]:checked+label {
+a.test input[type="radio"]:checked+label {
     font-weight:bold;
 }
 

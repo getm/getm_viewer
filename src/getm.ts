@@ -62,20 +62,16 @@ function saveShapes(){
             featureArray.push(globals.shapes[shapesID].getFeature());
         }
     }                
-    var a = document.createElement('a');
-    //a.download = 'shapes.shp';            
+    var a = document.createElement('a');         
 
     var geoJsons = [];
     for(var feature of featureArray) {
         var geoJson = new ol.format.GeoJSON().writeFeature(feature);
-        console.log(geoJson);
         geoJson = JSON.parse(geoJson);
         geoJson['properties']['type'] = geoJson['geometry']['type'];
         geoJsons.push(JSON.stringify(geoJson));
     }
-    //a.href = window.URL.createObjectURL(new Blob([shp], {'type': 'application/octet-stream'}));
-    console.log(JSON.stringify(geoJsons));
-    console.log(geoJsons);
+
     $.ajax({
         type: 'POST',
         url: ProductRestInterface.getSaveShapesUrl(),
@@ -86,7 +82,8 @@ function saveShapes(){
 }
 
 function successSave(response, a) {
-    a.href = ProductRestInterface.getResultUrl() + response['result'];//window.URL.createObjectURL(new Blob([JSON.stringify(response)], {'type': 'application/octet-stream'}));
+    if(response.length > 0)
+        a.href = ProductRestInterface.getResultUrl() + response['result'];//window.URL.createObjectURL(new Blob([JSON.stringify(response)], {'type': 'application/octet-stream'}));
     a.click();
 }
 

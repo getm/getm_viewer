@@ -4,7 +4,6 @@ CGSWeb_Map.Options = {
 	banner_color: "green",
 	banner_text: "UNCLASSIFIED",
 	baseUrl: "http://localhost:9002/",
-	//wfsUrl: "http://localhost:8080/",
 	zoomThreshold: 8,
 	saveFormat: 'SHAPEFILE',
 	layers: {
@@ -63,12 +62,6 @@ CGSWeb_Map.Options = {
 					layers: 'wfs:cl_airports',
 					url: 'geoserver/wfs/wms?service=WMS&request=GetMap',
 					version: '1.1.0',
-					style: {
-						stroke: {
-							color: 'rgba(255,0,0,1)',
-							width: 3
-						}
-					}
 				}
 			},
 			{
@@ -92,12 +85,6 @@ CGSWeb_Map.Options = {
 					layers: 'wfs:cl_roads',
 					url: 'geoserver/wfs/wms?service=WMS&request=GetMap',
 					version: '1.1.0',
-					style: {
-						stroke: {
-							color: 'rgba(0,255,0,1)',
-							width: 3
-						}
-					}
 				}
 			},
 			{
@@ -121,12 +108,6 @@ CGSWeb_Map.Options = {
 					layers: 'wfs:cl_state_routes',
 					url: 'geoserver/wfs/wms?service=WMS&request=GetMap',
 					version: '1.1.0',
-					style: {
-						stroke: {
-							color: 'rgba(0,255,0,1)',
-							width: 3
-						}
-					}
 				}
 			}     
 		],
