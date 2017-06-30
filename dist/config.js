@@ -7,6 +7,7 @@ CGSWeb_Map.Options = {
 	zoomThreshold: 8,
 	saveFormat: 'SHAPEFILE',
 	map: {
+		defaultProjection: 'EPSG:4326',
 		defaultZoom: 3,
 		defaultCenter: [0, 0]
 	},
@@ -46,10 +47,11 @@ CGSWeb_Map.Options = {
 		],
 		wfsMapConfigs: [
 			{
+				title: 'Airports',
+				name: 'airports',				
 				wfs: {
-					title: 'Airports',
-					name: 'airports',
 					hostAddress: 'http://localhost:9002/',
+					//url: 'geoserver/getm/ows?service=WFS&request=GetFeature&typeName=getm:tm_prime',
 					url: 'geoserver/wfs/ows?service=WFS&request=GetFeature&typeName=wfs:cl_airports',
 					version: '1.1.0',
 					style: {
@@ -60,18 +62,18 @@ CGSWeb_Map.Options = {
 					}
 				},
 				wms: {
-					title: 'Airports',
-					name: 'airports',
 					hostAddress: 'http://localhost:9002/',
 					layers: 'wfs:cl_airports',
+					//layers: 'getm:tm_prime',
+					//url: 'geoserver/getm/wms?service=WFS&request=GetFeature&typeName=getm:tm_prime',
 					url: 'geoserver/wfs/wms?service=WMS&request=GetMap',
 					version: '1.1.0',
 				}
 			},
 			{
+				title: 'Roads',
+				name: 'roads',				
 				wfs: {
-					title: 'Roads',
-					name: 'roads',
 					hostAddress: 'http://localhost:9002/',
 					url: 'geoserver/wfs/ows?service=WFS&request=GetFeature&typeName=wfs:cl_roads',
 					version: '1.1.0',
@@ -83,8 +85,6 @@ CGSWeb_Map.Options = {
 					}		
 				},
 				wms: {
-					title: 'Roads',
-					name: 'roads',
 					hostAddress: 'http://localhost:9002/',
 					layers: 'wfs:cl_roads',
 					url: 'geoserver/wfs/wms?service=WMS&request=GetMap',
@@ -92,9 +92,9 @@ CGSWeb_Map.Options = {
 				}
 			},
 			{
+				title: 'State Routes',
+				name: 'state_routes',
 				wfs: {
-					title: 'State Routes',
-					name: 'state_routes',
 					hostAddress: 'http://localhost:9002/',
 					url: 'geoserver/wfs/ows?service=WFS&request=GetFeature&typeName=wfs:cl_state_routes',
 					version: '1.1.0',
@@ -106,8 +106,6 @@ CGSWeb_Map.Options = {
 					}				
 				},
 				wms: {
-					title: 'State Routes',
-					name: 'state_routes',
 					hostAddress: 'http://localhost:9002/',
 					layers: 'wfs:cl_state_routes',
 					url: 'geoserver/wfs/wms?service=WMS&request=GetMap',

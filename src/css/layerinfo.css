@@ -66,3 +66,6 @@
     float: right;
     height: inherit;
 }
+#featureInfo-contents button{
+    color: black;
+}

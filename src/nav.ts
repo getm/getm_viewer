@@ -28,7 +28,7 @@ export function navSetup() {
     navBarNav.appendChild(createNavDropDownMapLayers());
     navBarNav.appendChild(createNavDropDownWFS());
     navBarNav.appendChild(createNavButton('getmButton', 'GETM'));  
-    navBarNav.appendChild(createNavDropDownSearch());
+    navBarNav.appendChild(createNavDropDownLocalSearch());
     navBarNav.appendChild(createNavDropDown('Tools', 
     {
         'drawButton': 'Draw',
@@ -83,7 +83,7 @@ function createNavDropDown(title, options) {
     return li;
 }
 
-function createNavDropDownSearch() {
+function createNavDropDownLocalSearch() {
     var li = document.createElement('li');
     li.className = 'dropdown';
 
@@ -91,7 +91,7 @@ function createNavDropDownSearch() {
     a.className = 'dropdown-toggle';
     a.setAttribute('data-toggle', 'dropdown');
     a.href = '#';
-    a.innerHTML = 'Search';
+    a.innerHTML = 'Local Search';
     li.appendChild(a);
     
     var caret = document.createElement('span');
@@ -139,7 +139,7 @@ function createNavDropDownSearch() {
 
     var catsearchLabel = document.createElement('label');
     catsearchLabel.htmlFor = 'catsearch';
-    catsearchLabel.innerHTML = 'Cat Search:';
+    catsearchLabel.innerHTML = 'Catcode Search:';
     catsearchGroup.appendChild(catsearchLabel);
 
     var catsearchInput = document.createElement('input');
@@ -188,12 +188,12 @@ function createNavDropDownWFS() {
 
         var input = document.createElement('input');
         input.type = 'checkbox';
-        input.id = wfsMapConfig.wfs.name.replace(/\W/g, '') + '_checkbox';
+        input.id = wfsMapConfig.name.replace(/\W/g, '') + '_checkbox';
         div.appendChild(input);
 
         var label = document.createElement('label');
         label.setAttribute('for', input.id);
-        label.innerHTML = wfsMapConfig.wfs.title;
+        label.innerHTML = wfsMapConfig.title;
         div.appendChild(label);
     });
     return li;

@@ -77,11 +77,14 @@ h5 {
 }
 
 .dropdown-menu {
-	width: 200px;
+	min-width: 200px;
+	width: max-content;
 }
 
 .dropdown-menu label{
-	width: 90%;
+	font-weight: normal;
+	width: max-content;
+	padding: 5px;
 }#insertShapes {
     float: left;
     width: 33%;
@@ -202,6 +205,9 @@ select{
     display: table-cell;
     float: right;
     height: inherit;
+}
+#featureInfo-contents button{
+    color: black;
 }.dropdown-submenu {
     position: relative;
 }

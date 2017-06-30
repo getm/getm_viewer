@@ -5,7 +5,6 @@ import {setupShapes} from './getm';
 import {globals} from './globals';
 
 // layer defaults if not specified in configs
-const defaultProjection = 'EPSG:4326';
 const defaultVersion = '1.1.0';
 const defaultStyleStroke = 'rgba(0,0,0,1)';
 const defaultStyleFill = 'rgba(0,0,0,0)';
@@ -20,7 +19,7 @@ export const map = new ol.Map({
     target: 'map',
     controls: new ol.Collection([new ol.control.FullScreen(), attribution,new ol.control.Zoom()]),
     view: new ol.View({
-        projection: ol.proj.get(defaultProjection),
+        projection: ol.proj.get(CGSWeb_Map.Options.map.defaultProjection),
         center: CGSWeb_Map.Options.map.defaultCenter,
         zoom: CGSWeb_Map.Options.map.defaultZoom
     }),
@@ -74,9 +73,9 @@ function populateBaseMapLayers() {
                         LAYERS: baseMapConfig.layer,
                         VERSION: baseMapConfig.version,
                         FORMAT: 'image/jpeg',
-                        SRS: defaultProjection
+                        SRS: CGSWeb_Map.Options.map.defaultProjection
                     },
-                    projection: defaultProjection,
+                    projection: CGSWeb_Map.Options.map.defaultProjection,
                     crossOrigin: 'anonymous'
                 }),
             });
@@ -196,7 +195,7 @@ function populateLayers(){
                         url: layerConfig.url ? function(extent,resolution,proj) {
                             return layerConfig.hostAddress + layerConfig.url 
                                 + '&version=' + (layerConfig.version ? layerConfig.version : defaultVersion)
-                                + '&srs=' + (layerConfig.srs ? layerConfig.srs : defaultProjection)
+                                + '&srs=' + (layerConfig.srs ? layerConfig.srs : CGSWeb_Map.Options.map.defaultProjection)
                                 + '&bbox=' + flipExtent(
                                     extent, 
                                     '1.3.0',
@@ -266,7 +265,7 @@ function populateWFS() {
                     url: wfsMapConfig.wfs.url ? function(extent,resolution,proj) {
                         return wfsMapConfig.wfs.hostAddress + wfsMapConfig.wfs.url 
                             + '&version=' + (wfsMapConfig.wfs.version ? wfsMapConfig.wfs.version : defaultVersion)
-                            + '&srs=' + (wfsMapConfig.wfs.srs ? wfsMapConfig.wfs.srs : defaultProjection)
+                            + '&srs=' + (wfsMapConfig.wfs.srs ? wfsMapConfig.wfs.srs : CGSWeb_Map.Options.map.defaultProjection)
                             + '&bbox=' + flipExtent(
                                 extent, 
                                 '1.3.0',
@@ -314,7 +313,16 @@ function populateWFS() {
                         },
                         crossOrigin: 'anonymous',
                         serverType: 'geoserver',
-                        projection: defaultProjection,
+                        projection: CGSWeb_Map.Options.map.defaultProjection,
+                        attributions: [new ol.Attribution({
+                            html: '<div style="color:' + 
+                                (wfsMapConfig.wfs.style ? 
+                                (wfsMapConfig.wfs.style.stroke ? wfsMapConfig.wfs.style.stroke.color : 
+                                (wfsMapConfig.wfs.style.fill ? wfsMapConfig.wfs.style.fill.color : 
+                                defaultStyleStroke)): 
+                                defaultStyleStroke) + ';" class="wfs_legend">' + wfsMapConfig.wfs.title + '</div>',
+                            
+                        })]  
                     }),
                     visible: false
                 }) ;
@@ -324,7 +332,7 @@ function populateWFS() {
             }
 
             // checkbox will trigger visibility change
-            $('#' + wfsMapConfig.wfs.name.replace(/\W/g, '') +'_checkbox').click(function(){
+            $('#' + wfsMapConfig.name.replace(/\W/g, '') +'_checkbox').click(function(){
                 wfslayer.setVisible(this.checked);
                 if(wmslayer) {
                     wmslayer.setVisible(this.checked);
@@ -344,12 +352,12 @@ function populateWFS() {
 
     // WMS/WFS change when zoom level passes threshold
     map.getView().on('change:resolution', function(){
-        console.log(map.getView().getZoom());
+        //console.log(map.getView().getZoom());
         if(map.getView().getZoom() > CGSWeb_Map.Options.zoomThreshold) {
-            console.log('wfs')
+            //console.log('wfs')
             map.getLayerGroup().getLayers().getArray()[WFS_LAYER] = wfslayerGroup;
         } else {
-            console.log('wms');
+            //console.log('wms');
             map.getLayerGroup().getLayers().getArray()[WFS_LAYER] = wmslayerGroup;
         }
     });
