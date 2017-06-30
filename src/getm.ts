@@ -58,7 +58,7 @@ function saveSession(){
     localStorage.shapes = JSON.stringify(storageShapes);
 }
 
-// TODO saves shapes as a shapefile or kml
+// saves shapes as a shapefile or kml
 function saveShapes(){
     var featureArray = [];
     for(var shapesID in globals.shapes) {
@@ -172,11 +172,11 @@ function normalizeExtent(extent) {
     }
 }
 
-// TODO: catcode searches within range broke this somehow....
+// catcode searches within extent -- searches only for shapes :(
 function catsearch() {
     var extent = map.getView().calculateExtent(map.getSize());
     document.getElementById('catsearchResults').innerHTML = "";
-    (<ol.layer.Group>(map.getLayerGroup().getLayers().getArray()[3])).getLayers().getArray().forEach(function(layer){
+    (<ol.layer.Group>(map.getLayerGroup().getLayers().getArray()[SHAPES_LAYER])).getLayers().getArray().forEach(function(layer){
         (<ol.layer.Vector>layer).getSource().getFeaturesInExtent(extent).forEach(function(feature){
             if($('#catsearch').val()){
                 if($('#catsearch').val() == WILDCARD ||

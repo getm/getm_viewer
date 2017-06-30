@@ -317,11 +317,7 @@ $(document).ready(function(){
     $('.dropdown-submenu a.test').on("click", function(e){
         $(this).next('ul').toggle();
         e.stopPropagation();
-        // e.preventDefault();
     });
-    // $('.dropdown-menu').on('click', function (event) {
-    //     $(this).parent().toggleClass('open');
-    // });
 
     $('body').on('click', function (e) {
         if (!$('.dropdown-menu').is(e.target) 

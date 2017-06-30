@@ -448,7 +448,7 @@ export function layerInfoSetup(){
         msg.id = layerInfoReq.val + '-msg';
         msglabelcontainer.appendChild(msg);
         
-        // TODO: change this
+        // form entry is input
         if(layerInfoReq['options'] == undefined) {
             var input = document.createElement('input');
             input.type = 'text';
@@ -458,6 +458,7 @@ export function layerInfoSetup(){
                 validateLayerInfo(layerInfoReq);
             }
             div.appendChild(input);
+        // form entry is select
         } else {
             var select = document.createElement('select');
             select.id = layerInfoReq.val;

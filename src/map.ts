@@ -12,8 +12,9 @@ const defaultStyleFill = 'rgba(0,0,0,0)';
 
 var attribution = new ol.control.Attribution();
 const layerGroups = [];
-var SHAPE_LAYER = 2; // index of shape layer in map.getLayerGroup()
+var BASEMAP_LAYER = 0; // index of basemap layer in map.getLayerInfoGroup();
 var WFS_LAYER = 1; // index of wfs layer in map.getLayerGroup()
+var SHAPE_LAYER = 2; // index of shape layer in map.getLayerGroup()
 declare const CGSWeb_Map; // Config object
 export const map = new ol.Map({ 
     target: 'map',
@@ -84,7 +85,7 @@ function populateBaseMapLayers() {
 
         // swap the basemap layer being used
         $('#' + baseMapConfig.title.replace(/\W/g, '') +'_checkbox').change(function(){
-            map.getLayerGroup().getLayers().getArray()[0] = layer; 
+            map.getLayerGroup().getLayers().getArray()[BASEMAP_LAYER] = layer; 
             map.updateSize();
         });         
     });
@@ -302,23 +303,21 @@ function populateWFS() {
             globals.counts[wfsMapConfig.wfs.name] = 0;
             
             // wms optional
-            if(wfsMapConfig.wms != undefined && wfsMapConfig.wms != {}) {
-                var wmslayer = new ol.layer.Image({
-                    visible: false,
-                    source: new ol.source.ImageWMS({
+            if(wfsMapConfig.wms != undefined && wfsMapConfig.wms != {}) {      
+                var wmslayer = new ol.layer.Tile({
+                    source: new ol.source.TileWMS({
                         url: wfsMapConfig.wms.hostAddress + wfsMapConfig.wms.url,
                         params: {
                             LAYERS: wfsMapConfig.wms.layers,
+                            TILED: true,
                             VERSION: wfsMapConfig.wms.version,
-                            FORMAT: 'image/png',
-                            SRS: defaultProjection,
-                            TRANSPARENT: 'true',
-                            BBOX: '-180.0,-90.0,180.0,90.0'
                         },
+                        crossOrigin: 'anonymous',
+                        serverType: 'geoserver',
                         projection: defaultProjection,
-                        crossOrigin: 'anonymous'
                     }),
-                });
+                    visible: false
+                }) ;
                 wmslayers.push(wmslayer);
             } else { // if wms does not exist, does not display when past zoom threshold
                 wmslayers.push(new ol.layer.Vector());
@@ -356,6 +355,7 @@ function populateWFS() {
     });
 }
 
+// sets up the shape layer options
 function populateShape(){
     // default global shape layer is index 0
     setGlobalShapeLayer(layerGroups[SHAPE_LAYER].getLayers().item(0));
@@ -364,6 +364,7 @@ function populateShape(){
     var shapeLayerSelect = document.getElementsByClassName('shape-layer-select');
     Array.apply(null, {length: shapeLayerSelect.length}).map(Number.call, Number).forEach(function(i){
         CGSWeb_Map.Options.layers.shapesConfigs.forEach(function(shapeConfig){
+            // inserts options for each select
             var opt = document.createElement('option');
             opt.innerHTML = shapeConfig.title;
             opt.value = shapeConfig.name;
