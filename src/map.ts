@@ -250,6 +250,33 @@ function populateMap() {
     populateShape(); 
 }
 
+function rgb2hex(rgb){
+ rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
+ return (rgb && rgb.length === 4) ? "#" +
+  ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
+  ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
+  ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
+}
+
+function createSLD(wfsMapConfig){
+    return '<StyledLayerDescriptor xmlns="http://www.opengis.net/sld" '
+    + 'xmlns:ogc="http://www.opengis.net/ogc" ' 
+    + 'xmlns:xlink="http://www.w3.org/1999/xlink" ' 
+    + 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.0.0" ' 
+    + 'xsi:schemaLocation="http://www.opengis.net/sld StyledLayerDescriptor.xsd">'
+        + '<NamedLayer>' 
+        + '<Name>' + wfsMapConfig.wms.layers + '</Name>' 
+            + '<UserStyle>'
+                + '<Title>SLD Cook Book: Simple Line</Title>' 
+                + '<FeatureTypeStyle><Rule><LineSymbolizer><Stroke>'
+                    + '<CssParameter name="stroke">' + rgb2hex(wfsMapConfig.wfs.style.stroke.color) + '</CssParameter>'
+                    + '<CssParameter name="stroke-width">' + wfsMapConfig.wfs.style.stroke.width + '</CssParameter>'
+                + '</Stroke></LineSymbolizer></Rule></FeatureTypeStyle>'
+            + '</UserStyle>'
+        + '</NamedLayer>'
+    + '</StyledLayerDescriptor>';
+}
+
 // populates WFS layers 
 function populateWFS() {
     var wfslayers = [];
@@ -310,6 +337,7 @@ function populateWFS() {
                             LAYERS: wfsMapConfig.wms.layers,
                             TILED: true,
                             VERSION: wfsMapConfig.wms.version,
+                            SLD_BODY: createSLD(wfsMapConfig)//encodeURI(createSLD())
                         },
                         crossOrigin: 'anonymous',
                         serverType: 'geoserver',
