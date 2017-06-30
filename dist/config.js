@@ -54,12 +54,6 @@ CGSWeb_Map.Options = {
 					//url: 'geoserver/getm/ows?service=WFS&request=GetFeature&typeName=getm:tm_prime',
 					url: 'geoserver/wfs/ows?service=WFS&request=GetFeature&typeName=wfs:cl_airports',
 					version: '1.1.0',
-					style: {
-						stroke: {
-							color: 'rgba(255,0,0,1)',
-							width: 3
-						}
-					}
 				},
 				wms: {
 					hostAddress: 'http://localhost:9002/',
@@ -68,6 +62,12 @@ CGSWeb_Map.Options = {
 					//url: 'geoserver/getm/wms?service=WFS&request=GetFeature&typeName=getm:tm_prime',
 					url: 'geoserver/wfs/wms?service=WMS&request=GetMap',
 					version: '1.1.0',
+				},
+				style: {
+					stroke: {
+						color: 'rgba(255,0,0,1)',
+						width: 3
+					}
 				}
 			},
 			{
@@ -76,20 +76,20 @@ CGSWeb_Map.Options = {
 				wfs: {
 					hostAddress: 'http://localhost:9002/',
 					url: 'geoserver/wfs/ows?service=WFS&request=GetFeature&typeName=wfs:cl_roads',
-					version: '1.1.0',
-					style: {
-						stroke: {
-							color: 'rgba(0,0,255,1)',
-							width: 3
-						}
-					}		
+					version: '1.1.0',	
 				},
 				wms: {
 					hostAddress: 'http://localhost:9002/',
 					layers: 'wfs:cl_roads',
 					url: 'geoserver/wfs/wms?service=WMS&request=GetMap',
 					version: '1.1.0',
-				}
+				},
+				style: {
+					stroke: {
+						color: 'rgba(0,255,0,1)',
+						width: 3
+					}
+				}				
 			},
 			{
 				title: 'State Routes',
@@ -97,20 +97,20 @@ CGSWeb_Map.Options = {
 				wfs: {
 					hostAddress: 'http://localhost:9002/',
 					url: 'geoserver/wfs/ows?service=WFS&request=GetFeature&typeName=wfs:cl_state_routes',
-					version: '1.1.0',
-					style: {
-						stroke: {
-							color: 'rgba(0,255,0,1)',
-							width: 3
-						}
-					}				
+					version: '1.1.0',				
 				},
 				wms: {
 					hostAddress: 'http://localhost:9002/',
 					layers: 'wfs:cl_state_routes',
 					url: 'geoserver/wfs/wms?service=WMS&request=GetMap',
 					version: '1.1.0',
-				}
+				},
+				style: {
+					stroke: {
+						color: 'rgba(0,0,255,1)',
+						width: 3
+					}
+				}	
 			}     
 		],
 		shapesConfigs: [

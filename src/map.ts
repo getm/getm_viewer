@@ -217,11 +217,11 @@ function populateLayers(){
                     style: layerConfig.style ? 
                         new ol.style.Style({
                             stroke: layerConfig.style.stroke ? new ol.style.Stroke({
-                                color: layerConfig.style.stroke.color ? layerConfig.style.stroke.color : defaultStyleStroke,
+                                color: getStyleColor(layerConfig, 'stroke'),
                                 width: layerConfig.style.stroke.width ? layerConfig.style.stroke.width : 3
                             }) : new ol.style.Stroke(),
                             fill: layerConfig.style.fill ? new ol.style.Fill({
-                                color: layerConfig.style.fill.color ? layerConfig.style.fill.color : defaultStyleFill
+                                color: getStyleColor(layerConfig, 'fill')
                             }) : new ol.style.Fill(),
                         }): 
                         new ol.style.Style()      
@@ -251,11 +251,11 @@ function populateMap() {
 }
 
 function rgb2hex(rgb){
- rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
- return (rgb && rgb.length === 4) ? "#" +
-  ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
-  ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
-  ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
+    rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
+    return (rgb && rgb.length === 4) ? "#" +
+        ("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
+        ("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
+        ("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
 }
 
 function createSLD(wfsMapConfig){
@@ -269,12 +269,32 @@ function createSLD(wfsMapConfig){
             + '<UserStyle>'
                 + '<Title>SLD Cook Book: Simple Line</Title>' 
                 + '<FeatureTypeStyle><Rule><LineSymbolizer><Stroke>'
-                    + '<CssParameter name="stroke">' + rgb2hex(wfsMapConfig.wfs.style.stroke.color) + '</CssParameter>'
-                    + '<CssParameter name="stroke-width">' + wfsMapConfig.wfs.style.stroke.width + '</CssParameter>'
+                    + '<CssParameter name="stroke">' + rgb2hex(getStyleColor(wfsMapConfig, 'stroke')) + '</CssParameter>'
+                    + '<CssParameter name="stroke-width">' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
                 + '</Stroke></LineSymbolizer></Rule></FeatureTypeStyle>'
             + '</UserStyle>'
         + '</NamedLayer>'
     + '</StyledLayerDescriptor>';
+}
+
+
+function getStyleColor(layerConfig, style='stroke') {
+    if(layerConfig.style) {
+        switch(style) {
+            case 'stroke': 
+                return layerConfig.style.stroke ? layerConfig.style.stroke.color : defaultStyleStroke;
+            case 'fill':
+                return layerConfig.style.fill ? layerConfig.style.fill.color : defaultStyleFill;
+        }
+    }
+    return defaultStyleStroke;
+}
+
+function getStyleWidth(layerConfig) {
+    if(layerConfig.style && layerConfig.style.stroke) {
+        return layerConfig.style.stroke.width ? layerConfig.style.stroke.width : 3;
+    }
+    return 3;
 }
 
 // populates WFS layers 
@@ -301,9 +321,9 @@ function populateWFS() {
                     strategy: ol.loadingstrategy.bbox,
                     attributions: [new ol.Attribution({
                         html: '<div style="color:' + 
-                            (wfsMapConfig.wfs.style ? 
-                            (wfsMapConfig.wfs.style.stroke ? wfsMapConfig.wfs.style.stroke.color : 
-                            (wfsMapConfig.wfs.style.fill ? wfsMapConfig.wfs.style.fill.color : 
+                            (wfsMapConfig.style ? 
+                            (wfsMapConfig.style.stroke ? wfsMapConfig.style.stroke.color : 
+                            (wfsMapConfig.style.fill ? wfsMapConfig.style.fill.color : 
                             defaultStyleStroke)): 
                             defaultStyleStroke) + ';" class="wfs_legend">' + wfsMapConfig.wfs.title + '</div>',
                         
@@ -311,14 +331,14 @@ function populateWFS() {
                 }),
                 updateWhileInteracting: true,
                 visible: false,
-                style: wfsMapConfig.wfs.style ? 
+                style: wfsMapConfig.style ? 
                     new ol.style.Style({
-                        stroke: wfsMapConfig.wfs.style.stroke ? new ol.style.Stroke({
-                            color: wfsMapConfig.wfs.style.stroke.color ? wfsMapConfig.wfs.style.stroke.color : defaultStyleStroke,
-                            width: wfsMapConfig.wfs.style.stroke.width ? wfsMapConfig.wfs.style.stroke.width : 3
+                        stroke: wfsMapConfig.style.stroke ? new ol.style.Stroke({
+                            color: getStyleColor(wfsMapConfig, 'stroke'),
+                            width: wfsMapConfig.style.stroke.width ? wfsMapConfig.style.stroke.width : 3
                         }) : new ol.style.Stroke(),
-                        fill: wfsMapConfig.wfs.style.fill ? new ol.style.Fill({
-                            color: wfsMapConfig.wfs.style.fill.color ? wfsMapConfig.wfs.style.fill.color : defaultStyleFill
+                        fill: wfsMapConfig.style.fill ? new ol.style.Fill({
+                            color: getStyleColor(wfsMapConfig, 'fill')
                         }) : new ol.style.Fill(),
                     }): 
                     new ol.style.Style()      
@@ -344,9 +364,9 @@ function populateWFS() {
                         projection: CGSWeb_Map.Options.map.defaultProjection,
                         attributions: [new ol.Attribution({
                             html: '<div style="color:' + 
-                                (wfsMapConfig.wfs.style ? 
-                                (wfsMapConfig.wfs.style.stroke ? wfsMapConfig.wfs.style.stroke.color : 
-                                (wfsMapConfig.wfs.style.fill ? wfsMapConfig.wfs.style.fill.color : 
+                                (wfsMapConfig.style ? 
+                                (wfsMapConfig.style.stroke ? wfsMapConfig.style.stroke.color : 
+                                (wfsMapConfig.style.fill ? wfsMapConfig.style.fill.color : 
                                 defaultStyleStroke)): 
                                 defaultStyleStroke) + ';" class="wfs_legend">' + wfsMapConfig.wfs.title + '</div>',
                             
