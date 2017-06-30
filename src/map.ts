@@ -203,12 +203,7 @@ function populateLayers(){
                         }: undefined,
                         strategy: ol.loadingstrategy.bbox,
                         attributions: [new ol.Attribution({
-                            html: '<div style="color:' + 
-                                (layerConfig.style ? 
-                                (layerConfig.style.stroke ? layerConfig.style.stroke.color : 
-                                (layerConfig.style.fill ? layerConfig.style.fill.color : 
-                                defaultStyleStroke)): 
-                                defaultStyleStroke) + ';" class="wfs_legend">' + layerConfig.title + '</div>',
+                            html: '<div style="color:' + getStyleColor(layerConfig) + ';" class="wfs_legend">' + layerConfig.title + '</div>',
                             
                         })]  
                     }),
@@ -216,13 +211,13 @@ function populateLayers(){
                     visible: false,
                     style: layerConfig.style ? 
                         new ol.style.Style({
-                            stroke: layerConfig.style.stroke ? new ol.style.Stroke({
+                            stroke: new ol.style.Stroke({
                                 color: getStyleColor(layerConfig, 'stroke'),
-                                width: layerConfig.style.stroke.width ? layerConfig.style.stroke.width : 3
-                            }) : new ol.style.Stroke(),
-                            fill: layerConfig.style.fill ? new ol.style.Fill({
+                                width: getStyleWidth(layerConfig)
+                            }),
+                            fill: new ol.style.Fill({
                                 color: getStyleColor(layerConfig, 'fill')
-                            }) : new ol.style.Fill(),
+                            })
                         }): 
                         new ol.style.Style()      
                 });
@@ -286,8 +281,9 @@ function getStyleColor(layerConfig, style='unspecified') {
                 if(layerConfig.style.stroke)
                     return layerConfig.style.stroke.color ? layerConfig.style.stroke.color : defaultStyleStroke;
             case 'fill':
-                if(layerConfig.style.stroke.fill)
+                if(layerConfig.style.fill)
                     return layerConfig.style.fill.color ? layerConfig.style.fill.color : defaultStyleFill;
+                return defaultStyleFill;
         }
     }
     return defaultStyleStroke;
@@ -323,12 +319,7 @@ function populateWFS() {
                     }: undefined,
                     strategy: ol.loadingstrategy.bbox,
                     attributions: [new ol.Attribution({
-                        html: '<div style="color:' + 
-                            (wfsMapConfig.style ? 
-                            (wfsMapConfig.style.stroke ? wfsMapConfig.style.stroke.color : 
-                            (wfsMapConfig.style.fill ? wfsMapConfig.style.fill.color : 
-                            defaultStyleStroke)): 
-                            defaultStyleStroke) + ';" class="wfs_legend">' + wfsMapConfig.wfs.title + '</div>',
+                        html: '<div style="color:' + getStyleColor(wfsMapConfig) + ';" class="wfs_legend">' + wfsMapConfig.title + '</div>',
                         
                     })]  
                 }),
@@ -336,13 +327,13 @@ function populateWFS() {
                 visible: false,
                 style: wfsMapConfig.style ? 
                     new ol.style.Style({
-                        stroke: wfsMapConfig.style.stroke ? new ol.style.Stroke({
+                        stroke: new ol.style.Stroke({
                             color: getStyleColor(wfsMapConfig, 'stroke'),
-                            width: wfsMapConfig.style.stroke.width ? wfsMapConfig.style.stroke.width : 3
-                        }) : new ol.style.Stroke(),
-                        fill: wfsMapConfig.style.fill ? new ol.style.Fill({
+                            width: getStyleWidth(wfsMapConfig)
+                        }),
+                        fill: new ol.style.Fill({
                             color: getStyleColor(wfsMapConfig, 'fill')
-                        }) : new ol.style.Fill(),
+                        }),
                     }): 
                     new ol.style.Style()      
             });
@@ -366,7 +357,7 @@ function populateWFS() {
                         serverType: 'geoserver',
                         projection: CGSWeb_Map.Options.map.defaultProjection,
                         attributions: [new ol.Attribution({
-                            html: '<div style="color:' + getStyleColor(wfsMapConfig) + ';" class="wfs_legend">' + wfsMapConfig.wfs.title + '</div>',
+                            html: '<div style="color:' + getStyleColor(wfsMapConfig) + ';" class="wfs_legend">' + wfsMapConfig.title + '</div>',
                             
                         })]  
                     }),
