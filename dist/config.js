@@ -6,6 +6,10 @@ CGSWeb_Map.Options = {
 	baseUrl: "http://localhost:9002/",
 	zoomThreshold: 8,
 	saveFormat: 'SHAPEFILE',
+	map: {
+		defaultZoom: 3,
+		defaultCenter: [0, 0]
+	},
 	layers: {
 		baseMapConfigs: [
 			{

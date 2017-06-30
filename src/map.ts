@@ -21,8 +21,8 @@ export const map = new ol.Map({
     controls: new ol.Collection([new ol.control.FullScreen(), attribution,new ol.control.Zoom()]),
     view: new ol.View({
         projection: ol.proj.get(defaultProjection),
-        center: [20, 0],
-        zoom: 2
+        center: CGSWeb_Map.Options.map.defaultCenter,
+        zoom: CGSWeb_Map.Options.map.defaultZoom
     }),
     logo: false
 });
