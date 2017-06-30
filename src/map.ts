@@ -278,13 +278,16 @@ function createSLD(wfsMapConfig){
 }
 
 
-function getStyleColor(layerConfig, style='stroke') {
+function getStyleColor(layerConfig, style='unspecified') {
     if(layerConfig.style) {
         switch(style) {
+            case 'unspecified':
             case 'stroke': 
-                return layerConfig.style.stroke ? layerConfig.style.stroke.color : defaultStyleStroke;
+                if(layerConfig.style.stroke)
+                    return layerConfig.style.stroke.color ? layerConfig.style.stroke.color : defaultStyleStroke;
             case 'fill':
-                return layerConfig.style.fill ? layerConfig.style.fill.color : defaultStyleFill;
+                if(layerConfig.style.stroke.fill)
+                    return layerConfig.style.fill.color ? layerConfig.style.fill.color : defaultStyleFill;
         }
     }
     return defaultStyleStroke;
@@ -363,12 +366,7 @@ function populateWFS() {
                         serverType: 'geoserver',
                         projection: CGSWeb_Map.Options.map.defaultProjection,
                         attributions: [new ol.Attribution({
-                            html: '<div style="color:' + 
-                                (wfsMapConfig.style ? 
-                                (wfsMapConfig.style.stroke ? wfsMapConfig.style.stroke.color : 
-                                (wfsMapConfig.style.fill ? wfsMapConfig.style.fill.color : 
-                                defaultStyleStroke)): 
-                                defaultStyleStroke) + ';" class="wfs_legend">' + wfsMapConfig.wfs.title + '</div>',
+                            html: '<div style="color:' + getStyleColor(wfsMapConfig) + ';" class="wfs_legend">' + wfsMapConfig.wfs.title + '</div>',
                             
                         })]  
                     }),
