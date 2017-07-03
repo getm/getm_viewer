@@ -8,8 +8,8 @@ CGSWeb_Map.Options = {
 	saveFormat: 'SHAPEFILE',
 	map: {
 		defaultProjection: 'EPSG:4326',
-		defaultZoom: 3,
-		defaultCenter: [0,0]
+		defaultZoom: 10,
+		defaultCenter: [-117.69069861,35.68503472]
 	},
 	layers: {
 		baseMapConfigs: [
