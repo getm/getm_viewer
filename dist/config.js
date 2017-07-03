@@ -8,8 +8,8 @@ CGSWeb_Map.Options = {
 	saveFormat: 'SHAPEFILE',
 	map: {
 		defaultProjection: 'EPSG:4326',
-		defaultZoom: 9,
-		defaultCenter: [-117.80679444, 35.73756389]
+		defaultZoom: 3,
+		defaultCenter: [0,0]
 	},
 	layers: {
 		baseMapConfigs: [
@@ -69,6 +69,29 @@ CGSWeb_Map.Options = {
 					}
 				}				
 			},
+			// using this to test other geoserver things
+			{
+				title: 'MPFPT View',
+				name: 'mpfptview',				
+				wfs: {
+					hostAddress: 'http://localhost:9002/',
+					url: 'geoserver/cite/ows?service=WFS&request=GetFeature&typeName=cite:mpfptview',
+					version: '1.1.0',
+					outputFormat: 'gml3'
+				},
+				wms: {
+					hostAddress: 'http://localhost:9002/',
+					layers: 'cite:mpfptview',
+					url: 'geoserver/cite/wms?service=WMS&request=GetMap',
+					version: '1.1.0',
+				},
+				style: {
+					stroke: {
+						color: 'rgba(230,100,255,1)',
+						width: 3
+					}
+				}					
+			},			
 			// using this to test other geoserver things
 			{
 				title: 'MPF View',
