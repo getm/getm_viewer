@@ -8,8 +8,8 @@ CGSWeb_Map.Options = {
 	saveFormat: 'SHAPEFILE',
 	map: {
 		defaultProjection: 'EPSG:4326',
-		defaultZoom: 3,
-		defaultCenter: [0, 0]
+		defaultZoom: 9,
+		defaultCenter: [-117.80679444, 35.73756389]
 	},
 	layers: {
 		baseMapConfigs: [
@@ -47,19 +47,63 @@ CGSWeb_Map.Options = {
 		],
 		wfsMapConfigs: [
 			{
+				// using this to test if correctly inserted into tm_prime
+				title: 'TM Prime',
+				name: 'tmprime',				
+				wfs: {
+					hostAddress: 'http://localhost:9002/',
+					url: 'geoserver/getm/ows?service=WFS&request=GetFeature&typeName=getm:tm_prime',
+					version: '1.1.0',
+					outputFormat: 'gml3'
+				},
+				wms: {
+					hostAddress: 'http://localhost:9002/',
+					layers: 'getm:tm_prime',
+					url: 'geoserver/getm/wms?service=WMS&request=GetMap',
+					version: '1.1.0',
+				},
+				style: {
+					stroke: {
+						color: 'rgba(230,100,255,1)',
+						width: 3
+					}
+				}				
+			},
+			// using this to test other geoserver things
+			{
+				title: 'MPF View',
+				name: 'mpfview',				
+				wfs: {
+					hostAddress: 'http://localhost:9002/',
+					url: 'geoserver/cite/ows?service=WFS&request=GetFeature&typeName=cite:mpfview',
+					version: '1.1.0',
+					outputFormat: 'gml3'
+				},
+				wms: {
+					hostAddress: 'http://localhost:9002/',
+					layers: 'cite:mpfview',
+					url: 'geoserver/cite/wms?service=WMS&request=GetMap',
+					version: '1.1.0',
+				},
+				style: {
+					stroke: {
+						color: 'rgba(230,100,255,1)',
+						width: 3
+					}
+				}					
+			},
+			{
 				title: 'Airports',
 				name: 'airports',				
 				wfs: {
 					hostAddress: 'http://localhost:9002/',
-					//url: 'geoserver/getm/ows?service=WFS&request=GetFeature&typeName=getm:tm_prime',
 					url: 'geoserver/wfs/ows?service=WFS&request=GetFeature&typeName=wfs:cl_airports',
 					version: '1.1.0',
+					outputFormat: 'gml3'
 				},
 				wms: {
 					hostAddress: 'http://localhost:9002/',
 					layers: 'wfs:cl_airports',
-					//layers: 'getm:tm_prime',
-					//url: 'geoserver/getm/wms?service=WFS&request=GetFeature&typeName=getm:tm_prime',
 					url: 'geoserver/wfs/wms?service=WMS&request=GetMap',
 					version: '1.1.0',
 				},
@@ -77,6 +121,7 @@ CGSWeb_Map.Options = {
 					hostAddress: 'http://localhost:9002/',
 					url: 'geoserver/wfs/ows?service=WFS&request=GetFeature&typeName=wfs:cl_roads',
 					version: '1.1.0',	
+					outputFormat: 'gml3'
 				},
 				wms: {
 					hostAddress: 'http://localhost:9002/',
@@ -97,7 +142,8 @@ CGSWeb_Map.Options = {
 				wfs: {
 					hostAddress: 'http://localhost:9002/',
 					url: 'geoserver/wfs/ows?service=WFS&request=GetFeature&typeName=wfs:cl_state_routes',
-					version: '1.1.0',				
+					version: '1.1.0',	
+					outputFormat: 'gml3'			
 				},
 				wms: {
 					hostAddress: 'http://localhost:9002/',

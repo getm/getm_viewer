@@ -279,8 +279,8 @@ function retrieveTgtName(){
 // displays and fills out layerInfo popup
 export function layerInfoPopup(){
     if(globals.shapes[globals.selectedFeatureID] == undefined || globals.shapes[globals.selectedFeatureID].getProperties() == undefined) {
-         //fillLayerInfoDefaults();
         clearLayerInfoContents();
+        //fillLayerInfoDefaults();
         retrieveValidProperties();
         retrieveTgtName();  
     } else
@@ -314,6 +314,7 @@ function assignValues() {
     layerInfoRequirements.forEach(function(layerInfoReq){
         if(id != undefined && id.length > 0 ) {
             try {
+                validateLayerInfo(layerInfoReq);
                 if((<HTMLInputElement>document.getElementById(layerInfoReq.val)).value.length > 0
                 && !(<HTMLInputElement>document.getElementById(layerInfoReq.val)).classList.contains('wrong'))
                     fields[layerInfoReq.val] =  {'val' : (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value, 'type': layerInfoReq.type };
@@ -379,15 +380,17 @@ function retrieveValidProperties() {
     layerInfoRequirements.forEach(function(layerInfoReq){
         // this is a shape
         if(globals.shapes[globals.selectedFeatureID] != undefined 
-        && (globals.shapes[globals.selectedFeatureID].getFeature().getProperties()[layerInfoReq.val] != undefined)) {
+        && (globals.shapes[globals.selectedFeatureID].getFeature().getProperties()[layerInfoReq.val] != undefined)
+        &&  (globals.shapes[globals.selectedFeatureID].getFeature().getProperties()[layerInfoReq.val].length > 0)) {
             (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = globals.shapes[globals.selectedFeatureID].getFeature().getProperties()[layerInfoReq.val];
         } else if (globals.selectedFeature != undefined 
         // this is wfs
         && globals.selectedFeature.getProperties()['id'] == globals.selectedFeatureID 
-        &&  globals.selectedFeature.get(layerInfoReq.val)!= undefined) {
+        &&  globals.selectedFeature.get(layerInfoReq.val)!= undefined 
+        && globals.selectedFeature.get(layerInfoReq.val).lenth > 0) {
             (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = globals.selectedFeature.getProperties()[layerInfoReq.val];
         } else {
-            (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = "";
+            //(<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = "";
         }        
     });    
     retrieveLayer();
@@ -507,12 +510,9 @@ export function layerInfoSetup(){
 
         var featureLayer = map.forEachFeatureAtPixel(map.getEventPixel(e),
             function (feature, layer) {
-                if(layer && feature && layer.get('selectable')) 
-                {
-                    console.log('layer is selectable');
+                if(layer && feature && layer.get('selectable')) {
                     return [feature, layer];
                 }
-                console.log('layer is not selectable');
         });
 
         if (featureLayer != undefined && featureLayer[0] != undefined) {

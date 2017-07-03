@@ -345,6 +345,7 @@ export function setupShapes() {
         input.onclick = buttonActions[a];
         div2.appendChild(input);
     }
+    map.render();
 }
 
 function normalizeCoord(coord) {

@@ -262,7 +262,7 @@ function createSLD(wfsMapConfig){
         + '<NamedLayer>' 
         + '<Name>' + wfsMapConfig.wms.layers + '</Name>' 
             + '<UserStyle>'
-                + '<Title>SLD Cook Book: Simple Line</Title>' 
+                // + '<Title>SLD Cook Book: Simple Line</Title>' 
                 + '<FeatureTypeStyle><Rule><LineSymbolizer><Stroke>'
                     + '<CssParameter name="stroke">' + rgb2hex(getStyleColor(wfsMapConfig, 'stroke')) + '</CssParameter>'
                     + '<CssParameter name="stroke-width">' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
@@ -305,13 +305,14 @@ function populateWFS() {
         if(wfsMapConfig.wfs != undefined && wfsMapConfig.wfs != {}) {
             var wfslayer = new ol.layer.Vector({
                 source: new ol.source.Vector({
-                    format: (wfsMapConfig.wfs.version == '1.1.0') ? new ol.format.GML3() : 
-                            (wfsMapConfig.wfs.version == '1.0.0') ? new ol.format.GML2() : 
-                            undefined,
+                    format: (wfsMapConfig.wfs.outputFormat == 'gml3') ? new ol.format.GML3() : 
+                            (wfsMapConfig.wfs.outputFormat == 'gml2') ? new ol.format.GML2() : 
+                            new ol.format.GML3(), // default format
                     url: wfsMapConfig.wfs.url ? function(extent,resolution,proj) {
                         return wfsMapConfig.wfs.hostAddress + wfsMapConfig.wfs.url 
                             + '&version=' + (wfsMapConfig.wfs.version ? wfsMapConfig.wfs.version : defaultVersion)
-                            + '&srs=' + (wfsMapConfig.wfs.srs ? wfsMapConfig.wfs.srs : CGSWeb_Map.Options.map.defaultProjection)
+                            + (wfsMapConfig.wfs.srs ? ('&srs=' + wfsMapConfig.wfs.srs ) : '')
+                            + (wfsMapConfig.wfs.outputFormat ? ('&outputFormat=' + wfsMapConfig.wfs.outputFormat) : '')
                             + '&bbox=' + flipExtent(
                                 extent, 
                                 '1.3.0',
@@ -351,7 +352,8 @@ function populateWFS() {
                             LAYERS: wfsMapConfig.wms.layers,
                             TILED: true,
                             VERSION: wfsMapConfig.wms.version,
-                            SLD_BODY: createSLD(wfsMapConfig)//encodeURI(createSLD())
+                            SLD_BODY: createSLD(wfsMapConfig),//encodeURI(createSLD())
+                            SRS: (wfsMapConfig.wfs.srs ? wfsMapConfig.wfs.srs : '')
                         },
                         crossOrigin: 'anonymous',
                         serverType: 'geoserver',
@@ -382,6 +384,7 @@ function populateWFS() {
     var wfslayerGroup = new ol.layer.Group({
         layers: wfslayers
     });
+
     var wmslayerGroup = new ol.layer.Group({
         layers: wmslayers
     })
@@ -393,9 +396,11 @@ function populateWFS() {
         if(map.getView().getZoom() > CGSWeb_Map.Options.zoomThreshold) {
             //console.log('wfs')
             map.getLayerGroup().getLayers().getArray()[WFS_LAYER] = wfslayerGroup;
+            map.render();
         } else {
             //console.log('wms');
             map.getLayerGroup().getLayers().getArray()[WFS_LAYER] = wmslayerGroup;
+            map.render();
         }
     });
 }
