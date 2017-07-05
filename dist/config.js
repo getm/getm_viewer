@@ -45,11 +45,15 @@ CGSWeb_Map.Options = {
 				arcgis_wmts: false
 			}
 		],
+		// Shapetype specifies what geometry type are stored in that layer
+		// Possible shapeTypes include: [*, undefined, Point]
+		// Default: Line
 		wfsMapConfigs: [
 			{
 				// using this to test if correctly inserted into tm_prime
 				title: 'TM Prime',
-				name: 'tmprime',				
+				name: 'tmprime',		
+				shapeType: 'Line',		
 				wfs: {
 					hostAddress: 'http://localhost:9002/',
 					url: 'geoserver/getm/ows?service=WFS&request=GetFeature&typeName=getm:tm_prime',
@@ -72,7 +76,8 @@ CGSWeb_Map.Options = {
 			// using this to test other geoserver things
 			{
 				title: 'MPFPT View',
-				name: 'mpfptview',				
+				name: 'mpfptview',	
+				shapeType: 'Point',			
 				wfs: {
 					hostAddress: 'http://localhost:9002/',
 					url: 'geoserver/cite/ows?service=WFS&request=GetFeature&typeName=cite:mpfptview',

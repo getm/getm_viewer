@@ -262,8 +262,8 @@ function createSLD(wfsMapConfig){
         + '<NamedLayer>' 
         + '<Name>' + wfsMapConfig.wms.layers + '</Name>' 
             + '<UserStyle><FeatureTypeStyle>'
-                + usingSLDToSpecifyShape(wfsMapConfig)
-                // + usingConfigsToSpecifyShape(wfsMapConfig)
+                // + usingSLDToSpecifyShape(wfsMapConfig)
+                + usingConfigsToSpecifyShape(wfsMapConfig)
             + '</FeatureTypeStyle></UserStyle>'
         + '</NamedLayer>'
     + '</StyledLayerDescriptor>';
@@ -324,38 +324,8 @@ function usingSLDToSpecifyShape(wfsMapConfig) {
 
 // Hacky temporary solution for SLD
 function usingConfigsToSpecifyShape(wfsMapConfig) {
-    return ((!wfsMapConfig.shapeType || wfsMapConfig.shapeType != 'Point')
-        ? ('<Rule>' // line rule
-            // + '<Filter>'
-            //     + '<PropertyIsEqualTo>'
-            //         + '<Function name="in3">'
-            //             + '<Function name="geometryType">'
-            //                 + '<PropertyName>shape</PropertyName>'
-            //             + '</Function>'
-            //             + '<Literal>Polyline</Literal>' 
-            //             + '<Literal>Polygon</Literal>' 
-            //             + '<Literal>Multiline</Literal>'  
-            //         + '</Function>'    
-            //         + '<Literal>true</Literal>'                   
-            //     + '</PropertyIsEqualTo>'
-            // + '</Filter>'          
-            + '<LineSymbolizer>' 
-                + '<Stroke>'
-                    + '<CssParameter name="stroke">' + rgb2hex(getStyleColor(wfsMapConfig, 'stroke')) + '</CssParameter>'
-                    + '<CssParameter name="stroke-width">' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
-                + '</Stroke>'
-            + '</LineSymbolizer>'
-        + '</Rule>') // end line rule
-
-        : ('<Rule>' // point rule
-            // + '<Filter>'
-            //     + '<PropertyIsEqualTo>'
-            //         + '<Function name="geometryType">'
-            //             + '<PropertyName>corners</PropertyName>'
-            //         + '</Function>'
-            //         + '<Literal>Point</Literal>'
-            //     + '</PropertyIsEqualTo>'
-            // + '</Filter>'                   
+    return ((wfsMapConfig.shapeType && wfsMapConfig.shapeType.toUpperCase().indexOf('POINT') != -1)
+        ? ('<Rule>' // point rule                
             + '<PointSymbolizer>'                
                 + '<Graphic>'
                     + '<Mark>'
@@ -371,7 +341,16 @@ function usingConfigsToSpecifyShape(wfsMapConfig) {
                     + '<Size>' + (getStyleWidth(wfsMapConfig) * 2) + '</Size>'
                 + '</Graphic>'
             + '</PointSymbolizer>'                
-        + '</Rule>')); // end point rule
+        + '</Rule>') // end point rule
+
+        : ('<Rule>' // line rule        
+            + '<LineSymbolizer>' 
+                + '<Stroke>'
+                    + '<CssParameter name="stroke">' + rgb2hex(getStyleColor(wfsMapConfig, 'stroke')) + '</CssParameter>'
+                    + '<CssParameter name="stroke-width">' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
+                + '</Stroke>'
+            + '</LineSymbolizer>'
+        + '</Rule>')); // end line rule 
 }
 
 function getStyleColor(layerConfig, style='unspecified') {
