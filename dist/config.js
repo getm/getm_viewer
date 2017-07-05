@@ -8,7 +8,7 @@ CGSWeb_Map.Options = {
 	saveFormat: 'SHAPEFILE',
 	map: {
 		defaultProjection: 'EPSG:4326',
-		defaultZoom: 10,
+		defaultZoom: 3,
 		defaultCenter: [-117.69069861,35.68503472]
 	},
 	layers: {
@@ -89,7 +89,10 @@ CGSWeb_Map.Options = {
 					stroke: {
 						color: 'rgba(230,100,255,1)',
 						width: 3
-					}
+					},
+					fill: {
+						color: 'rgba(230,100,255,1)'
+					}					
 				}					
 			},			
 			// using this to test other geoserver things

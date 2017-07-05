@@ -261,30 +261,118 @@ function createSLD(wfsMapConfig){
     + 'xsi:schemaLocation="http://www.opengis.net/sld StyledLayerDescriptor.xsd">'
         + '<NamedLayer>' 
         + '<Name>' + wfsMapConfig.wms.layers + '</Name>' 
-            + '<UserStyle>'
-                // + '<Title>SLD Cook Book: Simple Line</Title>' 
-                + '<FeatureTypeStyle><Rule>'
-                    + '<LineSymbolizer><Stroke>'
-                        + '<CssParameter name="stroke">' + rgb2hex(getStyleColor(wfsMapConfig, 'stroke')) + '</CssParameter>'
-                        + '<CssParameter name="stroke-width">' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
-                    + '</Stroke></LineSymbolizer>'
-                    + '<PointSymbolizer>'
-                        + '<Graphic>'
-                        + '<Mark>'
-                            + '<WellKnownName>circle</WellKnownName>'
-                            + '<Fill>'
-                            + '<CssParameter name="fill">' + rgb2hex(getStyleColor(wfsMapConfig, 'stroke')) + '</CssParameter>'
-                            + '</Fill>'
-                        + '</Mark>'
-                        + '<Size>' + (getStyleWidth(wfsMapConfig) * 2) + '</Size>'
-                        + '</Graphic>'
-                    + '</PointSymbolizer>'
-                + '</Rule></FeatureTypeStyle>'
-            + '</UserStyle>'
+            + '<UserStyle><FeatureTypeStyle>'
+                + usingSLDToSpecifyShape(wfsMapConfig)
+                // + usingConfigsToSpecifyShape(wfsMapConfig)
+            + '</FeatureTypeStyle></UserStyle>'
         + '</NamedLayer>'
     + '</StyledLayerDescriptor>';
 }
 
+// TODO: not working yet
+function usingSLDToSpecifyShape(wfsMapConfig) {
+    return '<Rule>' // line rule
+            + '<Filter>'
+                + '<PropertyIsEqualTo>'
+                    + '<Function name="in3">'
+                        + '<Function name="geometryType">'
+                            + '<PropertyName>shape</PropertyName>'
+                        + '</Function>'
+                        + '<Literal>Polyline</Literal>' 
+                        + '<Literal>Polygon</Literal>' 
+                        + '<Literal>Multiline</Literal>'  
+                    + '</Function>'    
+                    + '<Literal>true</Literal>'                   
+                + '</PropertyIsEqualTo>'
+            + '</Filter>'          
+            + '<LineSymbolizer>' 
+                + '<Stroke>'
+                    + '<CssParameter name="stroke">' + rgb2hex(getStyleColor(wfsMapConfig, 'stroke')) + '</CssParameter>'
+                    + '<CssParameter name="stroke-width">' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
+                + '</Stroke>'
+            + '</LineSymbolizer>'
+        + '</Rule>' // end line rule
+
+        + '<Rule>' // point rule
+            // + '<ElseFilter>'
+            + '<Filter>'
+                + '<PropertyIsEqualTo>'
+                    + '<Function name="geometryType">'
+                        + '<PropertyName>shape</PropertyName>'
+                    + '</Function>'
+                    + '<Literal>Point</Literal>'
+                + '</PropertyIsEqualTo>'
+            + '</Filter>' 
+            // + '</ElseFilter>'                  
+            + '<PointSymbolizer>'                
+                + '<Graphic>'
+                    + '<Mark>'
+                        + '<WellKnownName>circle</WellKnownName>'
+                        + '<Stroke>'
+                            + '<CssParameter name="stroke">' + rgb2hex(getStyleColor(wfsMapConfig, 'stroke')) + '</CssParameter>'
+                            + '<CssParameter name="stroke-width">' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
+                        + '</Stroke>'                            
+                        + '<Fill>'
+                            + '<CssParameter name="fill">' + rgb2hex(getStyleColor(wfsMapConfig, 'fill')) + '</CssParameter>'
+                        + '</Fill>'
+                    + '</Mark>'
+                    + '<Size>' + (getStyleWidth(wfsMapConfig) * 2) + '</Size>'
+                + '</Graphic>'
+            + '</PointSymbolizer>'                
+        + '</Rule>'; // end point rule
+}
+
+// Hacky temporary solution for SLD
+function usingConfigsToSpecifyShape(wfsMapConfig) {
+    return ((!wfsMapConfig.shapeType || wfsMapConfig.shapeType != 'Point')
+        ? ('<Rule>' // line rule
+            // + '<Filter>'
+            //     + '<PropertyIsEqualTo>'
+            //         + '<Function name="in3">'
+            //             + '<Function name="geometryType">'
+            //                 + '<PropertyName>shape</PropertyName>'
+            //             + '</Function>'
+            //             + '<Literal>Polyline</Literal>' 
+            //             + '<Literal>Polygon</Literal>' 
+            //             + '<Literal>Multiline</Literal>'  
+            //         + '</Function>'    
+            //         + '<Literal>true</Literal>'                   
+            //     + '</PropertyIsEqualTo>'
+            // + '</Filter>'          
+            + '<LineSymbolizer>' 
+                + '<Stroke>'
+                    + '<CssParameter name="stroke">' + rgb2hex(getStyleColor(wfsMapConfig, 'stroke')) + '</CssParameter>'
+                    + '<CssParameter name="stroke-width">' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
+                + '</Stroke>'
+            + '</LineSymbolizer>'
+        + '</Rule>') // end line rule
+
+        : ('<Rule>' // point rule
+            // + '<Filter>'
+            //     + '<PropertyIsEqualTo>'
+            //         + '<Function name="geometryType">'
+            //             + '<PropertyName>corners</PropertyName>'
+            //         + '</Function>'
+            //         + '<Literal>Point</Literal>'
+            //     + '</PropertyIsEqualTo>'
+            // + '</Filter>'                   
+            + '<PointSymbolizer>'                
+                + '<Graphic>'
+                    + '<Mark>'
+                        + '<WellKnownName>circle</WellKnownName>'
+                        + '<Stroke>'
+                            + '<CssParameter name="stroke">' + rgb2hex(getStyleColor(wfsMapConfig, 'stroke')) + '</CssParameter>'
+                            + '<CssParameter name="stroke-width">' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
+                        + '</Stroke>'                            
+                        + '<Fill>'
+                            + '<CssParameter name="fill">' + rgb2hex(getStyleColor(wfsMapConfig, 'fill')) + '</CssParameter>'
+                        + '</Fill>'
+                    + '</Mark>'
+                    + '<Size>' + (getStyleWidth(wfsMapConfig) * 2) + '</Size>'
+                + '</Graphic>'
+            + '</PointSymbolizer>'                
+        + '</Rule>')); // end point rule
+}
 
 function getStyleColor(layerConfig, style='unspecified') {
     if(layerConfig.style) {
@@ -320,6 +408,7 @@ function populateWFS() {
                 source: new ol.source.Vector({
                     format: (wfsMapConfig.wfs.outputFormat == 'gml3') ? new ol.format.GML3() : 
                             (wfsMapConfig.wfs.outputFormat == 'gml2') ? new ol.format.GML2() : 
+                            (wfsMapConfig.wfs.outputFormat == 'kml') ? new ol.format.KML() : 
                             new ol.format.GML3(), // default format
                     url: wfsMapConfig.wfs.url ? function(extent,resolution,proj) {
                         return wfsMapConfig.wfs.hostAddress + wfsMapConfig.wfs.url 
@@ -328,19 +417,30 @@ function populateWFS() {
                             + (wfsMapConfig.wfs.outputFormat ? ('&outputFormat=' + wfsMapConfig.wfs.outputFormat) : '')
                             + '&bbox=' + flipExtent(
                                 extent, 
-                                '1.3.0',
+                                '1.0.0',
                                 (wfsMapConfig.wfs.version ? wfsMapConfig.wfs.version : defaultVersion)).join(',') ;
                     }: undefined,
                     strategy: ol.loadingstrategy.bbox,
                     attributions: [new ol.Attribution({
                         html: '<div style="color:' + getStyleColor(wfsMapConfig) + ';" class="wfs_legend">' + wfsMapConfig.title + '</div>',
                         
-                    })]  
+                    })],
                 }),
+                renderBuffer:600,
                 updateWhileInteracting: true,
                 visible: false,
-                style: wfsMapConfig.style ? 
+                style:// wfsMapConfig.style ? 
                     new ol.style.Style({
+                        image: new ol.style.Circle({
+                            stroke: new ol.style.Stroke({
+                                color: getStyleColor(wfsMapConfig, 'stroke'),
+                                width: getStyleWidth(wfsMapConfig)
+                            }),
+                            fill: new ol.style.Fill({
+                                color: getStyleColor(wfsMapConfig, 'fill')
+                            }),
+                            radius: 5
+                        }),
                         stroke: new ol.style.Stroke({
                             color: getStyleColor(wfsMapConfig, 'stroke'),
                             width: getStyleWidth(wfsMapConfig)
@@ -348,8 +448,9 @@ function populateWFS() {
                         fill: new ol.style.Fill({
                             color: getStyleColor(wfsMapConfig, 'fill')
                         }),
-                    }): 
-                    new ol.style.Style()      
+                    })//: 
+                    //new ol.style.Style(),
+                         
             });
             wfslayer.set('name', wfsMapConfig.wfs.name);
             wfslayer.set('selectable', true);
@@ -409,11 +510,17 @@ function populateWFS() {
         if(map.getView().getZoom() > CGSWeb_Map.Options.zoomThreshold) {
             //console.log('wfs')
             map.getLayerGroup().getLayers().getArray()[WFS_LAYER] = wfslayerGroup;
-            map.render();
+            wfslayerGroup.getLayers().getArray().forEach(function(layer){
+                (<ol.layer.Vector>layer).getSource().changed();
+            });
+            // map.render();
         } else {
             //console.log('wms');
             map.getLayerGroup().getLayers().getArray()[WFS_LAYER] = wmslayerGroup;
-            map.render();
+            wmslayerGroup.getLayers().getArray().forEach(function(layer){
+                (<ol.layer.Tile>layer).getSource().changed();
+            });            
+            // map.render();
         }
     });
 }
