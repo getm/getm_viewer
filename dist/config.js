@@ -61,12 +61,12 @@ CGSWeb_Map.Options = {
 					version: '1.1.0',
 					outputFormat: 'gml3'
 				},
-				wms: {
-					hostAddress: 'http://localhost:9002/',
-					layers: 'getm:tm_prime',
-					url: 'geoserver/getm/wms?service=WMS&request=GetMap',
-					version: '1.1.0',
-				},
+				// wms: {
+				// 	hostAddress: 'http://localhost:9002/',
+				// 	layers: 'getm:tm_prime',
+				// 	url: 'geoserver/getm/wms?service=WMS&request=GetMap',
+				// 	version: '1.1.0',
+				// },
 				style: {
 					stroke: {
 						color: 'rgba(230,100,255,1)',
