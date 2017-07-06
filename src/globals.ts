@@ -8,6 +8,7 @@ export var globals = {
     featuresArray: [],
     shapeLayer: undefined,
     basemapLayer: undefined,
+    viewLabels: false,
     counts: {
         'rectangle': 0,
         'circle': 0,

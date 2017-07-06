@@ -32,7 +32,8 @@ export function navSetup() {
     navBarNav.appendChild(createNavDropDown('Tools', 
     {
         'drawButton': 'Draw',
-        'legend': 'Legend'
+        'legend': 'Legend',
+        'viewLabelsButton': 'View Labels'
     }));
 }
 

@@ -54,6 +54,7 @@ CGSWeb_Map.Options = {
 				title: 'TM Prime',
 				name: 'tmprime',		
 				shapeType: 'Line',		
+				label: 'name',
 				wfs: {
 					hostAddress: 'http://localhost:9002/',
 					url: 'geoserver/getm/ows?service=WFS&request=GetFeature&typeName=getm:tm_prime',
@@ -77,7 +78,8 @@ CGSWeb_Map.Options = {
 			{
 				title: 'MPFPT View',
 				name: 'mpfptview',	
-				shapeType: 'Point',			
+				shapeType: 'Point',		
+				label: 'name',	
 				wfs: {
 					hostAddress: 'http://localhost:9002/',
 					url: 'geoserver/cite/ows?service=WFS&request=GetFeature&typeName=cite:mpfptview',

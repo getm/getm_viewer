@@ -596,5 +596,8 @@ function featureInfoPopup() {
         featureval.disabled = true;
         featureval.value = properties[p];
         featurediv.appendChild(featureval);
+
+        $('#featureInfoPopup').css('left', window.innerWidth / 2  - $('#featureInfoPopup').width()/2);
+        $('#featureInfoPopup').css('top', window.innerHeight / 2  - $('#featureInfoPopup').height()/2);
     }    
 }

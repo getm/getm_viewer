@@ -408,8 +408,9 @@ function populateWFS() {
                 renderBuffer:600,
                 updateWhileInteracting: true,
                 visible: false,
-                style:// wfsMapConfig.style ? 
-                    new ol.style.Style({
+                style:
+                (function(feature, resolution){
+                    var style = new ol.style.Style({
                         image: new ol.style.Circle({
                             stroke: new ol.style.Stroke({
                                 color: getStyleColor(wfsMapConfig, 'stroke'),
@@ -420,6 +421,13 @@ function populateWFS() {
                             }),
                             radius: 5
                         }),
+                        text: new ol.style.Text({
+                            font: '20px Calibri,sans-serif',
+                            fill: new ol.style.Fill({ color: '#000' }),
+                            // get the text from the feature - `this` is ol.Feature
+                            text: (globals.viewLabels && this.getProperties()) ? this.getProperties()[wfsMapConfig.label] : '',
+                            offsetY: -25
+                        }),
                         stroke: new ol.style.Stroke({
                             color: getStyleColor(wfsMapConfig, 'stroke'),
                             width: getStyleWidth(wfsMapConfig)
@@ -427,15 +435,19 @@ function populateWFS() {
                         fill: new ol.style.Fill({
                             color: getStyleColor(wfsMapConfig, 'fill')
                         }),
-                    })//: 
-                    //new ol.style.Style(),
-                         
+                    });
+                    var styles = [style];
+                    return function(feature, resolution){
+                        console.log(this);
+                        style.getText().setText((globals.viewLabels && this.getProperties()) ? this.getProperties()[wfsMapConfig.label] : '');
+                        return styles;
+                    }})()
             });
             wfslayer.set('name', wfsMapConfig.wfs.name);
             wfslayer.set('selectable', true);
             wfslayers.push(wfslayer);
             globals.counts[wfsMapConfig.wfs.name] = 0;
-            
+            window.screenX
             // wms optional
             if(wfsMapConfig.wms != undefined && wfsMapConfig.wms != {}) {      
                 var wmslayer = new ol.layer.Tile({
@@ -502,6 +514,14 @@ function populateWFS() {
             // map.render();
         }
     });
+    // key for layers displayed -- not including basemap
+    $('#viewLabelsButton').click(function(){
+        globals.viewLabels = !globals.viewLabels;
+        wfslayerGroup.getLayers().getArray().forEach(function(layer){
+            (<ol.layer.Vector>layer).getSource().changed();
+        });
+        map.render();
+    });    
 }
 
 // sets up the shape layer options
