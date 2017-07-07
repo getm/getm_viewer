@@ -21,7 +21,22 @@
     -moz-appearance: button;
     padding: 2px 8px;
     border-radius: 4px;
-    color: black;
     font-weight: normal;
     width: max-content;
+}
+
+.button {
+    color: black;
+    background-color: #787878;
+    border: none;
+}
+
+input {
+    background-color: #646464;
+    border-color: #858585;
+}
+
+select{
+    background-color: #646464;
+    border-color: #858585;
 }

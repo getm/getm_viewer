@@ -223,7 +223,7 @@ function printImg(e) {
 
 // sets up catsearch result window
 function catsearchResultsSetup() {
-    var catsearchResultsPopup = windowSetup('catsearchResults', 'Cat Search');
+    var catsearchResultsPopup = windowSetup('catsearchResults', 'CATCODE Results');
     document.getElementById('app').appendChild(catsearchResultsPopup);
 
     var catsearchResults = document.createElement('div');
@@ -238,7 +238,7 @@ function catsearchResultsSetup() {
 
 // sets up besearch result window
 function besearchResultsSetup() {
-    var besearchResultsPopup = windowSetup('besearchResults', 'BE Search');
+    var besearchResultsPopup = windowSetup('besearchResults', 'BE Results');
     document.getElementById('app').appendChild(besearchResultsPopup);
 
     var besearchResults = document.createElement('div');
@@ -253,7 +253,7 @@ function besearchResultsSetup() {
 
 // sets up getm popup
 function getmSetup() {
-    var getm = windowSetup('getm');
+    var getm = windowSetup('getm', 'GETM');
     document.getElementById('getmButton').onclick = function(){    
         if(document.getElementById("getmPopupText").classList.toggle("show")) {
             $("#getmPopup").zIndex(2);
@@ -340,8 +340,8 @@ export function setupShapes() {
 
         var input = document.createElement('button');
         input.type='button';
+        input.className ='button';
         input.innerText = shapeActions[a].charAt(0).toUpperCase() + shapeActions[a].replace('Shapes', '').slice(1);
-        $(input).css('color', 'black');
         input.onclick = buttonActions[a];
         div2.appendChild(input);
     }

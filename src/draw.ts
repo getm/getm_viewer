@@ -163,11 +163,6 @@ export function drawSetup() {
 function drawPopup() {
     var drawPopupText = document.getElementById('drawPopupText')
     if(drawPopupText.classList.toggle("show")) {
-        // move around the popup
-        $(drawPopupText.parentElement).draggable();
-        $(drawPopupText).resizable({
-            handles: 'all'
-        });
         $(drawPopupText.parentElement).zIndex(1);
     } 
 }
@@ -187,7 +182,7 @@ function drawButtons() {
 
         var label = document.createElement('label');
         label.setAttribute('for', innerText[i]+'Option');
-        label.setAttribute('class', 'drawButtonOptionLabel');
+        label.setAttribute('class', 'drawButtonOptionLabel button');
         label.innerText = innerText[i];
 
         div.appendChild(radioInput);

@@ -460,6 +460,8 @@ export function layerInfoSetup(){
             input.onchange = function(){
                 validateLayerInfo(layerInfoReq);
             }
+            input.setAttribute('data-toggle', 'tooltip');
+            input.setAttribute('title', 'Regex: \n\t' + layerInfoReq.regex + '\n' + 'Example: \n\t' + layerInfoReq.example);            
             div.appendChild(input);
         // form entry is select
         } else {
@@ -475,6 +477,8 @@ export function layerInfoSetup(){
             select.onchange = function(){
                 validateLayerInfo(layerInfoReq);
             }
+            select.setAttribute('data-toggle', 'tooltip');
+            select.setAttribute('title', 'Regex: \n\t' + layerInfoReq.regex + '\n' + 'Example: \n\t' + layerInfoReq.example);                     
             div.appendChild(select);
         }
 
@@ -489,6 +493,7 @@ export function layerInfoSetup(){
     submit.type = 'button';
     submit.id = 'submitlayerinfo';
     submit.value = 'Submit';
+    submit.className = 'button';
     div2.appendChild(submit);
     $('#submitlayerinfo').click(function(){
         assignValues();
@@ -498,6 +503,22 @@ export function layerInfoSetup(){
         $('#featureInfoPopupText').removeClass('show');
         $('#featureInfoPopup').zIndex(-1);  
     }); 
+
+
+    // var x = 
+    // '<ul id="contextMenu" class="dropdown-menu" role="menu" style="display:none" >'
+    // +'    <li><a tabindex="-1" href="#">Action</a></li>'
+    // +'    <li><a tabindex="-1" href="#">Another action</a></li>'
+    // +'    <li><a tabindex="-1" href="#">Something else here</a></li>'
+    // +'    <li class="divider"></li>'
+    // +'    <li><a tabindex="-1" href="#">Separated link</a></li>'
+    // +'</ul>'
+
+
+    // // context menu
+    // map.getViewport().addEventListener('contextmenu', function (e) {
+    //     console.log('context menu');
+    // });
 
     // on chrome, map.on(click, fn...)
     // on firefox, map.getViewport().addEventListener('click')
@@ -571,9 +592,19 @@ function featureInfoSetup() {
 
     // click on edit button to bring up layerinfo popup
     var editButton = document.createElement('button');
-    editButton.innerHTML = "EDIT";
+    editButton.innerHTML = "Edit";
+    editButton.className = 'button';
+    $(editButton).css('margin','0 10px')
     editButton.onclick = layerInfoPopup;
     featureInfoContents.appendChild(editButton);
+
+    // click on edit button to bring up layerinfo popup
+    var copyButton = document.createElement('button');
+    copyButton.innerHTML = "Copy";
+    copyButton.className = 'button';
+    $(copyButton).css('margin','0 10px')
+    copyButton.onclick = copyFeatureInfo;
+    featureInfoContents.appendChild(copyButton);    
 }
 
 // displays and fills out featureInfo popup
@@ -600,4 +631,24 @@ function featureInfoPopup() {
         $('#featureInfoPopup').css('left', window.innerWidth / 2  - $('#featureInfoPopup').width()/2);
         $('#featureInfoPopup').css('top', window.innerHeight / 2  - $('#featureInfoPopup').height()/2);
     }    
+}
+
+// copies the feature info stuff as a list
+function copyFeatureInfo() {
+    var properties = globals.selectedFeature.getProperties();
+    var str = '';
+    for(var p in properties) {
+        str = str + p + ': ' + properties[p] + '\r\n\t';
+    }    
+    console.log(str);
+    copyToClipboard(str);
+}
+
+function copyToClipboard(str) {
+  var $temp = $("<input>");
+  $temp.css('white-space', 'pre')
+  $("body").append($temp);
+  $temp.val(str).select();
+  document.execCommand("copy");
+  $temp.remove();
 }

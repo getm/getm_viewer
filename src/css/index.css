@@ -1,17 +1,13 @@
-.inprogress{
-    background-color: orange;
-}
-
 .page-contents{
     /*padding-top: 20px;  nav bar has height of 50px     */
-    top:20px;
+    top: 20px;
     position:absolute;
     width: 100%;
     /*padding: 20px;*/
 }
 
 body {
-    background-color: #bba;/*#ddf;*/
+    background-color: #2E2E2E;/*#ddf;*/
 }
 
 #wmslayer {
@@ -19,12 +15,13 @@ body {
 }
 
 .window-contents {
-    background-color: #555;/*#dbc;/*#fde; /*#555;/* for debugging #555 for final*/
+    background-color:  #2E2E2E;/* #555;/*#dbc;/*#fde; /*#555;/* for debugging #555 for final*/
     overflow-x:hidden;
     overflow-y: auto;
     border-radius: 6px;
     height: 100%;
     padding: 20px;
+    min-height: 1px;
 }
 
 .popup .show {
@@ -51,16 +48,12 @@ body {
 .popup .popuptext {
     min-width: 40px;
     min-height: 40px;
-    background-color:  #333;/*#faa;;  /*find suitable color later*/
+    background-color:  #111;/*#faa;;  /*find suitable color later*/
     color: #fff;
     text-align: center;
     border-radius: 6px;
     border: 1px solid ; /*#ccc*/
     margin: 0;
-}
-
-.popup .popuptext input {
-    color: black;
 }
 
 .window-headers{
@@ -76,4 +69,7 @@ body {
     right: 10px; /*padding offset*/
     position: absolute;
     overflow: visible;
+    color: #858585;
+    opacity: .8;
+    text-shadow: 0 1px 0 #646464;
 }

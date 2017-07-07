@@ -30,13 +30,7 @@
 }
 
 .msg{ 
-    /*display: inline-table;*/
-    /*position: relative;*/
-    /*right: 0%;*/
-    /*text-align: center;*/
-    /*background-color: black;*/
     width: 100%;
-    /*//height: 40px;*/
     overflow-y: auto;
 }
 
@@ -65,7 +59,4 @@
     display: table-cell;
     float: right;
     height: inherit;
-}
-#featureInfo-contents button{
-    color: black;
 }

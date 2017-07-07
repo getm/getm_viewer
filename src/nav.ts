@@ -2,7 +2,7 @@ declare const CGSWeb_Map;
 import './css/nav.css';
 export function navSetup() {
     var nav = document.createElement('nav');
-    nav.className = "navbar navbar-inverse";
+    nav.className = "navbar";// navbar-inverse";
     document.getElementById('nav').appendChild(nav);
 
     var navContainer = document.createElement('div');
@@ -18,31 +18,64 @@ export function navSetup() {
     navContainer.appendChild(navBarNav);
 
     navBarNav.appendChild(createNavDropDown('File', 
-    {
-        'saveSessBtn': 'Save Session',
-        'loadSessBtn': 'Load Session',
-        'saveBtn': 'Save Shape',
-        'printBtn': 'Print',
-    }));
+    [
+        {
+            id: 'saveSessBtn',
+            title: 'Save Session',
+            description: 'Saves the shapes of the current session'
+        },
+        {
+            id: 'loadSessBtn',
+            title: 'Load Session',
+            description: 'Loads the shapes of the previously saved session'
+        },
+        {
+            id: 'saveBtn',
+            title: 'Save Shape',
+            description: 'Saves the shapes of the current session as a shapefile or kml'
+        },
+        {
+            id: 'printBtn',
+            title: 'Print',
+            description: 'Prints the displayed shapes and the map'
+        },                        
+        // 'loadSessBtn': 'Load Session',
+        // 'saveBtn': 'Save Shape',
+        // 'printBtn': 'Print',
+    ]));
 
     navBarNav.appendChild(createNavDropDownMapLayers());
     navBarNav.appendChild(createNavDropDownWFS());
-    navBarNav.appendChild(createNavButton('getmButton', 'GETM'));  
+    navBarNav.appendChild(createNavButton('getmButton', 'GETM', 'Opens popup for inserting, updating, \nand deleting to/from the database'));  
     navBarNav.appendChild(createNavDropDownLocalSearch());
     navBarNav.appendChild(createNavDropDown('Tools', 
-    {
-        'drawButton': 'Draw',
-        'legend': 'Legend',
-        'viewLabelsButton': 'View Labels'
-    }));
+    [
+        {
+            id: 'drawButton',
+            title: 'Draw',
+            description: 'Opens popup for shapes palatte'
+        },
+        {
+            id: 'legend',
+            title: 'Legend',
+            description: 'Displays legend for visible map layers'
+        },
+        {
+            id: 'viewLabelsButton',
+            title: 'View Labels',
+            description: 'Toggles labels for wfs layers'
+        },
+    ]));
 }
 
-function createNavButton(id, innerText) {
+function createNavButton(id, innerText, description='') {
     var li = document.createElement('li');
     
     var a = document.createElement('a');
     a.href = '#';
     a.id = id;
+    a.setAttribute('data-toggle', 'tooltip');
+    a.setAttribute('title', description);
     a.innerHTML = innerText;
     li.appendChild(a);
 
@@ -70,14 +103,16 @@ function createNavDropDown(title, options) {
     dropdownMenu.className = 'dropdown-menu';
     li.appendChild(dropdownMenu);
 
-    for(var o in options) {
+    for(var o of options) {
         var optionItem = document.createElement('li');
         dropdownMenu.appendChild(optionItem);
 
         var optionContent = document.createElement('a');
         optionContent.href = '#';
-        optionContent.id = o;
-        optionContent.innerHTML = options[o];
+        optionContent.id = o.id;
+        optionContent.innerHTML = o.title;
+        optionContent.setAttribute('data-toggle', 'tooltip');
+        optionContent.setAttribute('title', o.description);
         optionItem.appendChild(optionContent);
     }
 
@@ -115,6 +150,8 @@ function createNavDropDownLocalSearch() {
     var besearchLabel = document.createElement('label');
     besearchLabel.htmlFor = 'besearch';
     besearchLabel.innerHTML = 'BE Search:';
+    besearchLabel.setAttribute('data-toggle', 'tooltip');
+    besearchLabel.setAttribute('title', 'besearch description');
     besearchGroup.appendChild(besearchLabel);
 
     var besearchInput = document.createElement('input');
@@ -140,7 +177,9 @@ function createNavDropDownLocalSearch() {
 
     var catsearchLabel = document.createElement('label');
     catsearchLabel.htmlFor = 'catsearch';
-    catsearchLabel.innerHTML = 'Catcode Search:';
+    catsearchLabel.innerHTML = 'CATCODE Search:';
+    catsearchLabel.setAttribute('data-toggle', 'tooltip');
+    catsearchLabel.setAttribute('title', 'CATCODE description');    
     catsearchGroup.appendChild(catsearchLabel);
 
     var catsearchInput = document.createElement('input');

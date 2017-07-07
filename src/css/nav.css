@@ -23,6 +23,15 @@ a.test input[type="radio"]:checked+label {
     display: none;
 }
 
+.navbar {
+    background-color: #111;
+}
+
+.navbar a {
+    color: #858585;
+    font-weight: bold;
+}
+
 .caret-right {
     border-bottom: 4px solid transparent;
     border-top: 4px solid transparent;

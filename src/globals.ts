@@ -54,8 +54,9 @@ export function windowSetup(id, headerTitle=id){
     popupText.appendChild(windowContents);
 
     $(popup).draggable();
-    $(popupText).resizable({
-        handles: 'all'
-    });
+    popup.ondrag = function(e){e.preventDefault(); e.stopPropagation()};
+    // $(popupText).resizable({
+    //     handles: 'all'
+    // });
     return popup;
 }
