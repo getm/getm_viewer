@@ -147,14 +147,14 @@ function createNavDropDownLocalSearch() {
     var besearchLabel = document.createElement('label');
     besearchLabel.htmlFor = 'besearch';
     besearchLabel.innerHTML = 'BE Search:';
-    besearchLabel.setAttribute('data-toggle', 'tooltip');
-    besearchLabel.setAttribute('title', 'besearch description');
     besearchGroup.appendChild(besearchLabel);
 
     var besearchInput = document.createElement('input');
     besearchInput.type = 'text';
     besearchInput.className = 'form-control';
     besearchInput.id = 'besearch';
+    besearchInput.setAttribute('data-toggle', 'tooltip');
+    besearchInput.setAttribute('title', 'Query for shapes with specified BE number');    
     besearchGroup.appendChild(besearchInput);
 
     var besearchButton = document.createElement('button');
@@ -175,14 +175,14 @@ function createNavDropDownLocalSearch() {
     var catsearchLabel = document.createElement('label');
     catsearchLabel.htmlFor = 'catsearch';
     catsearchLabel.innerHTML = 'CATCODE Search:';
-    catsearchLabel.setAttribute('data-toggle', 'tooltip');
-    catsearchLabel.setAttribute('title', 'CATCODE description');    
     catsearchGroup.appendChild(catsearchLabel);
 
     var catsearchInput = document.createElement('input');
     catsearchInput.type = 'text';
     catsearchInput.className = 'form-control';
     catsearchInput.id = 'catsearch';
+    catsearchInput.setAttribute('data-toggle', 'tooltip');
+    catsearchInput.setAttribute('title', 'Query for features in viewable area with specified CATCODE');        
     catsearchGroup.appendChild(catsearchInput);
 
     var catsearchButton = document.createElement('button');
@@ -198,6 +198,8 @@ function createNavDropDownLocalSearch() {
 function createNavDropDownWFS() {
     var li = document.createElement('li');
     li.className = 'dropdown';
+    li.setAttribute('data-toggle', 'tooltip dropdown');
+    li.setAttribute('title', 'Select WFS layers to show');      
 
     var a = document.createElement('a');
     a.className = 'dropdown-toggle';
@@ -263,10 +265,12 @@ function createNavDropDownMapLayers() {
     wmsLayerLabel.className = 'test';
     wmsLayerLabel.tabIndex = -1;
     wmsLayerLabel.href = '#';
+    wmsLayerLabel.setAttribute('data-toggle', 'tooltip');
+    wmsLayerLabel.setAttribute('title', 'Set base map layer');         
     wmsLayerGroup.appendChild(wmsLayerLabel);
 
     var wmsLayerTitle = document.createElement('span');
-    wmsLayerTitle.innerHTML = 'WMS Layer ';
+    wmsLayerTitle.innerHTML = 'WMS Layer ';   
     wmsLayerLabel.appendChild(wmsLayerTitle);
 
     var caret = document.createElement('span');
@@ -309,6 +313,8 @@ function createNavDropDownMapLayers() {
     shapeLayerLabel.className = 'test';
     shapeLayerLabel.tabIndex = -1;
     shapeLayerLabel.href = '#';
+    shapeLayerLabel.setAttribute('data-toggle', 'tooltip');
+    shapeLayerLabel.setAttribute('title', 'Set current drawing layer');      
     shapeLayerGroup.appendChild(shapeLayerLabel);
 
     var shapeLayerTitle = document.createElement('span');
