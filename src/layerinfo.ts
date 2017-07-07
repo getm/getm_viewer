@@ -504,21 +504,75 @@ export function layerInfoSetup(){
         $('#featureInfoPopup').zIndex(-1);  
     }); 
 
+    document.onclick = function(e){
+        if(contextMenu && ($(contextMenu).is(e.target) || $.contains(contextMenu, <HTMLElement>e.target)))
+            return;
+        else if(contextMenu && contextMenu.parentElement) {
+            contextMenu.parentElement.removeChild(contextMenu);
+        }
+    }
 
-    // var x = 
-    // '<ul id="contextMenu" class="dropdown-menu" role="menu" style="display:none" >'
-    // +'    <li><a tabindex="-1" href="#">Action</a></li>'
-    // +'    <li><a tabindex="-1" href="#">Another action</a></li>'
-    // +'    <li><a tabindex="-1" href="#">Something else here</a></li>'
-    // +'    <li class="divider"></li>'
-    // +'    <li><a tabindex="-1" href="#">Separated link</a></li>'
-    // +'</ul>'
+    function contextMenuSetup() {
+        var ul = document.createElement('ul');
+        ul.className = 'dropdown-menu show';
+        // $(ul).css('display', 'inline');
+        $(ul).css('top', '0');
+        document.getElementById('app').appendChild(ul);
 
+        var li1 = document.createElement('li'); 
+        ul.appendChild(li1);
+        
+        var a = document.createElement('a');
+        a.className = 'test';
+        a.tabIndex = -1;
+        a.href = '#';
+        li1.appendChild(a);
 
-    // // context menu
-    // map.getViewport().addEventListener('contextmenu', function (e) {
-    //     console.log('context menu');
-    // });
+        var b = document.createElement('span');
+        b.innerHTML = 'b';
+        a.appendChild(b);
+
+        var divider = document.createElement('li');
+        divider.className = 'divider';
+        ul.appendChild(divider);
+
+        var li2 = document.createElement('li'); 
+        ul.appendChild(li2);
+
+        var c = document.createElement('a');
+        c.className = 'test';
+        c.tabIndex = -1;
+        c.href = '#';
+        li2.appendChild(c);
+
+        var d = document.createElement('span');
+        d.innerHTML = 'd';
+        c.appendChild(d);
+        return ul;
+    }
+    var contextMenu;// = contextMenuSetup();
+
+    // context menu
+    map.getViewport().addEventListener('contextmenu', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+        if(contextMenu && contextMenu.parentElement)
+        {
+            $(contextMenu).css({
+                left: (<MouseEvent>e).clientX,
+                top: (<MouseEvent>e).clientY,
+                position: 'absolute'
+            })
+        }
+        else {
+            contextMenu = contextMenuSetup();
+            $(contextMenu).css({
+                left: (<MouseEvent>e).clientX,
+                top: (<MouseEvent>e).clientY,
+                position: 'absolute'
+            })
+        }
+    });
 
     // on chrome, map.on(click, fn...)
     // on firefox, map.getViewport().addEventListener('click')

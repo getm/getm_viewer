@@ -39,9 +39,6 @@ export function navSetup() {
             title: 'Print',
             description: 'Prints the displayed shapes and the map'
         },                        
-        // 'loadSessBtn': 'Load Session',
-        // 'saveBtn': 'Save Shape',
-        // 'printBtn': 'Print',
     ]));
 
     navBarNav.appendChild(createNavDropDownMapLayers());
