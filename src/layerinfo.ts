@@ -513,49 +513,50 @@ export function layerInfoSetup(){
     }
 
     function contextMenuSetup() {
+        var contextmenuoptions = ['a', 'b', 'c', 'd'];
+        var contextmenufns = [
+            function(){console.log('a')}, 
+            function(){console.log('b')},
+            function(){console.log('c')}, 
+            function(){console.log('d')}
+        ];
+
         var ul = document.createElement('ul');
         ul.className = 'dropdown-menu show';
-        // $(ul).css('display', 'inline');
         $(ul).css('top', '0');
         document.getElementById('app').appendChild(ul);
 
-        var li1 = document.createElement('li'); 
-        ul.appendChild(li1);
-        
-        var a = document.createElement('a');
-        a.className = 'test';
-        a.tabIndex = -1;
-        a.href = '#';
-        li1.appendChild(a);
+        for(var contextmenuoption in contextmenuoptions) {
+            var li = document.createElement('li');
+            ul.appendChild(li);
 
-        var b = document.createElement('span');
-        b.innerHTML = 'b';
-        a.appendChild(b);
+            var a = document.createElement('a');
+            a.className = 'test';
+            a.tabIndex = -1;
+            a.onclick = contextmenufns[contextmenuoption];
+            a.href = '#';
+            li.appendChild(a);
 
-        var divider = document.createElement('li');
-        divider.className = 'divider';
-        ul.appendChild(divider);
+            var span = document.createElement('span');
+            span.innerHTML = contextmenuoptions[contextmenuoption];
+            a.appendChild(span);            
 
-        var li2 = document.createElement('li'); 
-        ul.appendChild(li2);
-
-        var c = document.createElement('a');
-        c.className = 'test';
-        c.tabIndex = -1;
-        c.href = '#';
-        li2.appendChild(c);
-
-        var d = document.createElement('span');
-        d.innerHTML = 'd';
-        c.appendChild(d);
+            if(contextmenuoption != (contextmenuoptions.length - 1).toString()) {
+                var divider = document.createElement('li');
+                divider.className = 'divider';
+                ul.appendChild(divider);
+            }
+        }
         return ul;
     }
-    var contextMenu;// = contextMenuSetup();
+    var contextMenu;
 
     // context menu
     map.getViewport().addEventListener('contextmenu', function (e) {
         e.stopPropagation();
         e.preventDefault();
+
+        // move context menu
         if(contextMenu && contextMenu.parentElement)
         {
             $(contextMenu).css({
@@ -564,6 +565,7 @@ export function layerInfoSetup(){
                 position: 'absolute'
             })
         }
+        // create context menu
         else {
             contextMenu = contextMenuSetup();
             $(contextMenu).css({
@@ -692,17 +694,14 @@ function copyFeatureInfo() {
     var properties = globals.selectedFeature.getProperties();
     var str = '';
     for(var p in properties) {
-        str = str + p + ': ' + properties[p] + '\r\n\t';
+        str = str + p + ': \t' + properties[p] + '\r\n';
     }    
-    console.log(str);
-    copyToClipboard(str);
-}
+   console.log(str);
 
-function copyToClipboard(str) {
-  var $temp = $("<input>");
-  $temp.css('white-space', 'pre')
-  $("body").append($temp);
-  $temp.val(str).select();
-  document.execCommand("copy");
-  $temp.remove();
+    var $temp = $("<input>");
+    $temp.css('white-space', 'pre')
+    $("body").append($temp);
+    $temp.val(str).select();
+    document.execCommand("copy");
+    $temp.remove();
 }
