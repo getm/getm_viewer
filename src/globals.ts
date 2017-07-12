@@ -25,14 +25,19 @@ export function windowSetup(id, headerTitle=id){
     popup.className = 'popup';
     document.getElementById('getmpage').appendChild(popup);
 
+    this.popup = popup;
+
     var popupText = document.createElement('div');
     popupText.id = id+'PopupText';
     popupText.className = 'popuptext';
     popup.appendChild(popupText);
 
+    this.popupText = popupText;
+
     var windowHeaders = document.createElement('div');
     windowHeaders.className = 'window-headers';
     popupText.appendChild(windowHeaders);
+    this.windowHeaders = windowHeaders;
 
     var windowHeaderTitle = document.createElement('span');
     windowHeaderTitle.innerHTML = headerTitle;
@@ -47,16 +52,13 @@ export function windowSetup(id, headerTitle=id){
         $(popupText).zIndex(-1);
     };
     windowHeaders.appendChild(windowHeadersCloseBtn);
-
+    this.close = windowHeadersCloseBtn;
+    
     var windowContents = document.createElement('div');
     windowContents.className = 'window-contents';
-    windowContents.id = id + '-contents';
+    windowContents.id = id + '-contents'; // TODO: CSS STILL DEPENDS ON THIS
     popupText.appendChild(windowContents);
+    this.windowContents = windowContents;
 
-    $(popup).draggable();
-    popup.ondrag = function(e){e.preventDefault(); e.stopPropagation()};
-    // $(popupText).resizable({
-    //     handles: 'all'
-    // });
-    return popup;
+    $(popup).draggable({cancel: '.window-contents'});
 }

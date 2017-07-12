@@ -7,7 +7,8 @@ import {setupShapes} from './getm';
 import {Shape} from './Shape'
 declare const GeoServerRestInterface;
 var required;
-
+var featureInfoDiv;
+var layerInfoDiv;
 // list of each of the layer info fields
 var layerInfoRequirements = [
     { // benumber
@@ -261,13 +262,13 @@ function setRequiredFields(response) {
 // set layerinfo popup's layer value
 function retrieveLayer() {
     if(globals.shapes[globals.selectedFeatureID] != undefined) { // shapes layer
-        $('#layerinfolayerwfs').addClass('hide');
-        $('#layerinfolayer').removeClass('hide');
-        (<HTMLSelectElement>document.getElementById('layerinfolayer')).value = globals.shapes[globals.selectedFeatureID].getLayer().get('name');  
+        $(layerInfoDiv.layerinfolayerwfs).addClass('hide');
+        $(layerInfoDiv.layerinfolayer).removeClass('hide');
+        layerInfoDiv.layerinfolayer.value = globals.shapes[globals.selectedFeatureID].getLayer().get('name');  
     } else { // wfs layer
-        $('#layerinfolayer').addClass('hide');
-        $('#layerinfolayerwfs').removeClass('hide');
-        (<HTMLInputElement>document.getElementById('layerinfolayerwfs')).value = globals.selectedFeature.getProperties()['layer'];
+        $(layerInfoDiv.layerinfolayer).addClass('hide');
+        $(layerInfoDiv.layerinfolayerwfs).removeClass('hide');
+        layerInfoDiv.layerinfolayerwfs.value = globals.selectedFeature.getProperties()['layer'];
     }
 }
 
@@ -288,9 +289,9 @@ export function layerInfoPopup(){
 
     // validate information, scroll to top, and display
     layerInfoRequirements.forEach(validateLayerInfo);
-    $('#layerInfo-contents').scrollTop(0);
-    $('#layerInfoPopupText').addClass('show');
-    $('#layerInfoPopup').zIndex(2);     
+    $(layerInfoDiv.windowContents).scrollTop(0);
+    $(layerInfoDiv.popupText).addClass('show');
+    $(layerInfoDiv.popup).zIndex(2);     
 }
 
 // retrieves values from globals.shapes to fill out layerInfo popup
@@ -410,11 +411,9 @@ function fillLayerInfoDefaults() {
 export function layerInfoSetup(){
     retrieveRequiredFields();
     featureInfoSetup();
-    var app = document.getElementById('app');
-    var layerInfoDiv = windowSetup('layerInfo', 'Layer Information');
-    app.appendChild(layerInfoDiv);
 
-    var layerInfoContents = document.getElementById('layerInfo-contents');
+    layerInfoDiv = new windowSetup('layerInfo', 'Layer Information');
+    var layerInfoContents = layerInfoDiv.windowContents;
     var layerInfoForm = document.createElement('form');
     layerInfoForm.id = 'layerInfoForm';
     layerInfoContents.appendChild(layerInfoForm);
@@ -426,12 +425,14 @@ export function layerInfoSetup(){
     shapeLayerSelect.className = "shape-layer-select";
     shapeLayerSelect.id = "layerinfolayer";
     div.appendChild(shapeLayerSelect);
+    layerInfoDiv.layerinfolayer = shapeLayerSelect; 
 
     var wfsLayerInput = document.createElement('input');
     wfsLayerInput.type = "text";
     wfsLayerInput.disabled = true;
     wfsLayerInput.id = "layerinfolayerwfs";
     div.appendChild(wfsLayerInput);
+    layerInfoDiv.layerinfolayerwfs = wfsLayerInput;
 
     layerInfoRequirements.forEach(function(layerInfoReq){
         var div = document.createElement('div');
@@ -495,13 +496,13 @@ export function layerInfoSetup(){
     submit.value = 'Submit';
     submit.className = 'button';
     div2.appendChild(submit);
-    $('#submitlayerinfo').click(function(){
+    $(submit).click(function(){
         assignValues();
     });
 
-    $('#layerInfo-close').click(function(){
-        $('#featureInfoPopupText').removeClass('show');
-        $('#featureInfoPopup').zIndex(-1);  
+    $(layerInfoDiv.close).click(function(){
+        $(featureInfoDiv.popupText).removeClass('show');
+        $(featureInfoDiv.popup).zIndex(-1);  
     }); 
 
     document.onclick = function(e){
@@ -580,10 +581,10 @@ export function layerInfoSetup(){
     // on firefox, map.getViewport().addEventListener('click')
     map.getViewport().addEventListener('click', function (e) {
         e.preventDefault();
-        $('#featureInfoPopupText').removeClass('show');
-        $('#featureInfoPopup').zIndex(-1);  
-        $('#layerInfoPopupText').removeClass('show');
-        $('#layerInfoPopup').zIndex(-1);  
+        $(featureInfoDiv.popupText).removeClass('show');
+        $(featureInfoDiv.popup).zIndex(-1);  
+        $(layerInfoDiv.popupText).removeClass('show');
+        $(layerInfoDiv.popup).zIndex(-1);  
 
         var featureLayer = map.forEachFeatureAtPixel(map.getEventPixel(e),
             function (feature, layer) {
@@ -637,14 +638,13 @@ function validateLayerInfo(layerInfoReq) {
 
 // sets up featureInfo popup
 function featureInfoSetup() {
-    var app = document.getElementById('app');
-    var featureInfoDiv = windowSetup('featureInfo', 'Feature Information');
-    app.appendChild(featureInfoDiv);
+    featureInfoDiv = new windowSetup('featureInfo', 'Feature Information');
 
-    var featureInfoContents = document.getElementById('featureInfo-contents');
+    var featureInfoContents = featureInfoDiv.windowContents;
     var fields = document.createElement('div');
     fields.id = 'featureInfoFields';
     featureInfoContents.appendChild(fields);
+    featureInfoDiv.fields = fields;
 
     // click on edit button to bring up layerinfo popup
     var editButton = document.createElement('button');
@@ -665,14 +665,14 @@ function featureInfoSetup() {
 
 // displays and fills out featureInfo popup
 function featureInfoPopup() {
-    $('#featureInfoPopupText').addClass('show');
-    $('#featureInfoPopup').zIndex(2);    
-    document.getElementById('featureInfoFields').innerHTML = ''; // clear off inside
+    $(featureInfoDiv.popupText).addClass('show');
+    $(featureInfoDiv.popup).zIndex(2);    
+    featureInfoDiv.fields.innerHTML = ''; // clear off inside
 
     var properties = globals.selectedFeature.getProperties();
     for(var p in properties) {
         var featurediv = document.createElement('div');
-        document.getElementById('featureInfoFields').appendChild(featurediv);
+        featureInfoDiv.fields.appendChild(featurediv);
 
         var featurelabel = document.createElement('span');
         featurelabel.innerHTML = p + ':';
@@ -684,8 +684,8 @@ function featureInfoPopup() {
         featureval.value = properties[p];
         featurediv.appendChild(featureval);
 
-        $('#featureInfoPopup').css('left', window.innerWidth / 2  - $('#featureInfoPopup').width()/2);
-        $('#featureInfoPopup').css('top', window.innerHeight / 2  - $('#featureInfoPopup').height()/2);
+        $(featureInfoDiv.popup).css('left', window.innerWidth / 2  - $(featureInfoDiv.popup).width()/2);
+        $(featureInfoDiv.popup).css('top', window.innerHeight / 2  - $(featureInfoDiv.popup).height()/2);
     }    
 }
 

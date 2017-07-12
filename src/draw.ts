@@ -8,6 +8,7 @@ import {Shape} from './Shape';
 
 // go over which i need
 var draw;
+var drawDiv;
 var deleteInteraction;
 var radioSelection;
 
@@ -150,10 +151,9 @@ function setupDelete(){
 export function drawSetup() {
     // creates popup
     document.getElementById('drawButton').onclick = drawPopup;
-    var app = document.getElementById("app");
-    var drawDiv = windowSetup('draw', 'Draw');
-    app.appendChild(drawDiv);
-    drawDiv.classList.toggle('show');
+    
+    drawDiv = new windowSetup('draw', 'Draw');
+    drawDiv.popup.classList.toggle('show');
 
     drawButtons(); // populate draw buttons and functionality
     setupDelete(); // creates delete interaction 
@@ -161,7 +161,7 @@ export function drawSetup() {
 
 // toggles popup
 function drawPopup() {
-    var drawPopupText = document.getElementById('drawPopupText')
+    var drawPopupText = drawDiv.popupText;
     if(drawPopupText.classList.toggle("show")) {
         $(drawPopupText.parentElement).zIndex(1);
     } 
@@ -172,7 +172,7 @@ function drawButtons() {
     var innerText = [ 'rectangle', 'circle', 'freeform', 'polyline', 'polygon', 'ellipse', 'delete'];
     for(var i in innerText) {
         var div = document.createElement('div');
-        div.id = 'draw' + innerText[i];
+        //div.id = 'draw' + innerText[i];
 
         var radioInput = document.createElement('input');
         radioInput.setAttribute('type', 'radio');
@@ -187,7 +187,7 @@ function drawButtons() {
 
         div.appendChild(radioInput);
         div.appendChild(label);
-        document.getElementById('draw-contents').appendChild(div);
+        drawDiv.windowContents.appendChild(div);
         radioInput.onclick = function(){
             if(radioSelection == (<HTMLInputElement>this).value) { // unselect
                 (<HTMLInputElement>this).checked = false;

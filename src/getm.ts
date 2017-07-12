@@ -11,6 +11,9 @@ declare const CGSWeb_Map;
 declare const GeoServerRestInterface;
 declare const ProductRestInterface;
 var SHAPES_LAYER = 2;
+var getmDiv;
+var catsearchResultsDiv;
+var besearchResultsDiv;
 
 // clears map of shapes and retrieves stored shapes
 function loadSession(){
@@ -96,7 +99,7 @@ function successSave(response, a) {
 // perform be search
 function besearch(){
     var results = [];
-    document.getElementById('besearchResults').innerHTML = "";
+    besearchResultsDiv.windowContents.innerHTML = "";
     for (var shapesID in globals.shapes) {   
         if($('#besearch').val()) {
             if($('#besearch').val() == WILDCARD ||
@@ -107,7 +110,7 @@ function besearch(){
                     globals.selectedFeatureID = this.innerHTML;
                     layerInfoPopup();
                 }
-                document.getElementById('besearchResults').appendChild(result);
+                besearchResultsDiv.windowContents.appendChild(result);
             }
         }
     }
@@ -175,7 +178,7 @@ function normalizeExtent(extent) {
 // catcode searches within extent -- searches only for shapes :(
 function catsearch() {
     var extent = map.getView().calculateExtent(map.getSize());
-    document.getElementById('catsearchResults').innerHTML = "";
+    catsearchResultsDiv.windowContents.innerHTML = "";
     (<ol.layer.Group>(map.getLayerGroup().getLayers().getArray()[SHAPES_LAYER])).getLayers().getArray().forEach(function(layer){
         (<ol.layer.Vector>layer).getSource().getFeaturesInExtent(extent).forEach(function(feature){
             if($('#catsearch').val()){
@@ -187,7 +190,7 @@ function catsearch() {
                         globals.selectedFeatureID = this.innerHTML;
                         layerInfoPopup();
                     }
-                    document.getElementById('catsearchResults').appendChild(result);
+                    catsearchResultsDiv.windowContents.appendChild(result);
                 }
             }            
         })
@@ -223,46 +226,45 @@ function printImg(e) {
 
 // sets up catsearch result window
 function catsearchResultsSetup() {
-    var catsearchResultsPopup = windowSetup('catsearchResults', 'CATCODE Results');
-    document.getElementById('app').appendChild(catsearchResultsPopup);
+    catsearchResultsDiv = new windowSetup('catsearchResults', 'CATCODE Results');
 
     var catsearchResults = document.createElement('div');
-    catsearchResults.id = 'catsearchResults';
-    document.getElementById('catsearchResults-contents').appendChild(catsearchResults);
+    //catsearchResults.id = 'catsearchResults';
+    catsearchResultsDiv.windowContents.appendChild(catsearchResults);
     document.getElementById('catsearchBtn').onclick = function() {
-        $('#catsearchResultsPopupText').addClass('show');
-        $('#catsearchResultsPopup').zIndex(2);     
+        $(catsearchResultsDiv.popupText).addClass('show');
+        $(catsearchResultsDiv.popup).zIndex(2);     
         catsearch();    
     }
 }
 
 // sets up besearch result window
 function besearchResultsSetup() {
-    var besearchResultsPopup = windowSetup('besearchResults', 'BE Results');
-    document.getElementById('app').appendChild(besearchResultsPopup);
+    besearchResultsDiv = new windowSetup('besearchResults', 'BE Results');
 
     var besearchResults = document.createElement('div');
-    besearchResults.id = 'besearchResults';
-    document.getElementById('besearchResults-contents').appendChild(besearchResults);
+    //besearchResults.id = 'besearchResults';
+    besearchResultsDiv.windowContents.appendChild(besearchResults);
     document.getElementById('besearchBtn').onclick = function(){
-        $('#besearchResultsPopupText').addClass('show');
-        $('#besearchResultsPopup').zIndex(2);     
+        $(besearchResultsDiv.popupText).addClass('show');
+        $(besearchResultsDiv.popup).zIndex(2);     
         besearch();      
     }
 }
 
 // sets up getm popup
 function getmSetup() {
-    var getm = windowSetup('getm', 'GETM');
+    getmDiv = new windowSetup('getm', 'GETM');
+
     document.getElementById('getmButton').onclick = function(){    
-        if(document.getElementById("getmPopupText").classList.toggle("show")) {
-            $("#getmPopup").zIndex(2);
+        if(getmDiv.popupText.classList.toggle("show")) {
+            $(getmDiv.popup).zIndex(2);
         };
     }
     var div1 = document.createElement('div');
     div1.id = 'layer';
     div1.align = 'center';
-    document.getElementById('getm-contents').appendChild(div1);
+    getmDiv.windowContents.appendChild(div1);
 
     var span = document.createElement('span'); 
     span.innerHTML = 'Layer:';
@@ -272,13 +274,13 @@ function getmSetup() {
     div1.appendChild(span2);
 
     var shapeLayerSelect = document.createElement('select');
-    shapeLayerSelect.id = 'getm-shape-layer-select';
+    //shapeLayerSelect.id = 'getm-shape-layer-select';
     shapeLayerSelect.className = 'shape-layer-select';
     span2.appendChild(shapeLayerSelect);
 
     var div2 = document.createElement('div');
     div2.id = 'shapes';
-    document.getElementById('getm-contents').appendChild(div2);
+    getmDiv.windowContents.appendChild(div2);
     setupShapes();
 }
 
