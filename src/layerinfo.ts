@@ -274,7 +274,7 @@ function retrieveLayer() {
 
 // retrieves target name
 function retrieveTgtName(){
-    (<HTMLInputElement>document.getElementById('tgt_name')).value =  globals.selectedFeatureID; 
+    layerInfoDiv['tgt_name'].value =  globals.selectedFeatureID; 
 }
 
 // displays and fills out layerInfo popup
@@ -298,9 +298,9 @@ export function layerInfoPopup(){
 function retrieveValues() {
     layerInfoRequirements.forEach(function(layerInfoReq){
         if(globals.shapes[globals.selectedFeatureID].getProperties()[layerInfoReq.val] != undefined) {
-            (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = globals.shapes[globals.selectedFeatureID].getProperties()[layerInfoReq.val]['val'];
+            layerInfoDiv[layerInfoReq.val].value = globals.shapes[globals.selectedFeatureID].getProperties()[layerInfoReq.val]['val'];
         } else {
-            (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = "";
+            layerInfoDiv[layerInfoReq.val].value = "";
         }
     });
     retrieveLayer();
@@ -308,7 +308,7 @@ function retrieveValues() {
 
 // assigns values from feature and layerInfo popup to globals.shapes(shape) or features(wfs/others)
 function assignValues() {
-    var id = (<HTMLInputElement>document.getElementById('tgt_name')).value;
+    var id = layerInfoDiv['tgt_name'].value;
     var fields = {};
     var entry = {};
 
@@ -316,11 +316,11 @@ function assignValues() {
         if(id != undefined && id.length > 0 ) {
             try {
                 validateLayerInfo(layerInfoReq);
-                if((<HTMLInputElement>document.getElementById(layerInfoReq.val)).value.length > 0
-                && !(<HTMLInputElement>document.getElementById(layerInfoReq.val)).classList.contains('wrong'))
-                    fields[layerInfoReq.val] =  {'val' : (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value, 'type': layerInfoReq.type };
+                if(layerInfoDiv[layerInfoReq.val].value.length > 0
+                && !layerInfoDiv[layerInfoReq.val].classList.contains('wrong'))
+                    fields[layerInfoReq.val] =  {'val' : layerInfoDiv[layerInfoReq.val].value, 'type': layerInfoReq.type };
             } catch(e) {
-                console.log('exception in assigning ' + (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value + ' field ' + layerInfoReq.val);
+                console.log('exception in assigning ' + layerInfoDiv[layerInfoReq.val].value + ' field ' + layerInfoReq.val);
             }
         }
     });
@@ -361,9 +361,9 @@ function assignValues() {
         }        
         var properties = {};
         layerInfoRequirements.forEach(function(layerInfoReq){
-            if((<HTMLInputElement>document.getElementById(layerInfoReq.val)).value.length > 0
-                && !(<HTMLInputElement>document.getElementById(layerInfoReq.val)).classList.contains('wrong'))
-                properties[layerInfoReq.val] = (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value;
+            if(layerInfoDiv[layerInfoReq.val].value.length > 0
+                && !layerInfoDiv[layerInfoReq.val].classList.contains('wrong'))
+                properties[layerInfoReq.val] = layerInfoDiv[layerInfoReq.val].value;
         });
         globals.selectedFeature.setProperties(properties);
     }
@@ -372,7 +372,7 @@ function assignValues() {
 // blank slate with layerInfo popup
 function clearLayerInfoContents() {
     layerInfoRequirements.forEach(function(layerInfoReq){
-        (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value ="";
+        layerInfoDiv[layerInfoReq.val].value ="";
     });
 }
 
@@ -383,13 +383,13 @@ function retrieveValidProperties() {
         if(globals.shapes[globals.selectedFeatureID] != undefined 
         && (globals.shapes[globals.selectedFeatureID].getFeature().getProperties()[layerInfoReq.val] != undefined)
         &&  (globals.shapes[globals.selectedFeatureID].getFeature().getProperties()[layerInfoReq.val].length > 0)) {
-            (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = globals.shapes[globals.selectedFeatureID].getFeature().getProperties()[layerInfoReq.val];
+            layerInfoDiv[layerInfoReq.val].value = globals.shapes[globals.selectedFeatureID].getFeature().getProperties()[layerInfoReq.val];
         } else if (globals.selectedFeature != undefined 
         // this is wfs
         && globals.selectedFeature.getProperties()['id'] == globals.selectedFeatureID 
         &&  globals.selectedFeature.get(layerInfoReq.val)!= undefined 
         && globals.selectedFeature.get(layerInfoReq.val).lenth > 0) {
-            (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = globals.selectedFeature.getProperties()[layerInfoReq.val];
+            layerInfoDiv[layerInfoReq.val].value = globals.selectedFeature.getProperties()[layerInfoReq.val];
         } else {
             //(<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = "";
         }        
@@ -400,7 +400,7 @@ function retrieveValidProperties() {
 // fill in default values for layerInfo popup
 function fillLayerInfoDefaults() {
     layerInfoRequirements.forEach(function(layerInfoReq){
-        (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value = layerInfoReq.example;
+        layerInfoDiv[layerInfoReq.val].value = layerInfoReq.example;
     });
     retrieveLayer();
     retrieveTgtName();  
@@ -423,14 +423,12 @@ export function layerInfoSetup(){
 
     var shapeLayerSelect = document.createElement('select');
     shapeLayerSelect.className = "shape-layer-select";
-    shapeLayerSelect.id = "layerinfolayer";
     div.appendChild(shapeLayerSelect);
     layerInfoDiv.layerinfolayer = shapeLayerSelect; 
 
     var wfsLayerInput = document.createElement('input');
     wfsLayerInput.type = "text";
     wfsLayerInput.disabled = true;
-    wfsLayerInput.id = "layerinfolayerwfs";
     div.appendChild(wfsLayerInput);
     layerInfoDiv.layerinfolayerwfs = wfsLayerInput;
 
@@ -449,14 +447,12 @@ export function layerInfoSetup(){
 
         var msg = document.createElement('span');
         msg.className = 'msg';
-        msg.id = layerInfoReq.val + '-msg';
         msglabelcontainer.appendChild(msg);
-        
+        layerInfoDiv[layerInfoReq.val] = input;
         // form entry is input
         if(layerInfoReq['options'] == undefined) {
             var input = document.createElement('input');
             input.type = 'text';
-            input.id = layerInfoReq.val;
             input.placeholder = layerInfoReq.val;
             input.onchange = function(){
                 validateLayerInfo(layerInfoReq);
@@ -464,10 +460,10 @@ export function layerInfoSetup(){
             input.setAttribute('data-toggle', 'tooltip');
             input.setAttribute('title', 'Regex: \n\t' + layerInfoReq.regex + '\n' + 'Example: \n\t' + layerInfoReq.example);            
             div.appendChild(input);
+            layerInfoDiv[layerInfoReq.val] = input;
         // form entry is select
         } else {
             var select = document.createElement('select');
-            select.id = layerInfoReq.val;
             select.placeholder = layerInfoReq.val;
             layerInfoReq['options'].forEach(function(option){
                 var opt = document.createElement('option');
@@ -481,8 +477,9 @@ export function layerInfoSetup(){
             select.setAttribute('data-toggle', 'tooltip');
             select.setAttribute('title', 'Regex: \n\t' + layerInfoReq.regex + '\n' + 'Example: \n\t' + layerInfoReq.example);                     
             div.appendChild(select);
+            layerInfoDiv[layerInfoReq.val] = select;
         }
-
+        layerInfoDiv[layerInfoReq.val]['msg'] = msg;
         var br = document.createElement('br');
         div.appendChild(br);
     });
@@ -492,7 +489,6 @@ export function layerInfoSetup(){
 
     var submit = document.createElement('input');
     submit.type = 'button';
-    submit.id = 'submitlayerinfo';
     submit.value = 'Submit';
     submit.className = 'button';
     div2.appendChild(submit);
@@ -524,7 +520,6 @@ export function layerInfoSetup(){
 
         var ul = document.createElement('ul');
         ul.className = 'dropdown-menu show';
-        $(ul).css('top', '0');
         document.getElementById('app').appendChild(ul);
 
         for(var contextmenuoption in contextmenuoptions) {
@@ -607,7 +602,7 @@ export function layerInfoSetup(){
                 (<ol.Feature>featureLayer[0]).setProperties({'id': globals.selectedFeatureID});
                 featureInfoPopup();
             // shape layer
-            } else {
+            } else { 
                 layerInfoPopup();
             }
         }
@@ -618,19 +613,19 @@ export function layerInfoSetup(){
 function validateLayerInfo(layerInfoReq) {
     // check for regex matches
     var check = false;
-    var value = (<HTMLInputElement>document.getElementById(layerInfoReq.val)).value;
+    var value = layerInfoDiv[layerInfoReq.val].value;
     if(value != undefined) 
         check =  matchRegex(new RegExp(layerInfoReq.regex), value.trim());
 
     // correct 
     if(check) {
-        (<HTMLInputElement>document.getElementById(layerInfoReq.val)).classList.remove('wrong')
-        document.getElementById(layerInfoReq.val + '-msg').innerHTML='';
+        layerInfoDiv[layerInfoReq.val].classList.remove('wrong')
+        layerInfoDiv[layerInfoReq.val]['msg'].innerHTML='';
     // incorrect and not marked as wrong
-    } else if(!(<HTMLInputElement>document.getElementById(layerInfoReq.val)).classList.contains('wrong')) {
-        (<HTMLInputElement>document.getElementById(layerInfoReq.val)).classList.add('wrong');
-        document.getElementById(layerInfoReq.val+'-msg').className = 'msg';
-        document.getElementById(layerInfoReq.val + '-msg').innerHTML='correct syntax is <br/> '
+    } else if(!layerInfoDiv[layerInfoReq.val].classList.contains('wrong')) {
+        layerInfoDiv[layerInfoReq.val].classList.add('wrong');
+        layerInfoDiv[layerInfoReq.val]['msg'].className = 'msg';
+        layerInfoDiv[layerInfoReq.val]['msg'].innerHTML='correct syntax is <br/> '
                 + '<b>Regex:</b> ' + layerInfoReq.regex + '<br/>' 
                 + '<b>Example:</b> ' + layerInfoReq.example;        
     } 
@@ -642,7 +637,6 @@ function featureInfoSetup() {
 
     var featureInfoContents = featureInfoDiv.windowContents;
     var fields = document.createElement('div');
-    fields.id = 'featureInfoFields';
     featureInfoContents.appendChild(fields);
     featureInfoDiv.fields = fields;
 

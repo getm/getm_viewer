@@ -17,7 +17,11 @@ var SHAPE_LAYER = 2; // index of shape layer in map.getLayerGroup()
 declare const CGSWeb_Map; // Config object
 export const map = new ol.Map({ 
     target: 'map',
-    controls: new ol.Collection([new ol.control.FullScreen(), attribution,new ol.control.Zoom()]),
+    controls: new ol.Collection([new ol.control.FullScreen(), attribution,new ol.control.Zoom(), 
+    new ol.control.MousePosition({
+        coordinateFormat: ol.coordinate.createStringXY(4),
+        projection: 'EPSG:4326'
+      })]),
     view: new ol.View({
         projection: ol.proj.get(CGSWeb_Map.Options.map.defaultProjection),
         center: CGSWeb_Map.Options.map.defaultCenter,
@@ -83,7 +87,7 @@ function populateBaseMapLayers() {
         layers.push(layer);
 
         // swap the basemap layer being used
-        $('#' + baseMapConfig.title.replace(/\W/g, '') +'_checkbox').change(function(){
+        $('#' + baseMapConfig.title.replace(/\W/g, '') + '_checkbox').change(function(){
             map.getLayerGroup().getLayers().getArray()[BASEMAP_LAYER] = layer; 
             map.updateSize();
         });         
@@ -91,7 +95,7 @@ function populateBaseMapLayers() {
 
     // default basemap is index 0
     layerGroups.push(layers[0]); 
-    $('#' + CGSWeb_Map.Options.layers.baseMapConfigs[0].title.replace(/\W/g, '') +'_checkbox').click();
+    $('#' + CGSWeb_Map.Options.layers.baseMapConfigs[0].title.replace(/\W/g, '') + '_checkbox').click();
 }
 
 // set the extent to max [-180, -90, 180, 90] and deals with wrap arounds
@@ -616,7 +620,7 @@ function setGlobalShapeLayer(layer){
     setupShapes(); // reflect global shape layer change in getm popup
 }
 
-export function setupMap() {
+export function mapSetup() {
     // map.getView().fit([-117.90295999999988, 35.551014000000066, -117.54647999999992, 35.71793700000006], map.getSize()); // china lake
     populateMap(); // populate layers of map
     

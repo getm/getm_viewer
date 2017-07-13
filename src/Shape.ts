@@ -22,7 +22,13 @@ export var Shape = function(feature, layer, properties={}, objectID=-1){
         return this.properties;
     }
     this.setProperties = function(properties) {
-        this.properties = properties;
+        if(this.properties == undefined || this.properties == {})
+            this.properties = properties;
+        else {
+            for(var property in properties) {
+                this.properties[property] = properties[property];
+            }
+        }
     }
     this.getProperty = function(property){
         if(this.properties == null || this.properties[property] == null)

@@ -6,6 +6,7 @@ import {layerInfoPopup} from './layerinfo'; // to something about this?
 import {globals, windowSetup} from './globals';
 import {map} from './map';
 import {Shape} from './Shape';
+
 const WILDCARD = '*';
 declare const CGSWeb_Map;
 declare const GeoServerRestInterface;
@@ -229,7 +230,6 @@ function catsearchResultsSetup() {
     catsearchResultsDiv = new windowSetup('catsearchResults', 'CATCODE Results');
 
     var catsearchResults = document.createElement('div');
-    //catsearchResults.id = 'catsearchResults';
     catsearchResultsDiv.windowContents.appendChild(catsearchResults);
     document.getElementById('catsearchBtn').onclick = function() {
         $(catsearchResultsDiv.popupText).addClass('show');
@@ -243,7 +243,6 @@ function besearchResultsSetup() {
     besearchResultsDiv = new windowSetup('besearchResults', 'BE Results');
 
     var besearchResults = document.createElement('div');
-    //besearchResults.id = 'besearchResults';
     besearchResultsDiv.windowContents.appendChild(besearchResults);
     document.getElementById('besearchBtn').onclick = function(){
         $(besearchResultsDiv.popupText).addClass('show');
@@ -274,13 +273,12 @@ function getmSetup() {
     div1.appendChild(span2);
 
     var shapeLayerSelect = document.createElement('select');
-    //shapeLayerSelect.id = 'getm-shape-layer-select';
     shapeLayerSelect.className = 'shape-layer-select';
     span2.appendChild(shapeLayerSelect);
 
     var div2 = document.createElement('div');
-    div2.id = 'shapes';
     getmDiv.windowContents.appendChild(div2);
+    getmDiv.shapes = div2;
     setupShapes();
 }
 
@@ -302,7 +300,7 @@ export function setupShapes() {
 
     var shapeEntries = [insertEntries, updateEntries, deleteEntries];
     var shapeActions = ['insertShapes', 'updateShapes', 'deleteShapes']; 
-    var shapesContent = document.getElementById('shapes');
+    var shapesContent = getmDiv.shapes;
     var buttonActions = [insertShapes, updateShapes, deleteShapes];
 
     shapesContent.innerHTML="";

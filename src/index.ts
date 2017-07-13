@@ -1,5 +1,5 @@
 import * as $ from 'jquery';
-import m = require('./map');
+import {mapSetup} from './map';
 import {setup} from './getm';
 import {navSetup} from './nav';
 import {drawSetup} from './draw';
@@ -23,9 +23,9 @@ function setupTopAndBottomBanners() {
     document.getElementById('app').appendChild(bottomBanner);
     $('.securityBanner').css('background-color', CGSWeb_Map.Options.banner_color)
 }
-navSetup();
 setupTopAndBottomBanners();
+navSetup();
 setup();
 drawSetup();
 layerInfoSetup();
-m.setupMap();
+mapSetup();

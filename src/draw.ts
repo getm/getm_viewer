@@ -172,7 +172,6 @@ function drawButtons() {
     var innerText = [ 'rectangle', 'circle', 'freeform', 'polyline', 'polygon', 'ellipse', 'delete'];
     for(var i in innerText) {
         var div = document.createElement('div');
-        //div.id = 'draw' + innerText[i];
 
         var radioInput = document.createElement('input');
         radioInput.setAttribute('type', 'radio');
