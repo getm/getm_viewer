@@ -189,6 +189,7 @@ function populateLayers(){
             layerConfigs.forEach(function(layerConfig){
                 var layer = new ol.layer.Vector({
                     source: new ol.source.Vector({
+                        wrapX: false,
                         format: (layerConfig.version == '1.1.0') ? new ol.format.GML3() : 
                                 (layerConfig.version == '1.0.0') ? new ol.format.GML2() : 
                                 undefined,
