@@ -690,7 +690,6 @@ function copyFeatureInfo() {
     for(var p in properties) {
         str = str + p + ': \t' + properties[p] + '\r\n';
     }    
-   console.log(str);
 
     var $temp = $("<input>");
     $temp.css('white-space', 'pre')

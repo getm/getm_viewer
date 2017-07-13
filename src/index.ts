@@ -4,7 +4,10 @@ import {setup} from './getm';
 import {navSetup} from './nav';
 import {drawSetup} from './draw';
 import {layerInfoSetup} from './layerinfo';
+import {catsearchResultsSetup} from './search';
+import {besearchResultsSetup} from './search';
 import './css/index.css';
+
 declare const CGSWeb_Map; 
 // Expose jQuery so Bootstrap can use it.
 (window as any).$ = $;
