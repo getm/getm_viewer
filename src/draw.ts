@@ -150,22 +150,15 @@ function setupDelete(){
 // creates popup and sets up interactions and buttons
 export function drawSetup() {
     // creates popup
-    document.getElementById('drawButton').onclick = drawPopup;
-    
     drawDiv = new windowSetup('draw', 'Draw');
-    drawDiv.popup.classList.toggle('show');
+    drawDiv.hide();
 
+    document.getElementById('drawButton').onclick = drawDiv.show;
+    
     drawButtons(); // populate draw buttons and functionality
     setupDelete(); // creates delete interaction 
 }
 
-// toggles popup
-function drawPopup() {
-    var drawPopupText = drawDiv.popupText;
-    if(drawPopupText.classList.toggle("show")) {
-        $(drawPopupText.parentElement).zIndex(1);
-    } 
-}
 
 // creates draw buttons and assigns functionality
 function drawButtons() {

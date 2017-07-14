@@ -5,238 +5,12 @@ import {map} from './map';
 import {globals, windowSetup} from './globals';
 import {setupShapes} from './getm';
 import {Shape} from './Shape'
+
 declare const GeoServerRestInterface;
+declare const layerInfoRequirements;
 var required;
 var featureInfoDiv;
 var layerInfoDiv;
-// list of each of the layer info fields
-var layerInfoRequirements = [
-    { // benumber
-        val: 'benumber',
-        type: 'java.lang.String',
-        regex: '[0,1][0-8]\\d{2}[A-Z,-][A-Z,0-9]\\d{4}',
-        example: '1234-12345'
-    },
-    { // osuffix
-        val: 'osuffix',
-        type: 'java.lang.String',
-        regex: '[A-Z]{2}\\d{3}',
-        example: 'DD001'
-    },
-    { // tgt_coor
-        val: 'tgt_coor',
-        type: 'java.lang.String',
-        regex: '^(\\d{1,2}[\\d.]{0,1}\\d{0,3})[NS][ ](\\d{1,3}[\\d.]{0,1}\\d{0,3})[EW]',
-        example: '123456N 1234567E'
-    },
-    { // tgt_name
-        val: 'tgt_name',
-        type: 'java.lang.String',
-        regex: '[A-Z,a-z,0-9,\\s]{1,256}',
-        example: 'SPIRIT OF ST LOUIS AIR PORT'
-    },
-    { // catcode
-        val: 'catcode',
-        type: 'java.lang.String',
-        regex: '\\d{5}',
-        example: '80000'
-    },
-    { // country
-        val: 'country',
-        type: 'java.lang.String',
-        regex: '[A-Z,a-z]{2}',
-        example: 'US'
-    },
-    { // label
-        val: 'label',
-        type: 'java.lang.String',
-        regex: '[A-Z,a-z,0-9]{1,10}',
-        example: 'label'
-    },      
-    { // feat_name
-        val: 'feat_name',
-        type: 'java.lang.String',
-        regex: '[A-Z,a-z,0-9,\\s]{0,254}',
-        example: 'Runway'
-    },
-    { // out_ty
-        val: 'out_ty',
-        type: 'java.lang.String',
-        regex: '[A-Z,a-z,0-9,\\s]{1,50}',
-        example: 'Installation',
-        options: ['Installation', 'Facility', 'Functional Area', 'Critical Element', 'Element', 'Collateral area', 'POI']
-    },
-    { // notional
-        val: 'notional',
-        type: 'java.lang.String',
-        regex: '[A-Z,a-z,0-9,\\s]{1,3}',
-        example: 'Yes',
-        options: ['Yes','No']
-    },
-    { // ce_l
-        val: 'ce_l',
-        type: '[-+]?[0-9]*\\.?[0-9]+',
-        regex: '[A-Z,a-z,0-9]{1,10}',
-        example: '4000'
-    },      
-    { // ce_w
-        val: 'ce_w',
-        type: '[-+]?[0-9]*\\.?[0-9]+',
-        regex: '[A-Z,a-z,0-9]{1,10}',
-        example: '100'
-    },
-    { // ce_h
-        val: 'ce_h',
-        type: 'java.math.BigDecimal',
-        regex: '[-+]?[0-9]*\\.?[0-9]+',
-        example: '0'
-    },
-    { // c_pvchar
-        val: 'c_pvchar',
-        type: 'java.lang.String',
-        regex: '[A-Z,a-z,0-9]{1,20}',
-        example: 'RC'
-    },
-    { // conf_lvl
-        val: 'conf_lvl',
-        type: 'java.lang.String',
-        regex: '[A-Z,a-z,0-9]{1,24}',
-        example: 'Confirmed',
-        options: ['Confirmed', 'Probable', 'Possible']
-    },      
-    { // icod
-        val: 'icod',
-        type: 'java.sql.Timestamp',
-        regex: '([0-1]{0,1}\\d{0,1}[/][0-3]{0,1}\\d{0,1}[/]\\d{4})(?![^\\0])',
-        example: '1/30/2015'
-    },      
-    { // class
-        val: 'class',
-        type: 'java.lang.String',
-        regex: '[A-Z,a-z,0-9,\\s]{1,12}',
-        example: 'UNCLASSIFIED',
-        options: ['UNCLASSIFIED', 'SECRET', ' TOP SECRET']
-    },      
-    { // release
-        val: 'release',
-        type: 'java.lang.String',
-        regex: '[A-Z,a-z,0-9]{1}',
-        example: 'X',
-        options: ['X', 'A', 'B', 'C', 'D']
-    },      
-    { // control
-        val: 'control',
-        type: 'java.lang.String',
-        regex: '[A-Z,a-z,0-9]{1,32}',
-        example: 'control'
-    },      
-    { // drv_from
-        val: 'drv_from',
-        type: 'java.lang.String',
-        regex: '[A-Z,a-z,0-9,\\s]{1,48}',
-        example: 'GEOINT SCG Annex',
-        options: ['GEOINT SCG Annex','TARGET Materials SCG, 3 March 2015']
-    },      
-    { // c_reason
-        val: 'c_reason',
-        type: 'java.lang.String',
-        regex: '[A-Z,a-z,0-9,\\s,\(,\),\.]{1,20}',
-        example: '1.4 (a)(c)(g)',
-        options: ['1.4 (a)(c)(g)']
-    },      
-    { // decl_on
-        val: 'decl_on',
-        type: 'java.lang.String',
-        regex: '[2][5][x][1][,][ ]\\d{8}',
-        example: '25x1, 20400210'             
-    },      
-    { // source
-        val: 'source',
-        type: 'java.lang.String',
-        regex: '[A-Z,a-z,0-9,_]{1,20}',
-        example: '25MAR07IK0101063po'     
-    },      
-    { // c_method
-        val: 'c_method',
-        type: 'java.lang.String',
-        regex: '[A-Z,a-z,0-9,\\s]{1,64}',
-        example: 'Stereo DPPDB collection',
-        options: ['Terrain Corrected Mono Collection', 'Stereo DPPDB collection']  
-    },      
-    { // doi
-        val: 'doi',
-        type: 'java.sql.Timestamp',
-        regex: '([0-1]{0,1}\\d{0,1}[/][0-3]{0,1}\\d{0,1}[/]\\d{4})(?![^\\0])',
-        example: '03/25/2007'     
-    },      
-    { // c_date
-        val: 'c_date',
-        type: 'java.sql.Timestamp',
-        regex: '([0-1]{0,1}\\d{0,1}[/][0-3]{0,1}\\d{0,1}[/]\\d{4})(?![^\\0])',
-        example: '6/13/2017'     
-    },      
-    { // circ_er
-        val: 'circ_er',
-        type: 'java.math.BigDecimal',
-        regex: '-1',
-        example: '-1'     
-    },      
-    { // lin_er
-        val: 'lin_er',
-        type: 'java.math.BigDecimal',
-        regex: '-1',
-        example: '-1'     
-    },      
-    { // producer
-        val: 'producer',
-        type: 'java.lang.Short',
-        regex: '\\d{1,3}',
-        example: '1',
-        options: [1, 2, 3, 4, 5, 6, 7, 8] 
-    },      
-    { // analyst
-        val: 'analyst',
-        type: 'java.lang.String',
-        regex: '[A-Z,a-z,0-9]{1,50}',
-        example: '1234567'    
-    },      
-    { // qc
-        val: 'qc',
-        type: 'java.lang.String',
-        regex: '[A-Z,a-z,0-9]{1,50}',
-        example: '1234567'    
-    },      
-    { // class_by
-        val: 'class_by',
-        type: 'java.lang.String',
-        regex: '[A-Z,a-z,0-9]{1,50}',
-        example: '1234567'    
-    },      
-    { // tot
-        val: 'tot',
-        type: 'java.lang.String',
-        regex: '\\d{4}[Z]',
-        example: '1259Z'    
-    },      
-    { // shape
-        val: 'shape',
-        type: 'com.vividsolutions.jts.geom.Geometry',
-        regex: '[A-Z,a-z,0-9]{1,50}',
-        example: 'shape'       
-    },      
-    { // chng_req
-        val: 'chng_req',
-        type: 'java.lang.String',
-        regex: '[A-Z,a-z,0-9]{1,50}',
-        example: 'ABCD01'  
-    },      
-    { // d_state
-        val: 'd_state',
-        type: 'java.lang.Short',
-        regex: '\\d{1,3}',
-        example: '12'                                                                                                                                                  
-    }            
-];
 
 // returns whether string s follows regex r's pattern
 function matchRegex(r, s) {
@@ -290,8 +64,7 @@ export function layerInfoPopup(){
     // validate information, scroll to top, and display
     layerInfoRequirements.forEach(validateLayerInfo);
     $(layerInfoDiv.windowContents).scrollTop(0);
-    $(layerInfoDiv.popupText).addClass('show');
-    $(layerInfoDiv.popup).zIndex(2);     
+    layerInfoDiv.show();    
 }
 
 // retrieves values from globals.shapes to fill out layerInfo popup
@@ -316,8 +89,7 @@ function assignValues() {
         if(id != undefined && id.length > 0 ) {
             try {
                 validateLayerInfo(layerInfoReq);
-                if(layerInfoDiv[layerInfoReq.val].value.length > 0
-                && !layerInfoDiv[layerInfoReq.val].classList.contains('wrong'))
+                if(layerInfoDiv[layerInfoReq.val].value.length > 0 && !layerInfoDiv[layerInfoReq.val].classList.contains('wrong'))
                     fields[layerInfoReq.val] =  {'val' : layerInfoDiv[layerInfoReq.val].value, 'type': layerInfoReq.type };
             } catch(e) {
                 console.log('exception in assigning ' + layerInfoDiv[layerInfoReq.val].value + ' field ' + layerInfoReq.val);
@@ -479,7 +251,7 @@ export function layerInfoSetup(){
             div.appendChild(select);
             layerInfoDiv[layerInfoReq.val] = select;
         }
-        layerInfoDiv[layerInfoReq.val]['msg'] = msg;
+        layerInfoDiv[layerInfoReq.val].msg = msg;
         var br = document.createElement('br');
         div.appendChild(br);
     });
@@ -497,8 +269,7 @@ export function layerInfoSetup(){
     });
 
     $(layerInfoDiv.close).click(function(){
-        $(featureInfoDiv.popupText).removeClass('show');
-        $(featureInfoDiv.popup).zIndex(-1);  
+        featureInfoDiv.hide();
     }); 
 
     document.onclick = function(e){
@@ -509,10 +280,10 @@ export function layerInfoSetup(){
         }
     }
 
-    function contextMenuSetup() {
+    function contextMenuSetup(e) {
         var contextmenuoptions = ['a', 'b', 'c', 'd'];
         var contextmenufns = [
-            function(){console.log('a')}, 
+            function(){console.log('a'); console.log(map.getEventPixel(e));}, 
             function(){console.log('b')},
             function(){console.log('c')}, 
             function(){console.log('d')}
@@ -553,17 +324,17 @@ export function layerInfoSetup(){
         e.preventDefault();
 
         // move context menu
-        if(contextMenu && contextMenu.parentElement)
-        {
+        if(contextMenu && contextMenu.parentElement) {
+            contextMenu.parentElement.removeChild(contextMenu);
+            contextMenu = contextMenuSetup(e);
             $(contextMenu).css({
                 left: (<MouseEvent>e).clientX,
                 top: (<MouseEvent>e).clientY,
                 position: 'absolute'
             })
-        }
-        // create context menu
-        else {
-            contextMenu = contextMenuSetup();
+        // create context menu            
+        } else {
+            contextMenu = contextMenuSetup(e);
             $(contextMenu).css({
                 left: (<MouseEvent>e).clientX,
                 top: (<MouseEvent>e).clientY,
@@ -576,10 +347,8 @@ export function layerInfoSetup(){
     // on firefox, map.getViewport().addEventListener('click')
     map.getViewport().addEventListener('click', function (e) {
         e.preventDefault();
-        $(featureInfoDiv.popupText).removeClass('show');
-        $(featureInfoDiv.popup).zIndex(-1);  
-        $(layerInfoDiv.popupText).removeClass('show');
-        $(layerInfoDiv.popup).zIndex(-1);  
+        featureInfoDiv.hide();
+        layerInfoDiv.hide();
 
         var featureLayer = map.forEachFeatureAtPixel(map.getEventPixel(e),
             function (feature, layer) {
@@ -620,12 +389,11 @@ function validateLayerInfo(layerInfoReq) {
     // correct 
     if(check) {
         layerInfoDiv[layerInfoReq.val].classList.remove('wrong')
-        layerInfoDiv[layerInfoReq.val]['msg'].innerHTML='';
+        layerInfoDiv[layerInfoReq.val].msg.innerHTML='';
     // incorrect and not marked as wrong
     } else if(!layerInfoDiv[layerInfoReq.val].classList.contains('wrong')) {
         layerInfoDiv[layerInfoReq.val].classList.add('wrong');
-        layerInfoDiv[layerInfoReq.val]['msg'].className = 'msg';
-        layerInfoDiv[layerInfoReq.val]['msg'].innerHTML='correct syntax is <br/> '
+        layerInfoDiv[layerInfoReq.val].msg.innerHTML='correct syntax is <br/> '
                 + '<b>Regex:</b> ' + layerInfoReq.regex + '<br/>' 
                 + '<b>Example:</b> ' + layerInfoReq.example;        
     } 
@@ -636,6 +404,7 @@ function featureInfoSetup() {
     featureInfoDiv = new windowSetup('featureInfo', 'Feature Information');
 
     var featureInfoContents = featureInfoDiv.windowContents;
+    $(featureInfoContents).css('height', '400px');
     var fields = document.createElement('div');
     featureInfoContents.appendChild(fields);
     featureInfoDiv.fields = fields;
@@ -659,27 +428,40 @@ function featureInfoSetup() {
 
 // displays and fills out featureInfo popup
 function featureInfoPopup() {
-    $(featureInfoDiv.popupText).addClass('show');
-    $(featureInfoDiv.popup).zIndex(2);    
+    featureInfoDiv.show();
     featureInfoDiv.fields.innerHTML = ''; // clear off inside
 
     var properties = globals.selectedFeature.getProperties();
     for(var p in properties) {
         var featurediv = document.createElement('div');
+        $(featurediv).css({
+            'position': 'relative',
+            'width': '500px',
+            'display': 'table-row'
+        })
         featureInfoDiv.fields.appendChild(featurediv);
 
         var featurelabel = document.createElement('span');
         featurelabel.innerHTML = p + ':';
+        $(featurelabel).css({
+            'text-align': 'left',
+            'display': 'table-cell',
+        });        
         featurediv.appendChild(featurelabel);
 
         var featureval = document.createElement('input');
         featureval.type = 'text';
         featureval.disabled = true;
         featureval.value = properties[p];
+        $(featureval).css({
+            'text-align': 'left',
+            'display': 'table-cell',
+            'float': 'right',
+            'height': 'inherit'
+        })        
         featurediv.appendChild(featureval);
 
-        $(featureInfoDiv.popup).css('left', window.innerWidth / 2  - $(featureInfoDiv.popup).width()/2);
-        $(featureInfoDiv.popup).css('top', window.innerHeight / 2  - $(featureInfoDiv.popup).height()/2);
+        featureInfoDiv.center();
     }    
 }
 

@@ -1,9 +1,7 @@
 .page-contents{
-    /*padding-top: 20px;  nav bar has height of 50px     */
     top: 20px;
     position:absolute;
     width: 100%;
-    /*padding: 20px;*/
 }
 
 body {

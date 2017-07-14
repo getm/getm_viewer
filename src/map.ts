@@ -15,6 +15,7 @@ var BASEMAP_LAYER = 0; // index of basemap layer in map.getLayerInfoGroup();
 var WFS_LAYER = 1; // index of wfs layer in map.getLayerGroup()
 var SHAPE_LAYER = 2; // index of shape layer in map.getLayerGroup()
 declare const CGSWeb_Map; // Config object
+
 export const map = new ol.Map({ 
     target: 'map',
     controls: new ol.Collection([new ol.control.FullScreen(), attribution,new ol.control.Zoom(), 
@@ -273,59 +274,6 @@ function createSLD(wfsMapConfig){
             + '</FeatureTypeStyle></UserStyle>'
         + '</NamedLayer>'
     + '</StyledLayerDescriptor>';
-}
-
-// TODO: not working yet
-function usingSLDToSpecifyShape(wfsMapConfig) {
-    return '<Rule>' // line rule
-            + '<Filter>'
-                + '<PropertyIsEqualTo>'
-                    + '<Function name="in3">'
-                        + '<Function name="geometryType">'
-                            + '<PropertyName>shape</PropertyName>'
-                        + '</Function>'
-                        + '<Literal>Polyline</Literal>' 
-                        + '<Literal>Polygon</Literal>' 
-                        + '<Literal>Multiline</Literal>'  
-                    + '</Function>'    
-                    + '<Literal>true</Literal>'                   
-                + '</PropertyIsEqualTo>'
-            + '</Filter>'          
-            + '<LineSymbolizer>' 
-                + '<Stroke>'
-                    + '<CssParameter name="stroke">' + rgb2hex(getStyleColor(wfsMapConfig, 'stroke')) + '</CssParameter>'
-                    + '<CssParameter name="stroke-width">' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
-                + '</Stroke>'
-            + '</LineSymbolizer>'
-        + '</Rule>' // end line rule
-
-        + '<Rule>' // point rule
-            // + '<ElseFilter>'
-            + '<Filter>'
-                + '<PropertyIsEqualTo>'
-                    + '<Function name="geometryType">'
-                        + '<PropertyName>shape</PropertyName>'
-                    + '</Function>'
-                    + '<Literal>Point</Literal>'
-                + '</PropertyIsEqualTo>'
-            + '</Filter>' 
-            // + '</ElseFilter>'                  
-            + '<PointSymbolizer>'                
-                + '<Graphic>'
-                    + '<Mark>'
-                        + '<WellKnownName>circle</WellKnownName>'
-                        + '<Stroke>'
-                            + '<CssParameter name="stroke">' + rgb2hex(getStyleColor(wfsMapConfig, 'stroke')) + '</CssParameter>'
-                            + '<CssParameter name="stroke-width">' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
-                        + '</Stroke>'                            
-                        + '<Fill>'
-                            + '<CssParameter name="fill">' + rgb2hex(getStyleColor(wfsMapConfig, 'fill')) + '</CssParameter>'
-                        + '</Fill>'
-                    + '</Mark>'
-                    + '<Size>' + (getStyleWidth(wfsMapConfig) * 2) + '</Size>'
-                + '</Graphic>'
-            + '</PointSymbolizer>'                
-        + '</Rule>'; // end point rule
 }
 
 // Hacky temporary solution for SLD
@@ -621,9 +569,9 @@ function setGlobalShapeLayer(layer){
 }
 
 export function mapSetup() {
-    // map.getView().fit([-117.90295999999988, 35.551014000000066, -117.54647999999992, 35.71793700000006], map.getSize()); // china lake
+    //map.getView().fit([-117.90295999999988, 35.551014000000066, -117.54647999999992, 35.71793700000006], map.getSize()); // china lake
     populateMap(); // populate layers of map
-    
+
     // assign the layers to map
     map.setLayerGroup(new ol.layer.Group({
         layers: layerGroups
@@ -637,10 +585,35 @@ export function mapSetup() {
     // sets map to take over large portion of page
     window.onresize = mapResize;
     mapResize();
+    hover();
+}
+
+function hover() {
+    var hoverInteraction = new ol.interaction.Select({
+        condition: ol.events.condition.pointerMove,
+        layers: layerGroups[SHAPE_LAYER].getLayers().getArray()
+    });
+
+    map.addInteraction(hoverInteraction);
+
+    var style = new ol.style.Style({
+        stroke: new ol.style.Stroke({
+            width: 10
+        })
+    });
+    hoverInteraction.getFeatures().on('add', function (e){
+        var selectedStyle = globals.shapes[e.element.getProperties()['id']].getLayer().getStyle();
+        e.element.setStyle(selectedStyle.clone());
+        e.element.getStyle().getStroke().setWidth(10);
+    });
+    hoverInteraction.getFeatures().on('remove', function (e){
+        e.element.setStyle(undefined);
+    });
+
 }
 
 // fixes firefox issue with canvas resizing and coordinate resetting
 function mapResize() {
-    $('#map').height(window.innerHeight - $('#topBanner').height() - $('#bottomBanner').height() - $('#nav').height() - $('#nav').height());  
+    $(map.getTargetElement()).height(window.innerHeight - $('#topBanner').height() - $('#bottomBanner').height() - $('#nav').height() - $('#nav').height());  
     map.updateSize();
 }

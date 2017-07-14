@@ -109,34 +109,13 @@ select{
     width: 90%;
 }
 
-#debug {
-    padding: 30px;
-}
-
-#debug-contents{
-    height: 400px;
-}
-
-#getmPopupText.popuptext{
-    height: 100%;
-}
-
 #getmPopup.popup{
     position: fixed;
     display: unset;
     width: 50%;
     top:25%;
     left: 25%;
-}
-
-/*#searchFilterPopup.popup{
-    position: fixed;
-    display: unset;
-    top:25%;
-    width: 33%;
-    left: 33%
-}*/
-#layerInfoPopup.popup {
+}#layerInfoPopup.popup {
     width: max-content;
     top: 100px;
     height: max-content;
@@ -147,6 +126,8 @@ select{
 
 #layerInfo-contents {
     height: 400px;
+    width: 100%;
+    left: 0px;
 }
 
 .wrong {
@@ -167,36 +148,9 @@ select{
     left: 0%;
 }
 
-.msg{ 
+.msg { 
     width: 100%;
     overflow-y: auto;
-}
-
-#layerInfo-contents {
-    width: 100%;
-    left: 0px;
-}
-
-#featureInfo-contents {
-    height: 400px;
-}
-
-#featureInfo-contents span {
-    text-align: left;
-    display: table-cell;
-}
-
-#featureInfo-contents div {
-    position: relative;
-    width: 500px;
-    display: table-row;
-}
-
-#featureInfo-contents input {
-    text-align: left;
-    display: table-cell;
-    float: right;
-    height: inherit;
 }
 
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
@@ -298,11 +252,9 @@ select{
     background-color: #646464;
     border-color: #858585;
 }.page-contents{
-    /*padding-top: 20px;  nav bar has height of 50px     */
     top: 20px;
     position:absolute;
     width: 100%;
-    /*padding: 20px;*/
 }
 
 body {

@@ -2,7 +2,7 @@ declare const CGSWeb_Map;
 import './css/nav.css';
 export function navSetup() {
     var nav = document.createElement('nav');
-    nav.className = "navbar";// navbar-inverse";
+    nav.className = "navbar";
     document.getElementById('nav').appendChild(nav);
 
     var navContainer = document.createElement('div');

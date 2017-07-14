@@ -8,14 +8,14 @@ var SHAPES_LAYER = 2;
 const WILDCARD = '*';
 
 // sets up catsearch result window
-export function catsearchResultsSetup() {
+function catsearchResultsSetup() {
     catsearchResultsDiv = new windowSetup('catsearchResults', 'CATCODE Results');
 
     var catsearchResults = document.createElement('div');
     catsearchResultsDiv.windowContents.appendChild(catsearchResults);
     document.getElementById('catsearchBtn').onclick = function() {
-        $(catsearchResultsDiv.popupText).addClass('show');
-        $(catsearchResultsDiv.popup).zIndex(2);     
+        catsearchResultsDiv.show(); 
+        catsearchResultsDiv.center();   
         catsearch();    
     }
 }
@@ -43,14 +43,14 @@ function catsearch() {
 }
 
 // sets up besearch result window
-export function besearchResultsSetup() {
+function besearchResultsSetup() {
     besearchResultsDiv = new windowSetup('besearchResults', 'BE Results');
 
     var besearchResults = document.createElement('div');
     besearchResultsDiv.windowContents.appendChild(besearchResults);
     document.getElementById('besearchBtn').onclick = function(){
-        $(besearchResultsDiv.popupText).addClass('show');
-        $(besearchResultsDiv.popup).zIndex(2);     
+        besearchResultsDiv.show();
+        besearchResultsDiv.center(); 
         besearch();      
     }
 }
@@ -73,4 +73,9 @@ function besearch(){
             }
         }
     }
+}
+
+export function searchResultsSetup() {
+    besearchResultsSetup();
+    catsearchResultsSetup();
 }

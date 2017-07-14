@@ -1,11 +1,11 @@
 import * as $ from 'jquery';
 import {mapSetup} from './map';
-import {setup} from './getm';
+import {getmSetup} from './getm';
 import {navSetup} from './nav';
 import {drawSetup} from './draw';
+import {fileSetup} from './file';
 import {layerInfoSetup} from './layerinfo';
-import {catsearchResultsSetup} from './search';
-import {besearchResultsSetup} from './search';
+import {searchResultsSetup} from './search';
 import './css/index.css';
 
 declare const CGSWeb_Map; 
@@ -28,7 +28,9 @@ function setupTopAndBottomBanners() {
 }
 setupTopAndBottomBanners();
 navSetup();
-setup();
+searchResultsSetup();
+getmSetup();
+fileSetup();
 drawSetup();
 layerInfoSetup();
 mapSetup();

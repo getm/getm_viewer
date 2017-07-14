@@ -61,4 +61,19 @@ export function windowSetup(id, headerTitle=id){
     this.windowContents = windowContents;
 
     $(popup).draggable({cancel: '.window-contents'});
+
+    this.center = function(){
+        $(popup).css('left', window.innerWidth / 2  - $(popup).width()/2);
+        $(popup).css('top', window.innerHeight / 2  - $(popup).height()/2);
+    }
+
+    this.show =  function() {
+        $(popupText).addClass('show');
+        $(popup).zIndex(2); 
+    }
+
+    this.hide =  function() {
+        $(popupText).removeClass('show');
+        $(popup).zIndex(-1); 
+    }
 }
