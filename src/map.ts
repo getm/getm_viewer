@@ -278,16 +278,45 @@ function createSLD(wfsMapConfig){
 
 // Hacky temporary solution for SLD
 function usingConfigsToSpecifyShape(wfsMapConfig) {
+    //http://docs.geoserver.org/stable/en/user/styling/sld/cookbook/lines.html#dashed-line
     return ((wfsMapConfig.shapeType && wfsMapConfig.shapeType.toUpperCase().indexOf('POINT') != -1)
-        ? ('<Rule>' // point rule                
+        ? ('<Rule>' // point rule     
+            + '<PointSymbolizer>'                
+                + '<Graphic>'
+                    + '<Mark>'
+                        + '<WellKnownName>circle</WellKnownName>'
+                        + '<Stroke>' 
+                            + '<CssParameter name="stroke">' + '#000000'/*rgb2hex(getStyleColor(wfsMapConfig, 'stroke'))*/ + '</CssParameter>'
+                            + '<CssParameter name="stroke-width">' + getStyleWidth(wfsMapConfig)*1.5 + '</CssParameter>'
+                            + '<CssParameter name="stroke-linecap">round</CssParameter>'                    
+                        + '</Stroke>'                        
+                    + '</Mark>'
+                    + '<Size>' + (getStyleWidth(wfsMapConfig) * 2) + '</Size>'
+                + '</Graphic>'
+            + '</PointSymbolizer>'        
+            + '<PointSymbolizer>'                
+                + '<Graphic>'
+                    + '<Mark>'
+                        + '<WellKnownName>circle</WellKnownName>'
+                        + '<Stroke>' 
+                            + '<CssParameter name="stroke">' + rgb2hex(getStyleColor(wfsMapConfig, 'stroke')) + '</CssParameter>'
+                            + '<CssParameter name="stroke-width">' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
+                            + '<CssParameter name="stroke-dasharray">' + getStyleWidth(wfsMapConfig) + ' ' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
+                            + '<CssParameter name="stroke-dashoffset">' + getStyleWidth(wfsMapConfig) + '</CssParameter>'       
+                        + '</Stroke>'                        
+                    + '</Mark>'
+                    + '<Size>' + (getStyleWidth(wfsMapConfig) * 2) + '</Size>'
+                + '</Graphic>'
+            + '</PointSymbolizer>'                            
             + '<PointSymbolizer>'                
                 + '<Graphic>'
                     + '<Mark>'
                         + '<WellKnownName>circle</WellKnownName>'
                         + '<Stroke>'
-                            + '<CssParameter name="stroke">' + rgb2hex(getStyleColor(wfsMapConfig, 'stroke')) + '</CssParameter>'
+                            + '<CssParameter name="stroke">' + '#FFFFFF'/*rgb2hex(getStyleColor(wfsMapConfig, 'stroke'))*/ + '</CssParameter>'
                             + '<CssParameter name="stroke-width">' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
-                        + '</Stroke>'                            
+                            + '<CssParameter name="stroke-dasharray">' + getStyleWidth(wfsMapConfig) + ' ' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
+                        + '</Stroke>'                        
                         + '<Fill>'
                             + '<CssParameter name="fill">' + rgb2hex(getStyleColor(wfsMapConfig, 'fill')) + '</CssParameter>'
                         + '</Fill>'
@@ -297,11 +326,27 @@ function usingConfigsToSpecifyShape(wfsMapConfig) {
             + '</PointSymbolizer>'                
         + '</Rule>') // end point rule
 
-        : ('<Rule>' // line rule        
-            + '<LineSymbolizer>' 
+        : ('<Rule>' // line rule
+            + '<LineSymbolizer>' // black border 
+                + '<Stroke>' 
+                    + '<CssParameter name="stroke">' + '#000000'/*rgb2hex(getStyleColor(wfsMapConfig, 'stroke'))*/ + '</CssParameter>'
+                    + '<CssParameter name="stroke-width">' + getStyleWidth(wfsMapConfig)*1.5 + '</CssParameter>'
+                    + '<CssParameter name="stroke-linecap">round</CssParameter>'                    
+                + '</Stroke>'
+            + '</LineSymbolizer>'
+            + '<LineSymbolizer>' // white dashes
+                + '<Stroke>'
+                    + '<CssParameter name="stroke">' + '#FFFFFF'/*rgb2hex(getStyleColor(wfsMapConfig, 'stroke'))*/ + '</CssParameter>'
+                    + '<CssParameter name="stroke-width">' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
+                    + '<CssParameter name="stroke-dasharray">' + getStyleWidth(wfsMapConfig) + ' ' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
+                + '</Stroke>'
+            + '</LineSymbolizer>'
+            + '<LineSymbolizer>' // colored dashes
                 + '<Stroke>'
                     + '<CssParameter name="stroke">' + rgb2hex(getStyleColor(wfsMapConfig, 'stroke')) + '</CssParameter>'
                     + '<CssParameter name="stroke-width">' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
+                    + '<CssParameter name="stroke-dasharray">' + getStyleWidth(wfsMapConfig) + ' ' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
+                    + '<CssParameter name="stroke-dashoffset">' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
                 + '</Stroke>'
             + '</LineSymbolizer>'
         + '</Rule>')); // end line rule 
@@ -365,7 +410,21 @@ function populateWFS() {
                 updateWhileInteracting: true,
                 visible: false,
                 style: (function(feature, resolution){ // function so that styling is dynamic
-                    var style = new ol.style.Style({
+                    var style0 = new ol.style.Style({ // black boarder
+                        stroke: new ol.style.Stroke({
+                            color: 'rgba(0,0,0,1)',
+                            width: getStyleWidth(wfsMapConfig) * 1.5,
+                        }),
+                    });                    
+                    var style1 = new ol.style.Style({ // white tiles
+                        stroke: new ol.style.Stroke({
+                            color: 'rgba(255,255,255,1)',//
+                            width: getStyleWidth(wfsMapConfig),
+                            lineDash: [20,0],
+                            lineCap: 'butt'
+                        }),
+                    });
+                    var style2 = new ol.style.Style({ // white tiles
                         image: new ol.style.Circle({
                             stroke: new ol.style.Stroke({
                                 color: getStyleColor(wfsMapConfig, 'stroke'),
@@ -385,18 +444,21 @@ function populateWFS() {
                         }),
                         stroke: new ol.style.Stroke({
                             color: getStyleColor(wfsMapConfig, 'stroke'),
-                            width: getStyleWidth(wfsMapConfig)
+                            width: getStyleWidth(wfsMapConfig),
+                            lineDash: [20,20],
+                            lineCap: 'butt'
                         }),
                         fill: new ol.style.Fill({
                             color: getStyleColor(wfsMapConfig, 'fill')
                         }),
                     });
-                    var styles = [style];
+                    var styles = [style0,style1, style2];
                     return function(feature, resolution){
-                        style.getText().setText((globals.viewLabels && feature.getProperties()) ? feature.getProperties()[wfsMapConfig.label] : '');
+                        style2.getText().setText((globals.viewLabels && feature.getProperties()) ? feature.getProperties()[wfsMapConfig.label] : '');
                         return styles;
                     }})()
             });
+            
             wfslayer.set('name', wfsMapConfig.wfs.name);
             wfslayer.set('selectable', true);
             wfslayers.push(wfslayer);
@@ -467,7 +529,8 @@ function populateWFS() {
                     }),
                     stroke: new ol.style.Stroke({
                         color: getStyleColor(wfsMapConfig, 'stroke'),
-                        width: getStyleWidth(wfsMapConfig)
+                        width: getStyleWidth(wfsMapConfig),
+                        lineDash: [20,20]
                     }),
                     fill: new ol.style.Fill({
                         color: getStyleColor(wfsMapConfig, 'fill')
