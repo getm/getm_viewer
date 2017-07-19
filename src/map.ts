@@ -420,7 +420,7 @@ function populateWFS() {
                         stroke: new ol.style.Stroke({
                             color: 'rgba(255,255,255,1)',//
                             width: getStyleWidth(wfsMapConfig),
-                            lineDash: [20,0],
+                            lineDash: [10,0],
                             lineCap: 'butt'
                         }),
                     });
@@ -445,7 +445,7 @@ function populateWFS() {
                         stroke: new ol.style.Stroke({
                             color: getStyleColor(wfsMapConfig, 'stroke'),
                             width: getStyleWidth(wfsMapConfig),
-                            lineDash: [20,20],
+                            lineDash: [10,10],
                             lineCap: 'butt'
                         }),
                         fill: new ol.style.Fill({

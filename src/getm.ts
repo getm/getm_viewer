@@ -75,6 +75,7 @@ export function setupShapes() {
 
         var select = document.createElement('select');
         select.multiple = true;
+        select.id = shapeActions[a] + 'Select';
         select.size = 10;
         div1.appendChild(select);
 
