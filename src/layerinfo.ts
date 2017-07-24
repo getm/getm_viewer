@@ -200,7 +200,7 @@ export function layerInfoSetup(){
 
     var wfsLayerInput = document.createElement('input');
     wfsLayerInput.type = "text";
-    wfsLayerInput.disabled = true;
+    wfsLayerInput.readOnly = true;
     div.appendChild(wfsLayerInput);
     layerInfoDiv.layerinfolayerwfs = wfsLayerInput;
 
@@ -451,7 +451,8 @@ function featureInfoPopup() {
 
         var featureval = document.createElement('input');
         featureval.type = 'text';
-        featureval.disabled = true;
+        $(featureval).selectable(true);
+        featureval.readOnly = true;
         featureval.value = properties[p];
         $(featureval).css({
             'text-align': 'left',

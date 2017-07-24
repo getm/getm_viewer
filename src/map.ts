@@ -15,6 +15,7 @@ var BASEMAP_LAYER = 0; // index of basemap layer in map.getLayerInfoGroup();
 var WFS_LAYER = 1; // index of wfs layer in map.getLayerGroup()
 var SHAPE_LAYER = 2; // index of shape layer in map.getLayerGroup()
 declare const CGSWeb_Map; // Config object
+declare const Spinner; // Spinner object
 
 export const map = new ol.Map({ 
     target: 'map',
@@ -384,6 +385,19 @@ function populateWFS() {
     CGSWeb_Map.Options.layers.wfsMapConfigs.forEach(function(wfsMapConfig) {
         // wfs required
         if(wfsMapConfig.wfs != undefined && wfsMapConfig.wfs != {}) {
+            var wfsloader = {};
+            // wfsloader['loading'] = 0;
+            // wfsloader['loaded'] = 0;
+            // wfsloader['spinner']= new Spinner();
+            // var wfstarget = document.createElement('div');
+            // document.getElementById('getmpage').appendChild(wfstarget);
+            // // new ol.format.WFS().writeGetFeature({
+            // //     srsName: 'EPSG:4326',
+            // //     featureNS: '',
+            // //     featurePrefix: 'idk',
+            // //     featureTypes: [],
+            // //     outputFormat: 'application/json'
+            // // })
             var wfslayer = new ol.layer.Vector({
                 source: new ol.source.Vector({
                     format: (wfsMapConfig.wfs.outputFormat == 'gml3') ? new ol.format.GML3() : 
@@ -391,6 +405,7 @@ function populateWFS() {
                             (wfsMapConfig.wfs.outputFormat == 'kml') ? new ol.format.KML() : 
                             new ol.format.GML3(), // default format
                     url: wfsMapConfig.wfs.url ? function(extent,resolution,proj) {
+                        // wfsloader['spinner'].spin(wfstarget);
                         return wfsMapConfig.wfs.hostAddress + wfsMapConfig.wfs.url 
                             + '&version=' + (wfsMapConfig.wfs.version ? wfsMapConfig.wfs.version : defaultVersion)
                             + (wfsMapConfig.wfs.srs ? ('&srs=' + wfsMapConfig.wfs.srs ) : '')
@@ -453,12 +468,10 @@ function populateWFS() {
                         }),
                     });
                     var styles = [style0,style1, style2];
-                    return function(feature, resolution){
-                        style2.getText().setText((globals.viewLabels && feature.getProperties()) ? feature.getProperties()[wfsMapConfig.label] : '');
-                        return styles;
-                    }})()
+                    style2.getText().setText((globals.viewLabels && feature.getProperties()) ? feature.getProperties()[wfsMapConfig.label] : '');
+                    return styles;
+                })()
             });
-            
             wfslayer.set('name', wfsMapConfig.wfs.name);
             wfslayer.set('selectable', true);
             wfslayers.push(wfslayer);
@@ -538,6 +551,38 @@ function populateWFS() {
                 })
             })
         }
+
+        // for wms
+        var wmsloader = {};
+        wmsloader['loading'] = 0;
+        wmsloader['loaded'] = 0;
+        wmsloader['spinner']= new Spinner();
+        var wmstarget = document.createElement('div');
+        document.getElementById('getmpage').appendChild(wmstarget);
+        var wmssrc = wmslayer.getSource();
+        wmssrc.on('tileloadstart', function(){
+            wmsloader['loading']++;
+            wmsloader['spinner'].spin(wmstarget);
+            console.log('tileloadstart');
+        });
+        wmssrc.on('tileloadend', function(){
+            wmsloader['loaded']++;
+            if(wmsloader['loaded'] == wmsloader['loading']){
+                wmsloader['loaded'] = 0;
+                wmsloader['loading'] = 0;
+                wmsloader['spinner'].stop();
+            }
+            console.log('tileloadend');
+        });
+        wmssrc.on('tileloaderror', function(){
+            wmsloader['loaded']++;
+            if(wmsloader['loaded'] == wmsloader['loading']){
+                wmsloader['loaded'] = 0;
+                wmsloader['loading'] = 0;
+                wmsloader['spinner'].stop();
+            }            
+            console.log('tileloaderror');
+        });
         wmslayers.push(wmslayer);
 
         // checkbox will trigger visibility change
