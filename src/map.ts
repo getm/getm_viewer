@@ -281,21 +281,21 @@ function createSLD(wfsMapConfig){
 function usingConfigsToSpecifyShape(wfsMapConfig) {
     //http://docs.geoserver.org/stable/en/user/styling/sld/cookbook/lines.html#dashed-line
     return ((wfsMapConfig.shapeType && wfsMapConfig.shapeType.toUpperCase().indexOf('POINT') != -1)
-        ? ('<Rule>' // point rule     
-            + '<PointSymbolizer>'                
+        ? ('<Rule>' // point rule
+            + '<PointSymbolizer>'
                 + '<Graphic>'
                     + '<Mark>'
                         + '<WellKnownName>circle</WellKnownName>'
                         + '<Stroke>' 
                             + '<CssParameter name="stroke">' + '#000000'/*rgb2hex(getStyleColor(wfsMapConfig, 'stroke'))*/ + '</CssParameter>'
                             + '<CssParameter name="stroke-width">' + getStyleWidth(wfsMapConfig)*1.5 + '</CssParameter>'
-                            + '<CssParameter name="stroke-linecap">round</CssParameter>'                    
-                        + '</Stroke>'                        
+                            + '<CssParameter name="stroke-linecap">round</CssParameter>'
+                        + '</Stroke>'
                     + '</Mark>'
                     + '<Size>' + (getStyleWidth(wfsMapConfig) * 2) + '</Size>'
                 + '</Graphic>'
-            + '</PointSymbolizer>'        
-            + '<PointSymbolizer>'                
+            + '</PointSymbolizer>'
+            + '<PointSymbolizer>'
                 + '<Graphic>'
                     + '<Mark>'
                         + '<WellKnownName>circle</WellKnownName>'
@@ -304,12 +304,12 @@ function usingConfigsToSpecifyShape(wfsMapConfig) {
                             + '<CssParameter name="stroke-width">' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
                             + '<CssParameter name="stroke-dasharray">' + getStyleWidth(wfsMapConfig) + ' ' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
                             + '<CssParameter name="stroke-dashoffset">' + getStyleWidth(wfsMapConfig) + '</CssParameter>'       
-                        + '</Stroke>'                        
+                        + '</Stroke>'
                     + '</Mark>'
                     + '<Size>' + (getStyleWidth(wfsMapConfig) * 2) + '</Size>'
                 + '</Graphic>'
-            + '</PointSymbolizer>'                            
-            + '<PointSymbolizer>'                
+            + '</PointSymbolizer>'
+            + '<PointSymbolizer>'
                 + '<Graphic>'
                     + '<Mark>'
                         + '<WellKnownName>circle</WellKnownName>'
@@ -317,14 +317,14 @@ function usingConfigsToSpecifyShape(wfsMapConfig) {
                             + '<CssParameter name="stroke">' + '#FFFFFF'/*rgb2hex(getStyleColor(wfsMapConfig, 'stroke'))*/ + '</CssParameter>'
                             + '<CssParameter name="stroke-width">' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
                             + '<CssParameter name="stroke-dasharray">' + getStyleWidth(wfsMapConfig) + ' ' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
-                        + '</Stroke>'                        
+                        + '</Stroke>'
                         + '<Fill>'
                             + '<CssParameter name="fill">' + rgb2hex(getStyleColor(wfsMapConfig, 'fill')) + '</CssParameter>'
                         + '</Fill>'
                     + '</Mark>'
                     + '<Size>' + (getStyleWidth(wfsMapConfig) * 2) + '</Size>'
                 + '</Graphic>'
-            + '</PointSymbolizer>'                
+            + '</PointSymbolizer>'
         + '</Rule>') // end point rule
 
         : ('<Rule>' // line rule
@@ -332,7 +332,7 @@ function usingConfigsToSpecifyShape(wfsMapConfig) {
                 + '<Stroke>' 
                     + '<CssParameter name="stroke">' + '#000000'/*rgb2hex(getStyleColor(wfsMapConfig, 'stroke'))*/ + '</CssParameter>'
                     + '<CssParameter name="stroke-width">' + getStyleWidth(wfsMapConfig)*1.5 + '</CssParameter>'
-                    + '<CssParameter name="stroke-linecap">round</CssParameter>'                    
+                    + '<CssParameter name="stroke-linecap">round</CssParameter>'
                 + '</Stroke>'
             + '</LineSymbolizer>'
             + '<LineSymbolizer>' // white dashes
@@ -384,20 +384,14 @@ function populateWFS() {
     var wmslayers = [];
     CGSWeb_Map.Options.layers.wfsMapConfigs.forEach(function(wfsMapConfig) {
         // wfs required
+        var wfsloader;
+        var wmsloader;
         if(wfsMapConfig.wfs != undefined && wfsMapConfig.wfs != {}) {
-            var wfsloader = {};
-            // wfsloader['loading'] = 0;
-            // wfsloader['loaded'] = 0;
-            // wfsloader['spinner']= new Spinner();
-            // var wfstarget = document.createElement('div');
-            // document.getElementById('getmpage').appendChild(wfstarget);
-            // // new ol.format.WFS().writeGetFeature({
-            // //     srsName: 'EPSG:4326',
-            // //     featureNS: '',
-            // //     featurePrefix: 'idk',
-            // //     featureTypes: [],
-            // //     outputFormat: 'application/json'
-            // // })
+            wfsloader = {};
+            wfsloader['spinner']= new Spinner({color: rgb2hex(getStyleColor(wfsMapConfig, 'stroke'))});
+            var target = document.createElement('div');
+            document.getElementById('getmpage').appendChild(target);
+
             var wfslayer = new ol.layer.Vector({
                 source: new ol.source.Vector({
                     format: (wfsMapConfig.wfs.outputFormat == 'gml3') ? new ol.format.GML3() : 
@@ -405,7 +399,7 @@ function populateWFS() {
                             (wfsMapConfig.wfs.outputFormat == 'kml') ? new ol.format.KML() : 
                             new ol.format.GML3(), // default format
                     url: wfsMapConfig.wfs.url ? function(extent,resolution,proj) {
-                        // wfsloader['spinner'].spin(wfstarget);
+                        wfsloader['spinner'].spin(target);
                         return wfsMapConfig.wfs.hostAddress + wfsMapConfig.wfs.url 
                             + '&version=' + (wfsMapConfig.wfs.version ? wfsMapConfig.wfs.version : defaultVersion)
                             + (wfsMapConfig.wfs.srs ? ('&srs=' + wfsMapConfig.wfs.srs ) : '')
@@ -415,10 +409,13 @@ function populateWFS() {
                                 '1.0.0',
                                 (wfsMapConfig.wfs.version ? wfsMapConfig.wfs.version : defaultVersion)).join(',') ;
                     }: undefined,
-                    strategy: ol.loadingstrategy.bbox,
+                    strategy: //ol.loadingstrategy.bbox, 
+                    function(extent, resolution) {
+                        wfsloader['spinner'].stop();
+                        return [extent];
+                    },
                     attributions: [new ol.Attribution({
                         html: '<div style="color:' + getStyleColor(wfsMapConfig) + ';" class="wfs_legend">' + wfsMapConfig.title + '</div>',
-                        
                     })],
                 }),
                 renderBuffer:600,
@@ -430,7 +427,7 @@ function populateWFS() {
                             color: 'rgba(0,0,0,1)',
                             width: getStyleWidth(wfsMapConfig) * 1.5,
                         }),
-                    });                    
+                    });
                     var style1 = new ol.style.Style({ // white tiles
                         stroke: new ol.style.Stroke({
                             color: 'rgba(255,255,255,1)',//
@@ -472,14 +469,16 @@ function populateWFS() {
                     return styles;
                 })()
             });
+
             wfslayer.set('name', wfsMapConfig.wfs.name);
             wfslayer.set('selectable', true);
             wfslayers.push(wfslayer);
             globals.counts[wfsMapConfig.wfs.name] = 0;
         }
-        var wmslayer;
-        // wms
-        if(wfsMapConfig.wms != undefined && wfsMapConfig.wms != {}) {      
+        
+        var wmslayer; // wms
+        if(wfsMapConfig.wms != undefined && wfsMapConfig.wms != {}) {
+            wmsloader = {};
             wmslayer = new ol.layer.Tile({
                 source: new ol.source.TileWMS({
                     url: wfsMapConfig.wms.hostAddress + wfsMapConfig.wms.url,
@@ -495,7 +494,6 @@ function populateWFS() {
                     projection: CGSWeb_Map.Options.map.defaultProjection,
                     attributions: [new ol.Attribution({
                         html: '<div style="color:' + getStyleColor(wfsMapConfig) + ';" class="wfs_legend">' + wfsMapConfig.title + '</div>',
-                        
                     })]  
                 }),
                 visible: false
@@ -553,16 +551,15 @@ function populateWFS() {
         }
 
         // for wms
-        var wmsloader = {};
+        
         wmsloader['loading'] = 0;
         wmsloader['loaded'] = 0;
-        wmsloader['spinner']= new Spinner();
-        var wmstarget = document.createElement('div');
-        document.getElementById('getmpage').appendChild(wmstarget);
+        wmsloader['spinner']= new Spinner({color: rgb2hex(getStyleColor(wfsMapConfig, 'stroke'))});
         var wmssrc = wmslayer.getSource();
         wmssrc.on('tileloadstart', function(){
             wmsloader['loading']++;
-            wmsloader['spinner'].spin(wmstarget);
+            wmsloader['spinner'].spin(target);
+            wfsloader['spinner'].stop();
             console.log('tileloadstart');
         });
         wmssrc.on('tileloadend', function(){
@@ -609,17 +606,14 @@ function populateWFS() {
             wfslayerGroup.getLayers().getArray().forEach(function(layer){
                 (<ol.layer.Vector>layer).getSource().changed();
             });
-            // map.render();
         } else {
             map.getLayerGroup().getLayers().getArray()[WFS_LAYER] = wmslayerGroup;
-            
             wmslayerGroup.getLayers().getArray().forEach(function(layer){
                 (<ol.layer.Layer>layer).getSource().changed();
-            });            
-            // map.render();
+            });
         }
     });
-    
+
     // update map when view labels is toggled
     $('#viewLabelsButton').click(function(){
         globals.viewLabels = !globals.viewLabels;
