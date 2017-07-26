@@ -277,11 +277,8 @@ function createSLD(wfsMapConfig){
     + '</StyledLayerDescriptor>';
 }
 
-// Hacky temporary solution for SLD
-function usingConfigsToSpecifyShape(wfsMapConfig) {
-    //http://docs.geoserver.org/stable/en/user/styling/sld/cookbook/lines.html#dashed-line
-    return ((wfsMapConfig.shapeType && wfsMapConfig.shapeType.toUpperCase().indexOf('POINT') != -1)
-        ? ('<Rule>' // point rule
+function sldPointStyle(wfsMapConfig) {
+    return '<Rule>' // point rule
             + '<PointSymbolizer>'
                 + '<Graphic>'
                     + '<Mark>'
@@ -325,9 +322,11 @@ function usingConfigsToSpecifyShape(wfsMapConfig) {
                     + '<Size>' + (getStyleWidth(wfsMapConfig) * 2) + '</Size>'
                 + '</Graphic>'
             + '</PointSymbolizer>'
-        + '</Rule>') // end point rule
+        + '</Rule>';
+}
 
-        : ('<Rule>' // line rule
+function sldDashedLineStyle(wfsMapConfig) {
+    return '<Rule>' // line rule
             + '<LineSymbolizer>' // black border 
                 + '<Stroke>' 
                     + '<CssParameter name="stroke">' + '#000000'/*rgb2hex(getStyleColor(wfsMapConfig, 'stroke'))*/ + '</CssParameter>'
@@ -350,7 +349,27 @@ function usingConfigsToSpecifyShape(wfsMapConfig) {
                     + '<CssParameter name="stroke-dashoffset">' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
                 + '</Stroke>'
             + '</LineSymbolizer>'
-        + '</Rule>')); // end line rule 
+        + '</Rule>';
+}
+
+function sldLineStyle(wfsMapConfig) {
+    return '<Rule>' // line rule
+            + '<LineSymbolizer>' // black border 
+                + '<Stroke>' 
+                    + '<CssParameter name="stroke">' + rgb2hex(getStyleColor(wfsMapConfig, 'stroke')) + '</CssParameter>'
+                    + '<CssParameter name="stroke-width">' + getStyleWidth(wfsMapConfig) + '</CssParameter>'
+                    + '<CssParameter name="stroke-linecap">round</CssParameter>'
+                + '</Stroke>'
+            + '</LineSymbolizer>'
+        + '</Rule>';
+}
+
+// Hacky temporary solution for SLD
+function usingConfigsToSpecifyShape(wfsMapConfig) {
+    //http://docs.geoserver.org/stable/en/user/styling/sld/cookbook/lines.html#dashed-line
+    return ((wfsMapConfig.shapeType && wfsMapConfig.shapeType.toUpperCase().indexOf('POINT') != -1)
+        ? (sldPointStyle(wfsMapConfig)) //  point rule
+        : (wfsMapConfig.style.dashed ? sldDashedLineStyle(wfsMapConfig) : (sldLineStyle(wfsMapConfig)))); //  line rule 
 }
 
 // retrieves style color for specified layer from configurations
@@ -421,7 +440,7 @@ function populateWFS() {
                 renderBuffer:600,
                 updateWhileInteracting: true,
                 visible: false,
-                style: (function(feature, resolution){ // function so that styling is dynamic
+                style: wfsMapConfig.style.dashed ? (function(feature, resolution){ // function so that styling is dynamic
                     var style0 = new ol.style.Style({ // black boarder
                         stroke: new ol.style.Stroke({
                             color: 'rgba(0,0,0,1)',
@@ -466,6 +485,36 @@ function populateWFS() {
                     });
                     var styles = [style0,style1, style2];
                     style2.getText().setText((globals.viewLabels && feature.getProperties()) ? feature.getProperties()[wfsMapConfig.label] : '');
+                    return styles;
+                })() : (function(feature, resolution){ // function so that styling is dynamic
+                    var style = new ol.style.Style({ // white tiles
+                        image: new ol.style.Circle({
+                            stroke: new ol.style.Stroke({
+                                color: getStyleColor(wfsMapConfig, 'stroke'),
+                                width: getStyleWidth(wfsMapConfig)
+                            }),
+                            fill: new ol.style.Fill({
+                                color: getStyleColor(wfsMapConfig, 'fill')
+                            }),
+                            radius: 5
+                        }),
+                        text: new ol.style.Text({
+                            font: '20px Calibri,sans-serif',
+                            fill: new ol.style.Fill({ color: '#000' }),
+                            // get the text from the feature - `this` is ol.Feature
+                            text: '',
+                            offsetY: -25
+                        }),
+                        stroke: new ol.style.Stroke({
+                            color: getStyleColor(wfsMapConfig, 'stroke'),
+                            width: getStyleWidth(wfsMapConfig),
+                        }),
+                        fill: new ol.style.Fill({
+                            color: getStyleColor(wfsMapConfig, 'fill')
+                        }),
+                    });
+                    var styles = [style];
+                    style.getText().setText((globals.viewLabels && feature.getProperties()) ? feature.getProperties()[wfsMapConfig.label] : '');
                     return styles;
                 })()
             });

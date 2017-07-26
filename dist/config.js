@@ -68,6 +68,7 @@ CGSWeb_Map.Options = {
 					version: '1.1.0',
 				},
 				style: {
+                    dashed: true,
 					stroke: {
 						color: 'rgba(230,100,255,1)',
 						width: 3
