@@ -1,0 +1,507 @@
+@import 'src/bootstrap_settings';
+@import 'src/variables.scss';
+
+$themes: (
+    dark-theme: (
+        accentType: LIGHTEN,
+        backgroundColor: #343434,
+        navColor: #2D2D2D,
+        fontColor: #ccc,
+        tableHighlightColor: #555,
+        borderColor: #555,
+        tier1: lighten(#222, 0%),
+        tier2: lighten(#2B2B2B, 1%),
+        tier3: lighten(#333333, 2%),
+        buttonColor: #444,
+        buttonHighlight: lighten(#343434, 10%),
+        formColor: #333,
+        shadowColor: #222
+    ),
+    light-theme: (
+        accentType: 'DARKEN',
+        backgroundColor: white,
+        navColor: #F2F4F4,
+        fontColor: #333,
+        tableHighlightColor: #E9EAEB,
+        borderColor: #ddd,
+        tier1: #e5e5e5,
+        tier2: #fdfdfd,
+        tier3: white,
+        buttonColor: #F2F4F4,
+        buttonHighlight: darken(#f2f4f4, 10%),
+        formColor: #F2F4F4,
+        shadowColor: #999
+    )
+);
+
+$classExceptions: ('modal_overlay', 'rc-slider-rail', 'leaflet-textbox');
+$exceptionSelector: ();
+@function accent($type, $color, $amount) {
+    @if $type == 'LIGHTEN' {
+        @return lighten($color, $amount);
+    } @else {
+        @return darken($color, $amount);
+    }
+}
+@function subdue($type, $color, $amount) {
+    @if $type == 'LIGHTEN' {
+        @return darken($color, $amount);
+    } @else {
+        @return lighten($color, $amount);
+    }
+}
+
+@each $class in $classExceptions {
+    $exceptionSelector: $exceptionSelector + ':not(.#{$class})';
+}
+
+.theme-exclude {
+    background-color: initial;
+    color: initial;
+    border-color: initial;
+}
+
+@each $theme, $map in $themes {
+    $accentType: map-get($map, accentType);
+    $backgroundColor: map-get($map, backgroundColor);
+    $navColor: map-get($map, navColor);
+    $fontColor: map-get($map, fontColor);
+    $tableHighlightColor: map-get($map, tableHighlightColor);
+    $borderColor: map-get($map, borderColor);
+    $tier1: map-get($map, tier1);
+    $tier2: map-get($map, tier2);
+    $tier3: map-get($map, tier3);
+    $buttonColor: map-get($map, buttonColor);
+    $buttonHighlight: map-get($map, buttonHighlight);
+    $formColor: map-get($map, formColor);
+    $shadowColor: map-get($map, shadowColor);
+
+
+    .#{$theme} {
+
+        .themed#{$exceptionSelector} {
+            background-color: $backgroundColor;
+            color: $fontColor;
+            border-color: $borderColor;
+        }
+
+        .themed-border {
+            border-color: $borderColor;
+        }
+
+        // Tables
+        .data_table__container {
+            color: $fontColor;
+            border-color: $borderColor;
+            background-color: darken($tier3, 2%);
+            .data_table__table {
+                border-color: $borderColor;
+            }
+            .data_table__row{
+                &:hover:not(.data_table__row--selected) {
+                    // background-color: darken($tableHigh`lightColor, 9%);
+                    background-color: subdue($accentType, $tableHighlightColor, 4%);
+                    // color: accent($accentType, $fontColor, 100%);
+                }
+
+                &.data_table__row--selected {
+                    background-color: $tableHighlightColor;
+                }
+            }
+
+        }
+
+        .workflow_container {
+            border-color: $borderColor;
+        }
+
+        fieldset {
+            border-color: $borderColor;
+        }
+        legend {
+            color: $fontColor;
+        }
+
+        .form-control {
+            background-color: lighten($formColor, 5%);
+            border-color: $borderColor;
+            color: $fontColor;
+        }
+
+        .form-control:disabled {
+            background-color: darken($formColor, 2%);
+            border-color: $borderColor;
+            color: #999;
+        }
+
+        select option {
+            background-color: lighten($formColor, 5%);
+        }
+
+        textarea#{$exceptionSelector} {
+            background-color: lighten($formColor, 5%);
+        }
+
+        .progress {
+            background-color: lighten($formColor, 5%);
+        }
+        .progress-bar {
+            color: $fontColor;
+        }
+
+        .input-group-addon {
+            background-color: lighten($formColor, 5%);
+            border-color: $borderColor;
+            color: desaturate($fontColor, 20%);
+        }
+        .input-group-addon.input-group-addon--disabled {
+            color: #999;
+        }
+        .input-group-btn > button {
+            border-color: $borderColor;
+        }
+
+
+        .classification_banner {
+            border-color: $borderColor;
+        }
+
+        .section_indicator {
+            border-color: $borderColor;
+        }
+
+        // Accordion
+        .rc-collapse {
+            border-color: $borderColor;
+            background: $tier1;
+
+        }
+        .rc-collapse > .rc-collapse-item > .rc-collapse-header {
+            background: $tier3;
+            color: $fontColor;
+        }
+
+        .rc-collapse > .rc-collapse-item > .rc-collapse-content {
+            background: $tier2;
+            color: $fontColor;
+        }
+
+        .collapsable-section {
+            background-color: $tier3;
+        }
+        .collapsable-section__content {
+            border-color: $borderColor;
+        }
+
+        .keyboard-shortcuts tbody tr {
+            border-color: $borderColor;
+        }
+
+        .keyboard-shortcuts_monospace {
+            background-color: $buttonHighlight
+        }
+
+        // Buttons
+        .btn.btn-default {
+            background-color: $buttonColor;
+            color: $fontColor;
+            &:hover {
+                background-color: $buttonHighlight
+            }
+            &:disabled:hover {
+                background-color: $buttonColor;
+            }
+        }
+
+        // Bootstrap window close button
+        .close {
+            color: $fontColor;
+            opacity: 0.8;
+            &:hover {
+                opacity: 1;
+            }
+        }
+
+        .dropdown-menu {
+            background-color: $tier2;
+            > li > a {
+                color: $fontColor;
+            }
+            > li > a:hover {
+                background-color: lighten($tier3, 10%);
+            }
+            .dropdown.open > a {
+                background-color: lighten($tier3, 10%);
+            }
+
+            .divider {
+                background-color: $borderColor;
+            }
+        }
+
+        // Navbar
+        .navbar.navbar-default {
+            // border: none;
+            // margin: 0;
+            .open > a.dropdown-toggle {
+                background-color: lighten($navColor, 5%);
+            }
+
+            >.collapse.navbar-collapse {
+                background-color: $navColor;
+                > .nav.navbar-nav > li {
+                    &:not(.disabled) {
+                        &:hover > a {
+                            background-color: lighten($navColor, 5%);
+                        }
+                        &.active {
+                            > a {
+                                background-color: $navColor;
+                                color: $fontColor;
+                                border-bottom: 2px solid $brand-primary;
+                            }
+                            &:hover > a {
+                                background-color: lighten($navColor, 5%);
+                            }
+                        }
+                    }
+                    &.disabled > a {
+                        color: #999;
+                    }
+                    a {
+                        color: $fontColor;
+                    }
+                }
+            }
+        }
+
+        // Tabs
+        .nav.nav-tabs {
+            border-bottom: 2px solid lighten($fontColor, 20%);
+
+            > li {
+                border: none;
+                margin-bottom: -2px;
+
+                &:hover {
+                    &:not(.active) > a {
+                        background-color: lighten($navColor, 10%);
+                        border-top: 1px solid transparent;
+                        border-left: 1px solid transparent;
+                        border-right: 1px solid transparent;
+                    }
+                    > a {
+                        background-color: lighten($navColor, 5%);
+                    }
+                }
+                &:not(.disabled).active > a {
+                    color: $fontColor;
+                    border: 1px solid transparent;
+                    border-bottom: 2px solid $brand-primary;
+                }
+                >a {
+                    background-color: $tier3;
+                    color: $fontColor;
+                    border-bottom: none;
+                }
+            }
+        }
+
+        // Switches
+        .switch__slider {
+            &.switch__slider_checked {
+                // background-color: lighten($brand-primary, 32%);
+                &:before {
+                    background-color: $tier3;
+                }
+            }
+
+            &:not(.switch__slider_checked) {
+                background-color: #bbb;
+                &:before {
+                    background-color: $tier3;
+                }
+            }
+        }
+
+        // Settings bar (below workflow sections)
+
+        .icon-button {
+            > .icon-button__icon_disabled {
+                color: darken($fontColor, 20%);
+            }
+        }
+
+        // Windows
+        .window_container {
+            background-color: $tier2 !important;
+        }
+
+        // Resizer
+        .resizer.resizer_horizontal {
+            background-color: transparent;
+            // border: none;
+            &:hover {
+                border-color: lighten($fontColor, 20%);
+            }
+        }
+
+        .list-group-item:hover:not(.active) {
+            background-color: $buttonHighlight;
+        }
+
+        .list-group-item:not(.active) {
+            background-color: transparent;
+            border-color: $borderColor;
+        }
+
+        // Timeline
+        .vis-timeline {
+            border-color: $borderColor;
+        }
+
+        .vis-time-axis .vis-text {
+            color: $fontColor;
+        }
+
+        .vis-item {
+            background-color: $tier2;
+        }
+
+        // Slide-Out Menu links
+        .slide_out__list{
+            .list-group-item:hover {
+                color: accent($accentType, $fontColor, 100%)
+            }
+        }
+
+        // Slide-Out Menu toggles
+        .cgsweb_banner__bars:hover {
+            color: accent($accentType, $fontColor, 100%)
+        }
+        .cgsweb_banner__bars_closed:hover {
+            color: accent($accentType, $fontColor, 100%)
+        }
+
+        .slide_out__close:hover {
+            color: accent($accentType, $fontColor, 100%)
+        }
+
+        .military-markers__explorer {
+            background-color: $tier3;
+        }
+
+    } // End theme
+} // End each loop
+
+
+// Styles unique to each theme
+
+.light-theme {
+    .image_viewer__status_bar {
+        background-color: gray;
+    }
+    .class-r {
+        background-color: #999;
+        padding: 0px 3px;
+    }
+    .class-sci {
+        background-color: #999;
+        padding: 0px 3px;
+    }
+}
+
+.dark-theme {
+    $backgroundColor: map-get(map-get($themes, dark-theme), backgroundColor);
+    $navColor: map-get(map-get($themes, dark-theme), navColor);
+    $fontColor: map-get(map-get($themes, dark-theme), fontColor);
+    $tableHighlightColor: map-get(map-get($themes, dark-theme), tableHighlightColor);
+    $borderColor: map-get(map-get($themes, dark-theme), borderColor);
+    $tier1: map-get(map-get($themes, dark-theme), tier1);
+    $tier2: map-get(map-get($themes, dark-theme), tier2);
+    $tier3: map-get(map-get($themes, dark-theme), tier3);
+    $buttonColor: map-get(map-get($themes, dark-theme), buttonColor);
+    $buttonHighlight: map-get(map-get($themes, dark-theme), buttonHighlight);
+    $formColor: map-get(map-get($themes, dark-theme), formColor);
+    $shadowColor: map-get(map-get($themes, dark-theme), shadowColor);
+
+    .class-c {
+        color: lighten(blue, 20%) !important;
+    }
+    .btn.btn-default {
+        border-color: #555;
+    }
+    .btn.btn-default:disabled {
+        color: #999;
+    }
+
+    .icon-button__toggled{
+        background: $brand-primary;
+        outline-color: darken($brand-primary, 5%);
+    }
+
+    // Date form
+    .rdtPicker {
+        background-color: $tier3;
+        border-color: $borderColor;
+        th { border-color: $tier3; }
+        .rdtPrev:hover,
+        .rdtNext:hover,
+        .rdtSwitch:hover,
+        .rdtDay:hover,
+        .rdtMonth:hover,
+        .rdtYear:hover,
+        .rdtHour:hover,
+        .rdtMinute:hover,
+        .rdtSecond:hover,
+        .rdtTimeToggle:hover {
+            background: $buttonHighlight;
+        }
+    }
+
+    // Pagination
+    .pagination {
+        li:not(.active) > a {
+            background-color: $tier3;
+            border-color: $borderColor;
+            color: $fontColor;
+            &:hover{
+                background-color: $buttonHighlight;
+            }
+        }
+    }
+
+    .switch__slider {
+        &.switch__slider_checked {
+            background-color: lighten($brand-primary, 8%);
+            &:before {
+                background-color: white
+            }
+        }
+
+        &:not(.switch__slider_checked) {
+            background-color: lighten(#444, 20%);
+            &:before {
+                background-color: white
+            }
+        }
+    }
+
+    .card {
+        box-shadow: 0 1px 2px 0 #292929, 0 0 0 1px #292929;
+    }
+}
+
+// Classification theming
+.class-u {color: $class-u !important; font-weight: bold}
+.class-r {color: $class-r !important; font-weight: bold}
+.class-c {color: $class-c !important; font-weight: bold}
+.class-s {color: $class-s !important; font-weight: bold}
+.class-ts {color: $class-ts !important; font-weight: bold}
+.class-sci {color: $class-sci !important; font-weight: bold}
+.bg-class-u {background-color: $class-u}
+.bg-class-r {background-color: $class-r;}
+.bg-class-c {background-color: $class-c;}
+.bg-class-s {background-color: $class-s}
+.bg-class-ts {background-color: $class-ts}
+.bg-class-sci {background-color: $class-sci}

@@ -1,0 +1,124 @@
+@font-face {
+  font-family: 'icomoon';
+  src:
+    url('fonts/icomoon.ttf?srw8zh') format('truetype'),
+    url('fonts/icomoon.woff?srw8zh') format('woff'),
+    url('fonts/icomoon.svg?srw8zh#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-stack:before {
+  content: "\e900";
+}
+.icon-layers:before {
+  content: "\e900";
+}
+.icon-check:before {
+  content: "\f00c";
+}
+.icon-close:before {
+  content: "\f00d";
+}
+.icon-remove:before {
+  content: "\f00d";
+}
+.icon-times:before {
+  content: "\f00d";
+}
+.icon-cog:before {
+  content: "\f013";
+}
+.icon-gear:before {
+  content: "\f013";
+}
+.icon-pencil:before {
+  content: "\f040";
+}
+.icon-forward:before {
+  content: "\f04e";
+}
+.icon-question-circle:before {
+  content: "\f059";
+}
+.icon-folder-open:before {
+  content: "\f07c";
+}
+.icon-thumb-tack:before {
+  content: "\f08d";
+}
+.icon-arrows-alt:before {
+  content: "\f0b2";
+}
+.icon-chain:before {
+  content: "\f0c1";
+}
+.icon-link:before {
+  content: "\f0c1";
+}
+.icon-floppy-o:before {
+  content: "\f0c7";
+}
+.icon-save:before {
+  content: "\f0c7";
+}
+.icon-bars:before {
+  content: "\f0c9";
+}
+.icon-reorder:before {
+  content: "\f0c9";
+}
+.icon-columns:before {
+  content: "\f0db";
+}
+.icon-rotate-left:before {
+  content: "\f0e2";
+}
+.icon-undo:before {
+  content: "\f0e2";
+}
+.icon-angle-double-left:before {
+  content: "\f100";
+}
+.icon-angle-double-right:before {
+  content: "\f101";
+}
+.icon-angle-double-up:before {
+  content: "\f102";
+}
+.icon-angle-double-down:before {
+  content: "\f103";
+}
+.icon-angle-up:before {
+  content: "\f106";
+}
+.icon-angle-down:before {
+  content: "\f107";
+}
+.icon-circle-o:before {
+  content: "\f10c";
+}
+.icon-keyboard-o:before {
+  content: "\f11c";
+}
+.icon-newspaper-o:before {
+  content: "\f1ea";
+}
+.icon-object-ungroup:before {
+  content: "\f248";
+}

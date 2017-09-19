@@ -1,0 +1,45 @@
+#map:-moz-full-screen {
+    height: 100%;
+}
+
+#map:-webkit-full-screen {
+    height: 100%;
+}
+
+#map:-ms-fullscreen {
+    height: 100%;
+}
+
+#map:fullscreen {
+    height: 100%;
+}
+
+#map .ol-control button {
+    background-color: rgba(40, 40, 40, 0.7);
+    background-repeat: no-repeat;
+}
+
+#map .ol-control button:hover {
+	background-color: rgba(40, 40, 40, 1);
+}
+
+#map .ol-scale-line {
+	background: rgba(40, 40, 40, 0.7);
+}
+
+#map .ol-mouse-position {
+	position: absolute;
+    background: rgba(40, 40, 40, 0.7);
+    border-radius: 4px;
+    color: #eee;
+	padding: 0 2px 0 2px;
+	bottom: 8px;
+	top: auto;
+}
+
+#map .ol-draw>.ol-draw-selected {
+    background-color: rgba(40, 40, 40, 1);
+}
+
+
+

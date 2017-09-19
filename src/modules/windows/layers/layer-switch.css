@@ -1,0 +1,18 @@
+.layers-window-content .form-group {
+    margin-bottom: 0;
+}
+
+.layers-window-content div[class*="col-"] {
+    text-align: center;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.legend {
+    fill: rgba(0,0,0,0);
+}
+
+.layers-window-content .control-label {
+    text-align: center
+}
+

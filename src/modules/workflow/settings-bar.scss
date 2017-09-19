@@ -1,0 +1,55 @@
+@import '~src/variables.scss';
+@import '~src/bootstrap_settings.scss';
+
+.settings-bar {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 0px 10px;
+    // text-align: right;
+    height: $settingsBarSize;
+    background-color: white;
+    border-top: 1px solid #ddd;
+
+    .settings-bar__left {
+        position: absolute;
+        left: 10px;
+    }
+
+    .settings-bar__right {
+        position: absolute;
+        right: 10px;
+    }
+
+    .settings-bar__left > div:not(:first-child) {
+        margin-left: 4px;
+    }
+
+    .settings-bar__right > div:not(:last-child) {
+        margin-right: 4px;
+    }
+}
+
+.settings-bar_vertical {
+    height: 100%;
+    text-align: center;
+    .settings-bar__section {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+
+        > div {
+            margin-top: 2px;
+        }
+    }
+    .icon-button {
+        display: block;
+    }
+}
+
+
+.icon-button__icon.settings-bar__btn_selected {
+    border: 1px solid $brand-primary;
+    border-radius: 05%;
+}

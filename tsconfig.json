@@ -1,5 +1,6 @@
 {
     "compilerOptions": {
+        "baseUrl": "./",
         "outDir": "./source_maps/",
         "sourceMap": true,
         "allowJs": true,
@@ -8,19 +9,29 @@
         "target": "es5",
         "jsx": "react",
         "types": [
+            "classnames",
+            "enzyme",
+            "jest",
+            "react",
+            "react-dom",
             "openlayers"
         ],
         "lib": [
             "dom",
             "es5",
+            "es6",
             "es2015.promise",
             "es2015.iterable"
-        ]
+        ],
+        "experimentalDecorators": true
     },
     "awesomeTypescriptLoaderOptions": {
         "useCache": false
     },
     "include": [
         "./src/**/*"
+    ],
+    "exclude": [
+        "./src/shared/components/DateInput/**"
     ]
 }

@@ -1,0 +1,16 @@
+.settings-bar {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 0px 10px;
+    background-color: white;
+}
+
+.settings-bar > div:not(:last-child) {
+    margin-right: 4px;
+}
+
+.icon-button__icon.settings-bar__btn_selected {
+    border: 1px solid #0072be;
+    border-radius: 05%;
+}
