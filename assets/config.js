@@ -8,7 +8,7 @@ window.CGSWeb_Map = {
 
     validText: "Geospatially Enabled Target Materials",
     
-    baseUrl: "http://localhost:8080/",
+    baseUrl: "http://localhost:9002",
     beUrl: "http://localhost:8080/",
     mdalUrl: "http://localhost:8080/",
     parseMdalUrl: "http://localhost:8080/",

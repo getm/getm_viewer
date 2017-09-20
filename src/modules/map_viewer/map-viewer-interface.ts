@@ -199,6 +199,10 @@ export default class MapViewerInterface {
         return this.featureLayers;
     }
 
+    public clearFeatureLayer() {
+        this.mapInterface.getFeatureLayer().getSource().clear();
+    }
+
     private addListeners() {
         this.mapInterface.on('moveend', (e: ol.MapEvent) => {
             let mapViewState = {projection: 'EPSG:4326', center: e.map.getView().getCenter(), zoom: e.map.getView().getZoom()}
@@ -345,7 +349,18 @@ export default class MapViewerInterface {
                 this.ignoreNextClick = true; // Set flag to ignore "click" event on draw end.
                 draw.setActive(false);
                 this.mapInterface.clearDrawInteraction();
-                this.listeners.fire(Events.CREATE, e.feature);
+                // this.listeners.fire(Events.CREATE, e.feature);
+
+                var polygon_extent = e.feature.getGeometry().getExtent();
+                let selectedFeatures = [];
+                this.mapInterface.getVectorLayers().forEach((layer) => {
+                    layer.getSource().forEachFeatureIntersectingExtent(polygon_extent, function(feature) {
+                        selectedFeatures.push(new ol.format.GeoJSON().writeFeature(feature));
+                    });
+                });
+
+                this.listeners.fire(Events.DOWNLOAD_TOGGLE, selectedFeatures);
+
             }.bind(this));
 
             this.mapInterface.addDrawInteraction(draw);

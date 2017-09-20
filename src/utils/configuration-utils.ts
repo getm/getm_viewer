@@ -24,6 +24,10 @@ export default class ConfigurationUtil {
         return tryGet('bannerColor');
     }
 
+    public static getBaseUrl(): string {
+        return tryGet('baseUrl');
+    }
+
     public static getDefaultProjection(): string {
         return tryGet('defaultProjection');
     }

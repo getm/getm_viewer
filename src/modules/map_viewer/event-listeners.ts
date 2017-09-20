@@ -2,7 +2,8 @@
 const Events = {
     SELECT: 'select',
     CREATE: 'create',
-    LAYERS_TOGGLE: 'layers-toggle'
+    LAYERS_TOGGLE: 'layers-toggle',
+    DOWNLOAD_TOGGLE: 'download-toggle'
 };
 
 export {Events};
